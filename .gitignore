@@ -33,3 +33,6 @@ desktop.ini
 
 # Logs of "Spiel starten.bat"
 /logs/
+
+# A copy of the game with the tuning harness (tools/tuning/setup.sh)
+/tuning-run/

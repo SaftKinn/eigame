@@ -1,6 +1,6 @@
 # ADR 003 — Every food a job (proposal A)
 
-- **Status:** Accepted (grilled 2026-10-24, not built — M2)
+- **Status:** Accepted (grilled 2026-10-24; built in M2 the same day, play-unverified — see the addendum)
 - **Date:** 2026-10-24
 - **Refs:** decision log D10–D12 in `progress.md`, `roadmap.md` M2, `architecture.md` §5.7;
   the boundary of ADR 002; no frames, ADR 001
@@ -92,3 +92,15 @@ sneezes and how long its pause lasts.
   game before building around it (lesson `read-the-installed-library-source`).
 - New content fields for all six; each is read and validated (lesson
   `unwired-knobs-and-silent-fallbacks`), each rule of the core gets its tests (M1's test project).
+
+## Addendum (2026-10-24, built)
+
+Built in M2 the same day (`architecture.md` §5.7), play-unverified. Where the build had to fill
+in what the grill left open: the sneezing pest **stands still** for its pause (point 10 said "a
+pause in attacking" — standing reads clearer, and a walker that walks on would only start
+attacking again); the glue is **two pins** per pair (one pin would let the piece turn); a blow
+tears the glue of the piece it hits, as the cheese or as the piece on it; picking up shows
+cheese strings too, a break does not. First numbers: tomato 15 gold, damage 60, radius 100,
+push 350; cheese tears at 400 (a meatball's 480 tears, an ant's 110 does not); toast takes
+35 %, throws back 90 px; pickle pierces 3; mustard 8 damage, a puddle of radius 70 for 4 s at
+40 % speed; pepper sneezes at 6 hits, 1.2 s pause, 30 px back.

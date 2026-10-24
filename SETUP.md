@@ -40,6 +40,11 @@ repository on this machine has it already (2026-10-24).
 - Red while dragging = it overlaps something; let go anyway and it pops up on top and drops.
 - **Space** (or the button) starts the wave. The food shoots by itself; higher food reaches further
   (the yellow band on the counter shows the reach while you hold a shooter).
+- **Every food has a job** (its shop card says it): **Käse** glues what rests on it — a hard
+  blow tears it off; **Toast** throws attackers back and is shoved less; **Gurke**'s slices go
+  through three pests; **Senf** leaves a puddle that slows walkers; **Pfeffer** makes pests sneeze
+  and pause; **Tomate** shoots nothing — it bursts when a pest touches it and shoves your food
+  (the red circle shows how far while you hold it).
 - **The egg**: lose when it breaks or touches the counter (Theke). On the cutting board (Brett) or on
   the tower it is fine. A wave can't start while it lies on the counter.
 - **F** doubles the speed, **R** restarts.

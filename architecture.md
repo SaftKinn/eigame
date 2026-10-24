@@ -72,16 +72,17 @@ rettet-das-ei/
 │   └── scripts/
 │       ├── Main.cs                 the scene: reports to the core, shows its events; the shop's hand, queries for others
 │       ├── Content/                GameContent — reads res://content/ through the core's loader
-│       ├── Units/                  UnitBody (RigidBody2D: health, shooting, drag state), UnitVisual, HpBar
-│       ├── Enemies/                Enemy (moves, attacks with impulses), EnemyVisual
-│       ├── Combat/                 Projectile (straight with lead, lob with splash)
+│       ├── Units/                  UnitBody (RigidBody2D: health, shooting, bomb, drag state), UnitVisual, HpBar, GlueBonds (the cheese's joints)
+│       ├── Enemies/                Enemy (moves, attacks with impulses, thrown back, sneezes), EnemyVisual
+│       ├── Combat/                 Projectile (straight with lead and pierce, lob with splash), Puddle
 │       ├── Ui/                     Hud (gold, wave, messages, shop, end page; Hud.Anchor), ShopCard, RangeOverlay
-│       ├── Fx/                     Fx (crumbs, numbers), FloatingText
+│       ├── Fx/                     Fx (crumbs, numbers), FloatingText, CheeseStrings
 │       ├── View/                   DrawKit — the stand-in drawings, magenta for unknown keys
 │       └── World/                  KitchenBackdrop
 ├── sim/RettetDasEi.Sim/            the rules core, NO Godot reference (ADR 002; M1)
 │   ├── Content/                    ContentDefs (the JSON's shapes), ContentDb (load + validate), HexColor
-│   └── Rules/                      GameState (gold, shop, waves, phases), GameEvent, WaveSchedule, Shop, Reach
+│   └── Rules/                      GameState (gold, shop, waves, phases), GameEvent, WaveSchedule, Shop, Reach;
+│                                   PestEffects (itch, sneeze, slow), Jobs (Bomb, Glue, Shield, Pierce) — ADR 003
 ├── tests/RettetDasEi.Sim.Tests/    xUnit, runs without Godot; TestContent — the tests' own small content
 ├── docs/                           decisions/ (ADRs), lessons/, conventions.md, art-prompts.md
 ├── tools/hooks/                    check-on-change.sh (Claude Stop hook) + pre-commit
@@ -192,18 +193,32 @@ radius. Life 3 s, gone off screen.
 (`DirectSpaceState`) only in `_PhysicsProcess` — a pick from the mouse is kept as
 `_pendingPick` and done in the next physics step.
 
-### 5.7 Decided, not built: every food a job (ADR 003, M2)
+### 5.7 Every food a job (ADR 003; built in M2, 2026-10-24, play-unverified)
 
-What changes once M2 is built (after M1), all numbers from content:
-- **Tomate** shoots no more: a bomb that bursts at any touch with a pest — damage to pests in its
-  radius, a push without damage to own food (the egg too).
-- **Käse** glues what comes to rest on its top; a hard blow tears it loose (cheese strings); it
-  sticks again at rest; picking up loosens it.
-- **Toast** is a shield wall: a pest striking it is thrown back, the toast takes a share of the push.
-- **Gurke**'s slices pierce up to N pests. **Senf** splashes less and leaves a puddle that slows
-  walkers (puddles don't stack). **Pfeffer** builds an itch; at N hits a pest sneezes — a push back
-  and a pause in attacking.
-- Each shop card names the job in a sentence; in play the job is seen, without frames.
+All numbers from content (§7); the rules are the core's (§6), the physics and the look Godot's.
+- **Tomate** (`bomb`) shoots no more. `UnitBody` asks `Main.PestTouches` every physics step of a
+  wave (a pest's centre within its radius + the tomato's + 8 px); then `Main.Burst`: every pest
+  `Bomb.Hits` takes the damage, every piece of own food gets `Bomb.PushAt` as an impulse away
+  from the centre (tilted 0.4 upward) through `UnitBody.Shove` — no damage, the egg too —, red
+  crumbs, "Platsch!", a shake, the tomato breaks. A held tomato shows its radius (`RangeOverlay`).
+- **Käse** (`glue`): `Units/GlueBonds` (a node of `Main`, `Main.Glue`) looks every physics step at
+  what touches a gluing piece; a piece above its centre and within its width, both slower than
+  `restSpeed`, is pinned by two `PinJoint2D` (softness 0, collisions kept) 30 % of the narrower
+  width apart. Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
+  (`GlueBonds.Blow`); `Glue.Tears` decides; a torn pair waits `regrabSeconds`. `BeginHold`
+  (picking up) and `Break` loosen all of a piece's glue. A tear and a pick-up show
+  `Fx/CheeseStrings`; sticking shows a few yellow crumbs.
+- **Toast** (`shield`): `Enemy.DoStrike` pushes with `Shield.PushOn` (the share), the toast
+  `SpringBack`s (squash, elastic), and the pest is thrown back `throwBack` px (`Enemy.KnockBack`:
+  0.32 s, a hop on the ground or a glide for a flyer) and has to come on again.
+- **Gurke** (`pierce`): a straight shot keeps a list of the pests it hit and flies on while
+  `Pierce.FliesOn`. **Senf** (`puddle`): a lob's impact adds a `Combat/Puddle` on the ground
+  (`Main.AddPuddle`, its own layer under the units); every step each walker's `PestEffects` is
+  cleared and told the puddles it stands in (`Main.ApplyPuddles`: within the puddle's radius + half
+  its own), and it walks at `SpeedFactor`. **Pfeffer** (`itch`): a hit that does not kill calls
+  `Enemy.AddItch`; the pest trembles by `ItchShare`; at a sneeze it is thrown back `push` px,
+  squashes, puffs, says "Hatschi!" and stands still for `pause` seconds.
+- **The shop card** draws the `description` under the name (two lines at most) — keep it short.
 
 ---
 
@@ -227,8 +242,12 @@ a small state, answers with values and appends events.
 - **Pure rules:** `WaveSchedule.Build` (keeps the prototype's `List.Sort`: pests at the same time
   keep their order); `Shop.Refund` (half to even, like Godot's `Mathf.RoundToInt`); `Reach.Of`
   (range by height — the shooter and the range overlay ask it).
-- **Next:** from M2 every effect of proposal A (ADR 003; state per pest: slowed, itching — timers
-  ticked by `Step`); recipes (M3): a function of "which piece rests on which".
+- **The jobs** (ADR 003, M2): `PestEffects` — one per pest, held by `Enemy`: `AddItch` (true at the
+  sneeze; no itch while sneezing), `Step(dt)` (the pause), `ClearPuddles` / `InPuddle`
+  (`SpeedFactor`, the strongest puddle counts); `Bomb.Hits` / `PushAt` (full push at the centre,
+  falling linearly to 0 where the piece's bounding circle leaves the radius), `Glue.Tears`,
+  `Shield.PushOn`, `Pierce.FliesOn`.
+- **Next:** recipes (M3): a function of "which piece rests on which".
 - **What it does not know:** positions in the world beyond what a rule needs, shapes, contacts,
   pictures, the hand. A random decision that is a rule will draw from a seeded `Rng` (none yet).
 
@@ -249,8 +268,11 @@ are English `snake_case`; `name` and `description` are German.
 - `units.json` — food (`UnitDef`): `inShop`, `cost`, `shape` (box, circle, capsule, egg), `width`,
   `height`, `mass`, `friction`, `hp`, `fill`/`accent` (colours of the stand-in), `visual`, and an
   optional `attack` (`AttackDef`: `projectile` straight or lob, `visual`, `damage`, `cooldown`,
-  `range`, `speed`, `splash`, `recoil`). Six in the shop: Käseblock, Toastbrot, Gurken-Kanone,
-  Senfflasche, Pfefferstreuer, Kirschtomate; and the egg (not in the shop).
+  `range`, `speed`, `splash`, `recoil`, `pierce` — and optional `puddle` {`radius`, `seconds`,
+  `slow`} and `itch` {`hits`, `pause`, `push`}); and optional jobs (ADR 003): `bomb` {`damage`,
+  `radius`, `push`}, `glue` {`tearImpulse`, `restSpeed`, `regrabSeconds`}, `shield` {`pushShare`,
+  `throwBack`}. Six in the shop: Käseblock (glue), Toastbrot (shield), Gurken-Kanone (pierce 3),
+  Senfflasche (puddle), Pfefferstreuer (itch), Kirschtomate (bomb); and the egg (not in the shop).
 - `enemies.json` — pests (`EnemyDef`): `movement` (waddle, roll, hop, fly), `radius`, `hp`,
   `speed`, `damage`, `push`, `attackCooldown`, `gold`, colours, `visual`. Ameise, Fleischbällchen,
   Fruchtfliege, Wackelpudding.
@@ -261,7 +283,8 @@ are English `snake_case`; `name` and `description` are German.
 
 Validated: shapes, projectile kinds, movements and sides from fixed lists; positive sizes, mass,
 health, speeds, cooldowns; colours parse; the egg exists and is not in the shop; a wave has
-groups and names known pests. `ContentFilesTests` loads the shipped files and checks that every
+groups and names known pests; the jobs: a bomb has no attack, only a straight shot pierces, only
+a lob leaves a puddle, shares and slows within 0..1. `ContentFilesTests` loads the shipped files and checks that every
 JSON file in the folder is one the loader reads.
 
 ---

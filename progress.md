@@ -8,24 +8,36 @@ Living status document. A milestone counts as done only when its **verification 
 _The only mandatory session-start read from this file (CLAUDE.md ritual). Everything below is
 on-demand._
 
-- **Where we are:** M0 (the prototype) **closed 2026-10-24** — Sezgin played it: "Das Spiel ist
-  cool", but every food feels the same, only the shapes differ. The project is set up like Chief
-  Wants His Cut (architecture, roadmap, skills, hooks, git). ADR 002: a rules core with tests, the
-  physics stays in Godot. **ADR 003** (grilled the same day): every food a job — not built.
-  **M1 built 2026-10-24:** content, gold, shop, waves, phases and range live in the core
-  (`sim/`), play-unverified.
-- **Next:** Sezgin plays one round of M1 (the script in `## Next concrete step`) — nothing may
-  feel different. Then M2 (all six jobs of ADR 003 in one step, his pick).
-- **Open live gates — one:** M1, "nothing changed" (his round).
-- **Tests:** 76, green (`dotnet test tests/RettetDasEi.Sim.Tests`).
+- **Where we are:** M0 and **M1 closed 2026-10-24** (M1: the rules core, his round "hat
+  gepasst"). **M2 built the same day, play-unverified:** every food a job (ADR 003 with its
+  addendum) — Käse glues, Toast throws back, Gurke pierces, Senf puddles, Pfeffer sneezes, Tomate
+  bursts. Headless smoke runs fired every job; a fixed six-food tower wins all five waves —
+  maybe too easy now.
+- **Next:** Sezgin plays M2 (the script in `## Next concrete step`); his words → a tuning round
+  (`/playtest-triage`) or M2 closed. Then M3 (recipes, grill first).
+- **Open live gates — one:** M2, every food a job (his round).
+- **Tests:** 111, green (`dotnet test tests/RettetDasEi.Sim.Tests`).
 - **Git:** local repo on `main`, no remote yet (GitHub when he wants one).
 
 ## Current focus
 
-**M1 — the rules core** (`roadmap.md`, ADR 002): built; its live gate is his round. **Then M2** —
-ADR 003 in one step.
+**M2 — every food a job** (`roadmap.md`, ADR 003): built; its live gate is his round. The first
+numbers are guesses — expect tuning (all in `units.json`).
 
 ## Last session
+
+- **2026-10-24 (M2)** — The six jobs built in one step (his pick). `5daa544`: content fields
+  (`bomb`, `glue`, `shield` on units; `pierce` required, `puddle`, `itch` on attacks), their
+  validation, the core's `PestEffects` and `Jobs` — 111 tests, a mutation check of three rules
+  turned each red (a first try with `if (false)` did not build: warnings are errors). `72b0922`:
+  the Godot side — `Main.Burst`, `GlueBonds` (two `PinJoint2D`, checked in GodotSharp 4.6.2),
+  `Enemy.KnockBack` / `AddItch`, `Puddle`, piercing slices, the job's sentence on the shop card,
+  the tomato's radius. Smoke runs in a scratch copy (a tower built by code, logs per job): glue
+  sticks, puddles, pierces of 2 and 3, a burst hitting pests and shoving the cheese, a meatball
+  sneezing; the toast throwing an ant (39 of 110 push) and a meatball (168 of 480) back; a
+  meatball tearing the egg off the cheese (480 ≥ 400) and the egg falling — no errors. The five
+  shipped waves against a fixed tower of all six (160 gold, placed for free): all won, no pest
+  reached the tower.
 
 - **2026-10-24 (M1)** — The rules core built, one seam at a time, a commit each: `df9ac84`
   (content: `ContentDb` loads through a file reader — `GameContent` in the game —, `HexColor` for
@@ -36,30 +48,24 @@ ADR 003 in one step.
   with the prototype's queue code (pests at the same time keep their order). A mutation check
   turned 4 tests red. A headless smoke run of wave 1 (scratch copy that starts the wave and prints
   events): six ants from the right at 1.0–10.0 s, the egg broken at 22 s, lost once, no errors.
-
-- **2026-10-24 (second session)** — Read this project and Chief Wants His Cut (roadmap,
-  architecture, CLAUDE.md, conventions, settings, hooks, all skills). Set up the same structure
-  here: `architecture.md`, `roadmap.md` (M0–M4 with gates), `docs/conventions.md`,
-  `docs/lessons/` (eleven lessons carried over as priors), `docs/decisions/README.md`, the seven
-  skills rewritten for this game, `.claude/settings.json` with a Stop hook and a pre-commit hook
-  (`tools/hooks/check-on-change.sh`: build; headless boot when content changed; tests once they
-  exist — tried in a scratch copy: a broken JSON and a broken C# file are reported, a commit with
-  a broken JSON is refused, a clean tree is silent). ADR 002 written after his "A". `git init`
-  and the first commits. Then the grill of proposal A (nine questions, all answered) → ADR 003.
-  The new skills could not be called by name in that session (Claude Code loads them at start);
-  the grill followed `grill-me/SKILL.md` by hand.
+  His round: "hat gepasst" — M1 closed.
 
 ## Next concrete step
 
-**Sezgin's round for M1** ("Spiel starten.bat") — does anything feel different from before?
-1. Start: 120 Gold, the egg on the board, the hint at the top.
-2. Buy a Käseblock and sell it straight back from the hand: 120 Gold again. Place one, then sell
-   it: you get its price × its health back.
-3. Push the egg onto the counter and press Space: the wave does not start, the red warning shows.
-4. Build a tower, egg on top, play waves 1–5: "Welle N!", pests from the right/both sides as
-   before, "+N" over a killed pest, "Welle N geschafft! +N Gold", and at the end "Gewonnen!".
-5. One round where the egg falls or breaks: "Das Ei ist kaputt!" with the right reason and count.
-His answer closes M1's live gate (or becomes a fix round); then M2 — ADR 003 in one step.
+**Sezgin's round for M2** ("Spiel starten.bat") — what to look at, food by food:
+1. **Laden:** each card says its job in a sentence — readable, and does it say enough?
+2. **Käse:** put the egg (or anything) on a cheese and wait a moment — yellow crumbs: it sticks.
+   Pick the cheese up: cheese strings, what lay on it falls. In wave 2 a meatball's blow should
+   tear a piece off (strings).
+3. **Toast:** stand one at the front of the tower — an attacker flies back, the toast springs,
+   the tower wobbles less.
+4. **Gurke:** a slice goes through a row of ants. **Senf:** a yellow puddle; ants in it crawl.
+   **Pfeffer:** a pest trembles more and more, then "Hatschi!", a hop back and a pause.
+5. **Tomate:** hold it — the red circle. Lay it in the pests' way: "Platsch!", pests hurt, your
+   food shoved (a tomato beside the egg is a risk).
+6. **Overall:** does each food feel different now? Is one useless or a must? Is it too easy (the
+   smoke run won all five waves with a fixed tower)?
+His words → `/playtest-triage` (tuning in `units.json`) or M2 closed; then M3 (recipes, `/grill-me` first).
 
 ## Decision log
 
@@ -76,6 +82,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D7 | Workflow | **Chief Wants His Cut's**: state on disk, session ritual, ADRs, lessons, max 3 open live gates, seven skills, Stop + pre-commit hook | Sezgin, 2026-10-24: set it up like Chief Wants His Cut |
 | D8 | Language | Docs/code English; the player reads German; chat German; GPT prompts English | As in Chief Wants His Cut; GPT follows English prompts better |
 | D9 | Milestones | **M0 prototype → M1 rules core → M2 every food a job → M3 recipes → M4 look** | The core before the new rules, so they are built test-first; the look after the mechanics |
+| D13 | Building M2 | **A sneezing pest stands still; glue is two pins; the card shows the description** | What the grill left open, filled while building → ADR 003 addendum |
 | D10 | Tomate | **A bomb, no longer a shooter: bursts at any pest's touch; pushes own food, damages none** | Its rolling becomes the job; risk beside the egg → ADR 003 |
 | D11 | Käse, Toast | **Cheese glue that a hard blow tears; toast a shield wall (throw-back, a share of the push)** | Clearly felt jobs for the two blocks → ADR 003 |
 | D12 | Gurke, Senf, Pfeffer; teaching; order | **Pierce N; less splash + a puddle; an itch to N hits; the card's sentence; all six in one step** | His picks in the grill of 2026-10-24 → ADR 003 |
@@ -95,8 +102,8 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | Milestone | Status | Evidence |
 |---|---|---|
 | M0 — the prototype | **Closed 2026-10-24** | Built and played the same day; `dotnet build` green; his verdict: "Das Spiel ist cool. ABER jedes Essen fühlt sich gleich an, nur die Formen unterscheiden sich." |
-| M1 — the rules core | **Built 2026-10-24**, live gate open | 76 tests green; build 0 warnings; headless boot clean; smoke run of wave 1 in a scratch copy — his round open |
-| M2 — every food a job | Grilled → ADR 003; built after M1 | — |
+| M1 — the rules core | **Closed 2026-10-24** | 76 tests green; build 0 warnings; headless boot clean; smoke run of wave 1; his round: "hat gepasst" |
+| M2 — every food a job | **Built 2026-10-24**, live gate open | 111 tests green; build 0 warnings; smoke runs fired every job; a fixed tower wins all five waves — his round open |
 | M3 — recipes | Later | — |
 | M4 — look and feel | Later | — |
 
@@ -106,13 +113,16 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
   drawn figures (2026-10-24). Decide from candidates side by side → its own ADR.
 - **The prototype's playtest questions** of 2026-10-24 that his verdict did not answer one by one:
   is stacking too slippery, sticky or jittery; does the tower topple too easily or never; is the
-  egg on top too safe or too fragile; is "higher shoots further" a real temptation. Ask after M1's
+  egg on top too safe or too fragile; is "higher shoots further" a real temptation. Ask with M2's
   round.
-- **M2's damage:** with the tomato a bomb and the mustard weaker, is there still enough steady
-  damage to clear the waves? First thing to watch in M2's round (ADR 003, consequences).
+- **M2: too easy now?** The feared lack of damage did not show — a fixed six-food tower won all
+  five waves in the smoke run and no pest reached it. If he finds it too easy: more or tougher
+  pests in `waves.json`, not weaker jobs. Note: the cheese glue makes the egg hard to knock off
+  (only a meatball or the pudding tears it).
 
 ## Playtest notes
 
+- **2026-10-24 — M1:** "hat gepasst" — nothing felt different.
 - **2026-10-24 — M0:** "Das Spiel ist cool." Every food feels the same, only the shapes differ →
   M2 (proposal A: every food a job). The figures drawn in code please him. A bug found and fixed in
   the other chat: the shop sat above the screen (`SetAnchorsPreset` alone; now `Hud.Anchor`).
@@ -135,4 +145,5 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
   pictures plug in by visual key. ADR 001. Played by Sezgin the same day (M0 closed).
 - **2026-10-24** — Project set up like Chief Wants His Cut; ADR 002; git; proposal A grilled →
   ADR 003.
-- **2026-10-24** — M1 built: the rules core with 76 tests (see Last session).
+- **2026-10-24** — M1 built: the rules core with 76 tests; played: "hat gepasst".
+- **2026-10-24** — M2 built: every food a job, 111 tests (see Last session).

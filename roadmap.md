@@ -43,7 +43,7 @@ fun, without any frame animation?
 - The Stop hook and the pre-commit hook run the tests.
 - **Built 2026-10-24** (commits `df9ac84`, `c4c6024`): `GameState`, `WaveSchedule`, `Shop`, `Reach`,
   `ContentDb` in the core; 76 tests; a headless smoke run of wave 1 in a scratch copy.
-  *The tests' gate is met; the live gate is open.*
+  **Gate met 2026-10-24:** he played a round — "hat gepasst".
 - **Verification (tests):** the shipped content loads; each kind of bad entry is rejected with a
   message naming file and id; the refund rule; the schedule (times, sides — "both" alternates,
   the first from the right — sorted); every phase change (a wave cannot start with the egg on the
@@ -60,6 +60,9 @@ fun, without any frame animation?
   core's (ADR 002), how strong, how it is seen without frames → ADR 003. *(Done 2026-10-24: ADR 003
   — the tomato a bomb that no longer shoots, cheese glue that tears, toast a shield wall; all six
   built in one step, his pick.)*
+- **Built 2026-10-24** (commits `5daa544`, `72b0922`; ADR 003's addendum): 111 tests; headless
+  smoke runs in a scratch copy fired every job; a fixed six-food tower wins the five waves.
+  *The tests' gate is met; the live gate is open.*
 - **Verification (tests):** each rule of the core with its edge cases — how effects stack, end,
   and meet each other.
 - **Verification (live):** Sezgin can say what each food is for; buying is a choice between jobs;

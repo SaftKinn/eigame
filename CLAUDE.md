@@ -80,9 +80,9 @@ stays in Godot. Godot reports facts (what touches what, where), the core answers
 (how much, how long, whether).
 
 **Where it stands:** the prototype (M0) was played on 2026-10-24 — "das Spiel ist cool", but every
-food feels the same. M1 (the rules core) is built, waiting for his round; then M2 (every food a job — proposal A, grilled
-into ADR 003: the tomato a bomb, cheese glue, toast a shield wall, piercing pickle, mustard puddle,
-pepper sneeze). Plan in `roadmap.md`, design in `architecture.md`. **If a design decision is unclear,
+food feels the same. M1 (the rules core) is closed; M2 (every food a job — ADR 003: the tomato a
+bomb, cheese glue, toast a shield wall, piercing pickle, mustard puddle, pepper sneeze) is built
+and waits for his round; then M3 (recipes). Plan in `roadmap.md`, design in `architecture.md`. **If a design decision is unclear,
 `architecture.md` wins — and if you change a decision, update `architecture.md` in the same
 change.**
 

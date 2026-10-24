@@ -12,7 +12,8 @@ physics stays in Godot ([ADR 002](docs/decisions/002-rules-core-physics-in-godot
 
 Prototype 0.1 (2026-10-24): one kitchen, six kinds of food, four pests, five waves, shop, drag and
 drop, sell, rotate, game over and win; stand-in drawings. **Played 2026-10-24** — fun, but every food
-feels the same. The rules core with its tests (M1) is built; next: every food a job (M2). See
+feels the same. The rules core with its tests (M1) is done; every food a job (M2: glue, shield,
+pierce, puddle, sneeze, bomb) is built and being played. See
 [`progress.md`](progress.md) and [`roadmap.md`](roadmap.md).
 
 ## Getting started

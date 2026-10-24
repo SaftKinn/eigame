@@ -16,15 +16,15 @@ Extend the table with every new folder.
 |---|---|---|
 | `game/scripts/Main.cs` | the scene: reports what the physics saw to `GameState` and shows its events (`ReadEvents`); the shop's hand (buy, move, rotate, sell, drop); the queries pests and shooters ask (`GroundY`, `FindTarget`, `HighestUnit`, `UnitTouching`, `IsBlockedByEnemy`) | 001, 002 |
 | `game/scripts/Content/` | `GameContent` — `res://content/` read through the core's `ContentDb.Load` | 002 |
-| `game/scripts/Units/` | `UnitBody` (`RigidBody2D`: health, shooting, recoil, hold state), `UnitVisual` (picture or stand-in, flash), `HpBar` | 001 |
-| `game/scripts/Enemies/` | `Enemy` (moves along the ground or flies, attacks with impulses — not a body), `EnemyVisual` | 001 |
-| `game/scripts/Combat/` | `Projectile` (straight with lead, lob with splash) | 001 |
+| `game/scripts/Units/` | `UnitBody` (`RigidBody2D`: health, shooting, recoil, the bomb's trigger, `Shove`, `SpringBack`, hold state), `UnitVisual` (picture or stand-in, flash), `HpBar`, `GlueBonds` (the cheese's pins) | 001, 003 |
+| `game/scripts/Enemies/` | `Enemy` (moves along the ground or flies, attacks with impulses — not a body; holds its `PestEffects`, is thrown back, sneezes, slows in puddles), `EnemyVisual` | 001, 003 |
+| `game/scripts/Combat/` | `Projectile` (straight with lead and pierce, lob with splash and puddle, itch), `Puddle` | 001, 003 |
 | `game/scripts/Ui/` | `Hud` (and `Hud.Anchor`), `ShopCard`, `RangeOverlay` | 001 |
 | `game/scripts/Fx/`, `View/`, `World/` | crumbs and numbers; `DrawKit` — the stand-in drawings, magenta for unknown keys; the kitchen backdrop | 001 |
 | `game/content/` | all balancing JSON: `units.json`, `enemies.json`, `waves.json`, `game.json` | 001 |
 | `game/art/units/`, `game/art/enemies/` | pictures by visual key (`docs/art-prompts.md`) | 001 |
 | `sim/RettetDasEi.Sim/Content/` | `ContentDefs`, `ContentDb` (load through a file reader, validate), `HexColor` | 002 |
-| `sim/RettetDasEi.Sim/Rules/` | `GameState` (gold, shop, waves, phases), `GameEvent`, `WaveSchedule`, `Shop` (refund), `Reach` (range by height) | 002 |
+| `sim/RettetDasEi.Sim/Rules/` | `GameState` (gold, shop, waves, phases), `GameEvent`, `WaveSchedule`, `Shop` (refund), `Reach` (range by height); `PestEffects`, `Jobs` (`Bomb`, `Glue`, `Shield`, `Pierce`) | 002, 003 |
 | `tests/RettetDasEi.Sim.Tests/` | xUnit tests for the core; `TestContent` (the tests' own content); `ContentFilesTests` (the shipped files) | 002 |
 | `tools/hooks/` | `check-on-change.sh` (Claude Stop hook), `pre-commit` (git) | — |
 
@@ -72,7 +72,13 @@ Extend the table with every new folder.
   - **Pressure:** a wave's `groups` (`count`, `start`, `interval`, `side`); a pest's `speed`, `hp`,
     `damage`, `attackCooldown`.
   - **Shooters:** `damage`, `cooldown`, `speed`, `splash`, `recoil` (a recoil shoves the shooter
-    itself — a tall light shooter can shoot itself off the tower).
+    itself — a tall light shooter can shoot itself off the tower), `pierce`.
+  - **The jobs (ADR 003):** the tomato's `bomb` (`damage`, `radius`, `push` — mind the egg: a
+    light piece flies far), the cheese's `glue` (`tearImpulse` against the pests' `push`: below
+    it a blow does not tear; `restSpeed`, `regrabSeconds`), the toast's `shield` (`pushShare`,
+    `throwBack`), the mustard's `puddle` (`radius`, `seconds`, `slow` — the speed kept), the
+    pepper's `itch` (`hits`, `pause`, `push`). Keep a `description` to about 40 characters: the
+    shop card shows two lines of it.
 - A new **required** field also goes into every entry of its file — and into `TestContent`, or
   every test fails at load, not at its assertion.
 
@@ -94,7 +100,7 @@ Extend the table with every new folder.
 
 ## Testing
 
-- `dotnet test tests/RettetDasEi.Sim.Tests` — no Godot needed, a few seconds (76 tests on
+- `dotnet test tests/RettetDasEi.Sim.Tests` — no Godot needed, a few seconds (111 tests on
   2026-10-24). Assert exact outcomes with explicit set-up; prefer a tiny scenario that isolates one
   behaviour. Tests don't use the shipped content for logic (`TestContent`, its own small content),
   so tuning never breaks a logic test; `ContentFilesTests` loads the shipped files to validate them.
@@ -103,7 +109,11 @@ Extend the table with every new folder.
   broken`. A boot stays in the build phase; to see a wave run without a person, a **scratch
   copy** of `game/` and `sim/` whose `Main` starts a wave by itself and prints every event, run
   with `--headless --fixed-fps 60 --quit-after 3600` (done for M1 on 2026-10-24) — never such a
-  change in the repo.
+  change in the repo. For M2 the copy also built a tower in `Main._Ready`, put its own wave into
+  its `waves.json` and printed a line where each job fires (`[glue]`, `[bomb]`, `[shield]`,
+  `[sneeze]`, `[pierce]`, `[puddle]`): a job that never prints was never tried.
+- **Warnings are errors in the core:** a mutation that makes code unreachable (`if (false)`)
+  does not build — no test runs, and a grep for "Bestanden" finds nothing. Mutate so it compiles.
 - **A mutation check** shows the tests can fail: break a rule on purpose (in a copy, or restore
   it with `git checkout -- <file>` once it is committed), see which tests turn red, put it back,
   see green again.

@@ -14,7 +14,7 @@ Extend the table with every new folder.
 
 | Path | What | ADR |
 |---|---|---|
-| `game/scripts/Main.cs` | the scene: reports what the physics saw to `GameState` and shows its events (`ReadEvents`); the shop's hand (buy, move, rotate, sell, drop); the queries pests and shooters ask (`GroundY`, `FindTarget`, `HighestUnit`, `UnitTouching`, `IsBlockedByEnemy`) | 001, 002 |
+| `game/scripts/Main.cs` | the scene: reports what the physics saw to `GameState` and shows its events (`ReadEvents`); the shop's hand (buy, move, rotate, sell, drop); the queries pests and shooters ask (`GroundY`, `FindTarget`, `HighestUnit`, `UnitTouching`, `Egg`, `CrowdIndex`) | 001, 002 |
 | `game/scripts/Content/` | `GameContent` — `res://content/` read through the core's `ContentDb.Load` | 002 |
 | `game/scripts/Units/` | `UnitBody` (`RigidBody2D`: health, shooting, recoil, the bomb's trigger, `Shove`, `SpringBack`, hold state), `UnitVisual` (picture or stand-in, flash), `HpBar`, `GlueBonds` (the cheese's pins) | 001, 003 |
 | `game/scripts/Enemies/` | `Enemy` (moves along the ground or flies, attacks with impulses — not a body; holds its `PestEffects`, is thrown back, sneezes, slows in puddles), `EnemyVisual` | 001, 003 |

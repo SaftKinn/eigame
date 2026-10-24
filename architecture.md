@@ -203,8 +203,12 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
   crumbs, "Platsch!", a shake, the tomato breaks. A held tomato shows its radius (`RangeOverlay`).
 - **Käse** (`glue`): `Units/GlueBonds` (a node of `Main`, `Main.Glue`) looks every physics step at
   what touches a gluing piece; a piece above its centre and within its width, both slower than
-  `restSpeed`, is pinned by two `PinJoint2D` (softness 0, collisions kept) 30 % of the narrower
-  width apart. Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
+  `restSpeed`, is pinned by two `PinJoint2D` (softness 0) 30 % of the narrower width apart, **with
+  the pair's own collision off** (`DisableCollision`; pins and contact fighting made a resting
+  stack jump — 836 px/s measured, 0 without). It is seen: a seam of melted cheese (dark rim,
+  drips) on the cheese's face nearest the piece while they are stuck, and while a piece is in the
+  hand over a gluing piece it would rest on, that face glows with "klebt hier" (`GlueBonds._Draw`,
+  `StickTarget` — the same `RestsOnTop` rule as sticking). Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
   (`GlueBonds.Blow`); `Glue.Tears` decides; a torn pair waits `regrabSeconds`. `BeginHold`
   (picking up) and `Break` loosen all of a piece's glue. A tear and a pick-up show
   `Fx/CheeseStrings`; sticking shows a few yellow crumbs.

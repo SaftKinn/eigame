@@ -104,3 +104,10 @@ cheese strings too, a break does not. First numbers: tomato 15 gold, damage 60, 
 push 350; cheese tears at 400 (a meatball's 480 tears, an ant's 110 does not); toast takes
 35 %, throws back 90 px; pickle pierces 3; mustard 8 damage, a puddle of radius 70 for 4 s at
 40 % speed; pepper sneezes at 6 hits, 1.2 s pause, 30 px back.
+
+**After his first round (2026-10-24):** a glued tower jumped and drifted by itself in the build
+phase (his recording). Cause measured: the pins and the pair's contact fought; the pair's
+collision is now off (a resting stack: 836 px/s before, 0 after). At his word the glue is
+**seen**: a seam while stuck and a glowing "klebt hier" while a piece in the hand would stick.
+Glue at the cheese's sides ("vertikal") was asked and put off — "es würde das Spiel aktuell nur
+noch leichter machen".

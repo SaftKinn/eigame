@@ -163,6 +163,9 @@ Extend the table with every new folder.
   without a picture.
 - **Pieces float in the air after something under them broke or was taken** → they are asleep;
   `WakeAll` was not called on that path.
+- **A glued stack jumps or creeps while nothing touches it** → joints and the pair's own contact
+  fight; `DisableCollision` must be true on the glue's pins (lesson
+  `a-joint-and-a-contact-on-one-pair-fight`).
 - **The tower jitters when tall** → more physics ticks or solver iterations, more damping
   (`game.json`) — measure one change at a time (ADR 001, consequences).
 

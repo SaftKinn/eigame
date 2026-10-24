@@ -55,3 +55,6 @@ confirms or refutes them. Lessons learned in this project go under their own hea
 - [grep-q-in-a-pipe-with-pipefail](grep-q-in-a-pipe-with-pipefail.md) — `echo | grep -q` under
   `pipefail` reported a found error as missing (SIGPIPE); match with a here-string, and try every
   check against the failure it is meant to catch.
+- [a-joint-and-a-contact-on-one-pair-fight](a-joint-and-a-contact-on-one-pair-fight.md) — The
+  cheese's pins plus the pair's contact made a resting stack jump (836 px/s); collision off between
+  joined bodies. Measure a resting scene's fastest body before naming a physics cause.

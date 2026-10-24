@@ -73,6 +73,10 @@ Extend the table with every new folder.
     `damage`, `attackCooldown`.
   - **Shooters:** `damage`, `cooldown`, `speed`, `splash`, `recoil` (a recoil shoves the shooter
     itself — a tall light shooter can shoot itself off the tower), `pierce`.
+  - **Stability (ADR 005):** a stack slides when the recoil a second (shots a second × `recoil`)
+    passes grip × mass × 980, and tips over its base when that times the height passes mass ×
+    980 × half the base's width. Food but cheese and egg grips at 0.5 on purpose. Measure with
+    the harness's `--tower=pepperweak` / `pepperstrong` (tilt and drift of the cheese) and `his`.
   - **The jobs (ADR 003):** the tomato's `bomb` (`damage`, `radius`, `push` — mind the egg: a
     light piece flies far), the cheese's `glue` (`tearImpulse` against the pests' `push`: below
     it a blow does not tear; `restSpeed`, `regrabSeconds`), the toast's `shield` (`pushShare`,

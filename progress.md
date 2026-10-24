@@ -15,7 +15,7 @@ on-demand._
   off); the cheese in red wax, only its cut face sticks; "klebt hier" while holding; a picked-up
   piece snaps to the 15° step; "too easy" → harder waves and less gold, aimed at "wave 5 only
   just"; **ADR 004:** pests gang up (a heap), never block each other, flies hunt the egg round
-  the food.
+  the food; **ADR 005:** food but cheese slippery, real recoil — a high stack needs a base.
 - **Next:** Sezgin plays (the script in `## Next concrete step`) — wave 3 first; his words → a
   tuning round (`/playtest-triage`) or M2 closed. Then M3 (recipes, grill first).
 - **Open live gates — one:** M2, every food a job, with the difficulty and ADR 004 (his round).
@@ -72,7 +72,10 @@ numbers are guesses — expect tuning (all in `units.json`).
    the tuning:** waves 1–2 relaxed, from wave 3 the tower has to be good, wave 5 only just — and
    sometimes lost? Less gold now (100 to start, little per kill). **Wave 3 above all** — the
    harness lost it even with all the gold one can have by then.
-7. **Pests (ADR 004):** nobody waits behind anybody any more — does a sneezing or thrown-back pest
+7. **Stability (ADR 005):** without cheese, does a high stack slide? Do shooters jump back when
+   they fire? Do several peppers glued high on a cheese tip a tower on a weak base (a toast)
+   and not on a strong one (a cheese on a cheese)? Is the cheese worth buying now?
+8. **Pests (ADR 004):** nobody waits behind anybody any more — does a sneezing or thrown-back pest
    get passed? Do walkers pile up at the tower and attack together (a heap)? Do flies fly
    round the food to the egg — and bite their way in when it is built in? Is an egg on top now
    too easy a target?
@@ -96,6 +99,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D13 | Building M2 | **A sneezing pest stands still; glue is two pins; the card shows the description** | What the grill left open, filled while building → ADR 003 addendum |
 | D14 | Pests together | **A crowd: walkers push in behind attackers and attack together, drawn as a heap** | His "nicht immer nur einer"; climbing was the costly alternative → ADR 004 |
 | D15 | Flies | **Hunt the egg round the food; after `flyPatience` (2 s) bite what blocks them** | His wish; a built-in egg is worth building → ADR 004 |
+| D16 | Stability | **Food but cheese and egg grips at 0.5; recoil pepper 200, pickle 150, mustard 120** | Height was free and the cheese pointless; his idea: recoil tips a stack on a weak base → ADR 005 |
 | D10 | Tomate | **A bomb, no longer a shooter: bursts at any pest's touch; pushes own food, damages none** | Its rolling becomes the job; risk beside the egg → ADR 003 |
 | D11 | Käse, Toast | **Cheese glue that a hard blow tears; toast a shield wall (throw-back, a share of the push)** | Clearly felt jobs for the two blocks → ADR 003 |
 | D12 | Gurke, Senf, Pfeffer; teaching; order | **Pierce N; less splash + a puddle; an itch to N hits; the card's sentence; all six in one step** | His picks in the grill of 2026-10-24 → ADR 003 |
@@ -129,12 +133,19 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
   is stacking too slippery, sticky or jittery; does the tower topple too easily or never; is the
   egg on top too safe or too fragile; is "higher shoots further" a real temptation. Ask with M2's
   round.
-- **M2: difficulty.** He found it too easy ("ich gewinne eigentlich immer"); tuned the same day
-  (Playtest notes). Open: is wave 5 now "nur knapp" for him? The cheese glue still makes the egg
-  hard to knock off (only a meatball or the pudding tears it).
+- **M2: difficulty for a good builder.** His compact tower (245 gold, rebuilt as `--tower=his`)
+  wins all five waves in the harness and in his game, with gold to spare; the flat harness towers
+  lose early. The harness's measure of "only just" should be his tower, not the flat ones —
+  harder waves 4–5 until it loses wave 5 sometimes? Ask after his round with ADR 005.
 
 ## Playtest notes
 
+- **2026-10-24 — M2, sixth answer:** won again with a compact tower (cheese base, the egg upright
+  between four peppers, a cheese roof, two pickles on top, a toast beside; screenshot) without
+  buying for wave 5. "Der Käseblock ist überflüssig geworden, da man sich ja auch so in die Höhe
+  bauen kann." His idea: real recoil that tips a high stack on a weak base → ADR 005 (slippery
+  food, recoil ×5–30). His tower rebuilt in the harness (`--tower=his`, 245 gold): wins every run,
+  before and after. Open: the waves for a good builder.
 - **2026-10-24 — M2, fifth answer:** "wenn der Pfefferstreuer einen anschießt und er zurück
   genockt wird, sollte eine andere Ameise vorgehen können" — then: "es soll allgemein kein Block
   geben" → walkers never block each other (ADR 004 addendum). Retuned: waves about a quarter

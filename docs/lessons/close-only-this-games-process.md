@@ -15,7 +15,8 @@ one afternoon two of them were a headless export of another project. They had no
 
 - Pick the process by its command line. Chief Wants His Cut also starts with `--path game`, so a
   relative `game` says nothing about which project. **Claude starts this game with the absolute
-  path** (`--path "C:\Users\kings\Desktop\Claude\rettet-das-ei\game"`) and closes what matches it;
+  path** (`--path "C:\Users\kings\Desktop\Projekte\EggGame\game"` — the checkout since 2026-10-25;
+  it was `Desktop\Claude\rettet-das-ei` before) and closes what matches it;
   a game started by "Spiel starten.bat" (relative `--path game`) is two processes: the
   `…_console.exe`, whose parent is the `cmd.exe` running that `.bat`, and the window
   `…_mono_win64.exe`, whose parent is that console exe — so look at the parent **and the
@@ -29,7 +30,7 @@ one afternoon two of them were a headless export of another project. They had no
   $mine = @($all | Where-Object {
       $parent = Cmd $_.ParentProcessId
       $grand = if ($parent) { Cmd $parent.ParentProcessId }
-      $_.CommandLine -match 'rettet-das-ei\\game' -or $parent.CommandLine -match 'rettet-das-ei' -or $grand.CommandLine -match 'rettet-das-ei'
+      $_.CommandLine -match 'EggGame\\game' -or $parent.CommandLine -match 'EggGame' -or $grand.CommandLine -match 'EggGame'
   })
   "$($all.Count) Godot, $($mine.Count) of this game"
   foreach ($p in $mine) { [void](Get-Process -Id $p.ProcessId -ErrorAction SilentlyContinue).CloseMainWindow() }

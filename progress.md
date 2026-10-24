@@ -23,7 +23,8 @@ on-demand._
 - **Open live gates — one:** M2, every food a job, with the difficulty, ADR 004 and ADR 005
   (his round). When a playtest is due, start the game for him (CLAUDE.md).
 - **Tests:** 116, green (`dotnet test tests/RettetDasEi.Sim.Tests`).
-- **Git:** `main`, remote `origin` = github.com/SaftKinn/eigame (since 2026-10-24).
+- **Git:** `main`, remote `origin` = github.com/SaftKinn/eigame (since 2026-10-24); checked out
+  at `C:\Users\kings\Desktop\Projekte\EggGame` (since 2026-10-25).
 
 ## Current focus
 
@@ -31,6 +32,12 @@ on-demand._
 numbers are guesses — expect tuning (all in `units.json`).
 
 ## Last session
+
+- **2026-10-25 (fresh checkout)** — The repo cloned anew into `Desktop\Projekte\EggGame` (the
+  old folder `Desktop\Claude\rettet-das-ei` is gone); the lesson `close-only-this-games-process`
+  now matches `EggGame`. The game started for his M2 round via "Spiel starten.bat": build green
+  (0 warnings), first import fine, no errors in `run.log`. He asked which pests there are (four —
+  answered from `enemies.json`); no playtest words yet, so M2's gate stays open. No code changed.
 
 - **2026-10-24 (M2's rounds with him)** — Six answers of his turned into rounds, each measured,
   committed and the game started for him (details in `## Playtest notes`): the glue's jumping
@@ -41,19 +48,6 @@ numbers are guesses — expect tuning (all in `units.json`).
   (`docs/conventions.md`); his own winning tower rebuilt in it showed the flat towers
   underestimate a good builder (lesson `measure-difficulty-with-his-tower`). Remote added and
   pushed.
-
-- **2026-10-24 (M2)** — The six jobs built in one step (his pick). `5daa544`: content fields
-  (`bomb`, `glue`, `shield` on units; `pierce` required, `puddle`, `itch` on attacks), their
-  validation, the core's `PestEffects` and `Jobs` — 111 tests, a mutation check of three rules
-  turned each red (a first try with `if (false)` did not build: warnings are errors). `72b0922`:
-  the Godot side — `Main.Burst`, `GlueBonds` (two `PinJoint2D`, checked in GodotSharp 4.6.2),
-  `Enemy.KnockBack` / `AddItch`, `Puddle`, piercing slices, the job's sentence on the shop card,
-  the tomato's radius. Smoke runs in a scratch copy (a tower built by code, logs per job): glue
-  sticks, puddles, pierces of 2 and 3, a burst hitting pests and shoving the cheese, a meatball
-  sneezing; the toast throwing an ant (39 of 110 push) and a meatball (168 of 480) back; a
-  meatball tearing the egg off the cheese (480 ≥ 400) and the egg falling — no errors. The five
-  shipped waves against a fixed tower of all six (160 gold, placed for free): all won, no pest
-  reached the tower.
 
 ## Next concrete step
 

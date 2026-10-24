@@ -61,7 +61,7 @@ Runs, unlocks and saves wait for the prototype rule in `CLAUDE.md` (Part 2 of `r
 ## 3. Solution layout
 
 ```
-rettet-das-ei/
+eigame/                             the repo (checked out as Desktop\Projekte\EggGame)
 ├── game/                           Godot project (open THIS folder in the editor)
 │   ├── project.godot               1920×1080, stretch canvas_items, aspect keep; physics 120 Hz, 24 iterations
 │   ├── RettetDasEi.csproj          Godot.NET.Sdk 4.6.2 — physics, hand, view; references the core (ADR 002)

@@ -5,6 +5,19 @@ Older `## Last session` entries and resolved open questions, rotated out of `pro
 
 ## Last session (Verlauf)
 
+- **2026-10-24 (M2)** — The six jobs built in one step (his pick). `5daa544`: content fields
+  (`bomb`, `glue`, `shield` on units; `pierce` required, `puddle`, `itch` on attacks), their
+  validation, the core's `PestEffects` and `Jobs` — 111 tests, a mutation check of three rules
+  turned each red (a first try with `if (false)` did not build: warnings are errors). `72b0922`:
+  the Godot side — `Main.Burst`, `GlueBonds` (two `PinJoint2D`, checked in GodotSharp 4.6.2),
+  `Enemy.KnockBack` / `AddItch`, `Puddle`, piercing slices, the job's sentence on the shop card,
+  the tomato's radius. Smoke runs in a scratch copy (a tower built by code, logs per job): glue
+  sticks, puddles, pierces of 2 and 3, a burst hitting pests and shoving the cheese, a meatball
+  sneezing; the toast throwing an ant (39 of 110 push) and a meatball (168 of 480) back; a
+  meatball tearing the egg off the cheese (480 ≥ 400) and the egg falling — no errors. The five
+  shipped waves against a fixed tower of all six (160 gold, placed for free): all won, no pest
+  reached the tower.
+
 - **2026-10-24 (M1)** — The rules core built, one seam at a time, a commit each: `df9ac84`
   (content: `ContentDb` loads through a file reader — `GameContent` in the game —, `HexColor` for
   Godot's colour check, 45 tests) and `c4c6024` (`GameState` with gold, shop, waves, phases and

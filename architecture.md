@@ -178,7 +178,8 @@ radius. Life 3 s, gone off screen.
 - **Buy:** press a shop card in the build phase with enough gold → the gold is paid and the piece
   is in the hand **→ core (M1: the payment)**. The physics state of a held piece is frozen and
   collides with nothing; it follows the mouse (kept above the counter), rotated by the wheel or
-  Q/E in steps of 15°.
+  Q/E in steps of 15°. A piece picked up crooked is snapped to the nearest step at once, so it can
+  always be turned back to exactly level or upright (his word, 2026-10-24).
 - **Overlap:** a held piece that overlaps something is tinted red; let go anyway, it is moved up
   until it is free and drops the last few pixels.
 - **Sell:** let go over the shop. Still in the hand since it was bought: the full price; placed
@@ -202,13 +203,15 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
   from the centre (tilted 0.4 upward) through `UnitBody.Shove` — no damage, the egg too —, red
   crumbs, "Platsch!", a shake, the tomato breaks. A held tomato shows its radius (`RangeOverlay`).
 - **Käse** (`glue`): `Units/GlueBonds` (a node of `Main`, `Main.Glue`) looks every physics step at
-  what touches a gluing piece; a piece above its centre and within its width, both slower than
-  `restSpeed`, is pinned by two `PinJoint2D` (softness 0) 30 % of the narrower width apart, **with
-  the pair's own collision off** (`DisableCollision`; pins and contact fighting made a resting
-  stack jump — 836 px/s measured, 0 without). It is seen: a seam of melted cheese (dark rim,
-  drips) on the cheese's face nearest the piece while they are stuck, and while a piece is in the
-  hand over a gluing piece it would rest on, that face glows with "klebt hier" (`GlueBonds._Draw`,
-  `StickTarget` — the same `RestsOnTop` rule as sticking). Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
+  what touches a gluing piece. **Only the cut face sticks** — the cheese's own top, drawn bare
+  while the rest is in red wax (`DrawKit`) — and only while it faces up (tilted less than 45°): a
+  piece over that face, both slower than `restSpeed`, is pinned by two `PinJoint2D` (softness 0)
+  30 % of the narrower width apart, **with the pair's own collision off** (`DisableCollision`;
+  pins and contact fighting made a resting stack jump — 836 px/s measured, 0 without). An upright
+  or upside-down cheese glues nothing. Sticking shows yellow crumbs; while a piece is in the hand
+  over a cut face it would rest on, that face glows with "klebt hier" (`GlueBonds._Draw`,
+  `StickTarget` — the same `RestsOnTop` rule as sticking). A seam drawn while stuck was tried and
+  taken out at his word. Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
   (`GlueBonds.Blow`); `Glue.Tears` decides; a torn pair waits `regrabSeconds`. `BeginHold`
   (picking up) and `Break` loosen all of a piece's glue. A tear and a pick-up show
   `Fx/CheeseStrings`; sticking shows a few yellow crumbs.

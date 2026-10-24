@@ -111,3 +111,8 @@ collision is now off (a resting stack: 836 px/s before, 0 after). At his word th
 **seen**: a seam while stuck and a glowing "klebt hier" while a piece in the hand would stick.
 Glue at the cheese's sides ("vertikal") was asked and put off — "es würde das Spiel aktuell nur
 noch leichter machen".
+
+**After his second round (2026-10-24):** his screenshot showed upright cheeses glued by their
+sides; he wants no side gluing and the seam "wie vorher" (gone). Now the cheese wears a red wax
+rind and **only its cut face sticks, while it faces up** (within 45°) — point 4's "top" is the
+cheese's own top, not the world's. The "klebt hier" preview stays.

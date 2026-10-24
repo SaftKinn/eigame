@@ -496,7 +496,9 @@ public partial class Main : Node2D
         _held = unit;
         _heldIsNew = isNew;
         _grabOffset = isNew ? Vector2.Zero : unit.GlobalPosition - mouse;
-        _heldRotation = unit.GlobalRotation;
+        // Snapped to the rotate step: a piece picked up crooked can be turned back to exactly
+        // level or upright with Q/E or the wheel (his word, 2026-10-24).
+        _heldRotation = Mathf.Snapped(unit.GlobalRotation, RotateStep);
         unit.BeginHold();
         WakeAll();
     }

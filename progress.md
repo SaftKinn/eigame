@@ -12,8 +12,10 @@ on-demand._
   gepasst"). **M2 built the same day, play-unverified:** every food a job (ADR 003 with its
   addendum) — Käse glues, Toast throws back, Gurke pierces, Senf puddles, Pfeffer sneezes, Tomate
   bursts. Headless smoke runs fired every job; a fixed six-food tower wins all five waves —
-  maybe too easy now. **His first round** found a glued tower jumping by itself: fixed (the
-  pair's collision off, measured calm), and the glue is now seen (seam, "klebt hier" preview).
+  maybe too easy now (his second round: won with a big glued tower). Fixed after his rounds: a
+  glued tower jumping by itself (the pair's collision off, measured calm); the cheese in red wax,
+  only its cut face sticks, while facing up; "klebt hier" while holding; a picked-up piece snaps
+  to the 15° step.
 - **Next:** Sezgin plays M2 (the script in `## Next concrete step`); his words → a tuning round
   (`/playtest-triage`) or M2 closed. Then M3 (recipes, grill first).
 - **Open live gates — one:** M2, every food a job (his round).
@@ -55,10 +57,11 @@ numbers are guesses — expect tuning (all in `units.json`).
 
 **Sezgin's round for M2** ("Spiel starten.bat") — what to look at, food by food:
 1. **Laden:** each card says its job in a sentence — readable, and does it say enough?
-2. **Käse:** hold a piece over a cheese — the top glows, "klebt hier". Let go and wait a moment —
-   a seam of melted cheese appears: it sticks. Does a glued tower now stay still in the build
-   phase (the jumping is fixed)? Pick the cheese up: cheese strings, what lay on it falls. In
-   wave 2 a meatball's blow should tear a piece off (strings, the seam gone).
+2. **Käse:** red wax all round, only the yellow cut face on top sticks. Hold a piece over it — the
+   cut face glows, "klebt hier"; let go, yellow crumbs: it sticks. A cheese stood upright or upside
+   down sticks nothing. Does a glued tower stay still in the build phase? Pick the cheese up:
+   cheese strings, what lay on it falls. In wave 2 a meatball's blow should tear a piece off.
+   **Turning:** pick up a crooked piece — Q/E brings it back to exactly level or upright.
 3. **Toast:** stand one at the front of the tower — an attacker flies back, the toast springs,
    the tower wobbles less.
 4. **Gurke:** a slice goes through a row of ants. **Senf:** a yellow puddle; ants in it crawl.
@@ -124,6 +127,11 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 
 ## Playtest notes
 
+- **2026-10-24 — M2, second round:** won all five waves with a big glued tower (screenshot).
+  "Der Klebebalken gefällt mir doch nicht ganz, mach es wie vorher" → seam out. "Seitliche
+  Verklebung soll doch nicht gehen … als wäre er in seiner Wachsschale" → wax rind, only the cut
+  face sticks, while facing up. "Wenn man ein Bauteil aufhebt … wieder senkrecht ausgerichtet
+  werden kann" → the held rotation snaps to the 15° step.
 - **2026-10-24 — M2, first round:** "manchmal springt der Turm … die Physik passt nicht immer.
   Vorher ist auch mal der Turm in die Höhe geflogen." His recording: a glued cheese tower
   wobbling and sliding by itself in the build phase → the glue's pins fought the pair's contact

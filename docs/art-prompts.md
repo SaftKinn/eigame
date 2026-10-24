@@ -34,7 +34,7 @@ whole shape: the physics uses the shape, not the picture.
 ## Per unit (add after the base style)
 
 - **egg:** "A raw white chicken egg lying on its side, nervous worried face looking right. Aspect ratio 3:2, wide."
-- **cheese:** "A wide flat block of yellow Swiss cheese with holes, brave smiling face looking right. Very wide aspect ratio 8:3."
+- **cheese:** "A wide flat block of yellow cheese wrapped in a glossy red wax rind on its bottom, left and right sides; only the top is a bare cut face with holes. Brave smiling face looking right. Very wide aspect ratio 8:3." (Only the cut face sticks — the wax must make that obvious, ADR 003.)
 - **toast:** "A thick square slice of toast bread with golden crust, calm smiling face looking right. Almost square."
 - **pickle:** "A green pickle lying horizontally like a cannon barrel, determined face looking right. Wide aspect ratio 11:4."
 - **mustard:** "A tall thin yellow mustard squeeze bottle with a red cap, cheeky face looking right. Tall aspect ratio 2:5."

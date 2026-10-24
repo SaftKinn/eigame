@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Godot;
+using RettetDasEi.Sim;
 
 namespace RettetDasEi;
 
@@ -26,7 +27,7 @@ public partial class Projectile : Node2D
         Vector2 aim = target.GlobalPosition;
         if (_lob)
         {
-            float g = ContentDb.Game.LobGravity;
+            float g = GameContent.Db.Game.LobGravity;
             float time = Mathf.Clamp(from.DistanceTo(aim) / 550f, 0.55f, 1.3f);
             Vector2 goal = aim + target.Velocity * time;
             if (!target.IsFlyer)
@@ -47,7 +48,7 @@ public partial class Projectile : Node2D
             return;
         float dt = (float)delta;
         if (_lob)
-            _velocity.Y += ContentDb.Game.LobGravity * dt;
+            _velocity.Y += GameContent.Db.Game.LobGravity * dt;
         Position += _velocity * dt;
         _spin += dt * 14f;
         _life -= dt;

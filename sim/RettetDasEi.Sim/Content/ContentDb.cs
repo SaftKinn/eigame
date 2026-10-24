@@ -1,23 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Godot;
-using FileAccess = Godot.FileAccess;
 
-namespace RettetDasEi;
+namespace RettetDasEi.Sim;
 
 /// <summary>
-/// Loads and checks game/content/*.json once at start. Anything wrong stops the game with a
-/// message naming the file and the field — never a silent default.
+/// Loads and checks game/content/*.json once at start. Anything wrong throws with a message naming
+/// the file and the field — never a silent default. The files are read through a function, so the
+/// game (Godot's FileAccess on res://content/) and the tests (plain files) load the same way.
 /// </summary>
-public static class ContentDb
+public sealed class ContentDb
 {
-    public static GameDef Game { get; private set; } = null!;
-    public static List<UnitDef> Units { get; private set; } = new();
-    public static List<EnemyDef> Enemies { get; private set; } = new();
-    public static List<WaveDef> Waves { get; private set; } = new();
+    public const string GameFile = "game.json";
+    public const string UnitsFile = "units.json";
+    public const string EnemiesFile = "enemies.json";
+    public const string WavesFile = "waves.json";
+
+    /// <summary>Every file the loader reads; a JSON file in game/content/ that is not here is a mistake.</summary>
+    public static readonly IReadOnlyList<string> Files = new[] { GameFile, UnitsFile, EnemiesFile, WavesFile };
+
+    public GameDef Game { get; }
+    public IReadOnlyList<UnitDef> Units { get; }
+    public IReadOnlyList<EnemyDef> Enemies { get; }
+    public IReadOnlyList<WaveDef> Waves { get; }
 
     static readonly JsonSerializerOptions Options = new()
     {
@@ -32,39 +36,50 @@ public static class ContentDb
     static readonly string[] Movements = { "waddle", "roll", "hop", "fly" };
     static readonly string[] Sides = { "left", "right", "both" };
 
-    public static void Load()
+    ContentDb(GameDef game, List<UnitDef> units, List<EnemyDef> enemies, List<WaveDef> waves)
     {
-        Game = Read<GameDef>("res://content/game.json");
-        Units = Read<List<UnitDef>>("res://content/units.json");
-        Enemies = Read<List<EnemyDef>>("res://content/enemies.json");
-        Waves = Read<List<WaveDef>>("res://content/waves.json");
-        Validate();
+        Game = game;
+        Units = units;
+        Enemies = enemies;
+        Waves = waves;
     }
 
-    public static UnitDef Unit(string id) =>
+    /// <summary>
+    /// Reads every file through <paramref name="readFile"/> (given a file name such as
+    /// "units.json", it returns the text) and validates them together.
+    /// </summary>
+    public static ContentDb Load(Func<string, string> readFile)
+    {
+        var db = new ContentDb(
+            Read<GameDef>(readFile, GameFile),
+            Read<List<UnitDef>>(readFile, UnitsFile),
+            Read<List<EnemyDef>>(readFile, EnemiesFile),
+            Read<List<WaveDef>>(readFile, WavesFile));
+        db.Validate();
+        return db;
+    }
+
+    public UnitDef Unit(string id) =>
         Units.FirstOrDefault(u => u.Id == id) ?? throw new InvalidOperationException($"units.json: no unit '{id}'");
 
-    public static EnemyDef Enemy(string id) =>
+    public EnemyDef Enemy(string id) =>
         Enemies.FirstOrDefault(e => e.Id == id) ?? throw new InvalidOperationException($"enemies.json: no enemy '{id}'");
 
-    static T Read<T>(string path)
+    static T Read<T>(Func<string, string> readFile, string name)
     {
-        using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
-        if (file == null)
-            throw new InvalidOperationException($"{path}: cannot open ({FileAccess.GetOpenError()})");
-        string text = file.GetAsText();
+        string text = readFile(name);
         try
         {
             return JsonSerializer.Deserialize<T>(text, Options)
-                ?? throw new InvalidOperationException($"{path}: is empty");
+                ?? throw new InvalidOperationException($"{name}: is empty");
         }
         catch (JsonException ex)
         {
-            throw new InvalidOperationException($"{path}: {ex.Message}", ex);
+            throw new InvalidOperationException($"{name}: {ex.Message}", ex);
         }
     }
 
-    static void Validate()
+    void Validate()
     {
         var errors = new List<string>();
         void Check(bool ok, string message)
@@ -88,8 +103,8 @@ public static class ContentDb
             Check(u.Mass > 0f, $"{at}: mass must be above 0");
             Check(u.Hp > 0f, $"{at}: hp must be above 0");
             Check(u.Cost >= 0, $"{at}: cost must be 0 or more");
-            Check(Color.HtmlIsValid(u.Fill), $"{at}: fill '{u.Fill}' is not a colour");
-            Check(Color.HtmlIsValid(u.Accent), $"{at}: accent '{u.Accent}' is not a colour");
+            Check(HexColor.IsValid(u.Fill), $"{at}: fill '{u.Fill}' is not a colour");
+            Check(HexColor.IsValid(u.Accent), $"{at}: accent '{u.Accent}' is not a colour");
             if (u.Attack is { } a)
             {
                 Check(Projectiles.Contains(a.Projectile), $"{at}: attack.projectile must be one of {string.Join(", ", Projectiles)}");
@@ -110,7 +125,7 @@ public static class ContentDb
             Check(Movements.Contains(e.Movement), $"{at}: movement must be one of {string.Join(", ", Movements)}");
             Check(e.Radius > 0f && e.Hp > 0f && e.Speed > 0f, $"{at}: radius, hp and speed must be above 0");
             Check(e.AttackCooldown > 0f, $"{at}: attackCooldown must be above 0");
-            Check(Color.HtmlIsValid(e.Fill) && Color.HtmlIsValid(e.Accent), $"{at}: fill or accent is not a colour");
+            Check(HexColor.IsValid(e.Fill) && HexColor.IsValid(e.Accent), $"{at}: fill or accent is not a colour");
         }
 
         Check(Waves.Count > 0, "waves.json: no waves");

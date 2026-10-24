@@ -1,4 +1,5 @@
 using Godot;
+using RettetDasEi.Sim;
 
 namespace RettetDasEi;
 
@@ -26,7 +27,7 @@ public partial class UnitBody : RigidBody2D
     /// <summary>Higher up shoots further: the core rule of the tower.</summary>
     public float EffectiveRange => Def.Attack == null
         ? 0f
-        : Def.Attack.Range + Mathf.Max(0f, Main.BoardTop - GlobalPosition.Y) * ContentDb.Game.RangePerHeight;
+        : Def.Attack.Range + Mathf.Max(0f, Main.BoardTop - GlobalPosition.Y) * GameContent.Db.Game.RangePerHeight;
 
     UnitVisual _visual = null!;
     HpBar _hpBar = null!;

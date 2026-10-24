@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace RettetDasEi;
+namespace RettetDasEi.Sim;
 
 // The shapes of game/content/*.json. Every field is required: a missing one fails at load
 // (balancing is data, never a silent default — CLAUDE.md).

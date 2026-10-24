@@ -1,8 +1,12 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RettetDasEi", "RettetDasEi.csproj", "{2DC04969-690C-422D-AD41-189C9CE67C5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RettetDasEi.Sim", "..\sim\RettetDasEi.Sim\RettetDasEi.Sim.csproj", "{5708176D-BDD1-4766-BD06-A6F29D6CBF75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RettetDasEi.Sim.Tests", "..\tests\RettetDasEi.Sim.Tests\RettetDasEi.Sim.Tests.csproj", "{7FC194C8-2D3E-4A34-B0E0-F177A1897CCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,5 +21,17 @@ Global
 		{2DC04969-690C-422D-AD41-189C9CE67C5A}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
 		{2DC04969-690C-422D-AD41-189C9CE67C5A}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{2DC04969-690C-422D-AD41-189C9CE67C5A}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{5708176D-BDD1-4766-BD06-A6F29D6CBF75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5708176D-BDD1-4766-BD06-A6F29D6CBF75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5708176D-BDD1-4766-BD06-A6F29D6CBF75}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5708176D-BDD1-4766-BD06-A6F29D6CBF75}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{5708176D-BDD1-4766-BD06-A6F29D6CBF75}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{5708176D-BDD1-4766-BD06-A6F29D6CBF75}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{7FC194C8-2D3E-4A34-B0E0-F177A1897CCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FC194C8-2D3E-4A34-B0E0-F177A1897CCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FC194C8-2D3E-4A34-B0E0-F177A1897CCB}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FC194C8-2D3E-4A34-B0E0-F177A1897CCB}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{7FC194C8-2D3E-4A34-B0E0-F177A1897CCB}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FC194C8-2D3E-4A34-B0E0-F177A1897CCB}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

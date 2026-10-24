@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using RettetDasEi.Sim;
 
 namespace RettetDasEi;
 
@@ -59,8 +60,8 @@ public partial class Main : Node2D
     {
         I = this;
         Engine.TimeScale = 1.0;
-        ContentDb.Load();
-        Gold = ContentDb.Game.StartGold;
+        GameContent.Load();
+        Gold = GameContent.Db.Game.StartGold;
 
         AddChild(new KitchenBackdrop { ZIndex = -10 });
         _counter = AddStatic(new Vector2(ScreenWidth / 2f, CounterTop + 150f), new Vector2(ScreenWidth + 400f, 300f));
@@ -80,9 +81,9 @@ public partial class Main : Node2D
 
         _hud = new Hud();
         AddChild(_hud);
-        _hud.Build(ContentDb.Units.Where(u => u.InShop), BuyFromShop, TryStartWave, Restart);
+        _hud.Build(GameContent.Db.Units.Where(u => u.InShop), BuyFromShop, TryStartWave, Restart);
 
-        var eggDef = ContentDb.Unit(ContentDb.Game.EggUnit);
+        var eggDef = GameContent.Db.Unit(GameContent.Db.Game.EggUnit);
         _egg = CreateUnit(eggDef, new Vector2((BoardLeft + BoardRight) / 2f, BoardTop - eggDef.Height / 2f - 1f), 0f);
 
         _hud.ShowMessage("Zieh Essen aus dem Laden aufs Brett und bau einen Turm. Das Ei gehört nach oben!", 7f);
@@ -117,7 +118,7 @@ public partial class Main : Node2D
         _camera.Offset = _shake > 0.01f
             ? new Vector2((float)GD.RandRange(-1.0, 1.0), (float)GD.RandRange(-1.0, 1.0)) * _shake
             : Vector2.Zero;
-        _hud.Refresh(Gold, WaveIndex, ContentDb.Waves.Count, Phase, CanStartWave(), EggOnCounter(), _fast);
+        _hud.Refresh(Gold, WaveIndex, GameContent.Db.Waves.Count, Phase, CanStartWave(), EggOnCounter(), _fast);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -144,7 +145,7 @@ public partial class Main : Node2D
         {
             var spawn = _spawnQueue[0];
             _spawnQueue.RemoveAt(0);
-            SpawnEnemy(ContentDb.Enemy(spawn.Enemy), spawn.Dir);
+            SpawnEnemy(GameContent.Db.Enemy(spawn.Enemy), spawn.Dir);
         }
 
         if (EggOnCounter())
@@ -196,7 +197,7 @@ public partial class Main : Node2D
     // ------------------------------------------------------------- waves
 
     bool CanStartWave() =>
-        Phase == Phase.Build && _held == null && !EggOnCounter() && WaveIndex < ContentDb.Waves.Count;
+        Phase == Phase.Build && _held == null && !EggOnCounter() && WaveIndex < GameContent.Db.Waves.Count;
 
     bool EggOnCounter() => IsInstanceValid(_egg) && !_egg.IsBroken && !_egg.IsHeld && _egg.IsTouching(_counter);
 
@@ -212,7 +213,7 @@ public partial class Main : Node2D
         Phase = Phase.Wave;
         _waveTime = 0f;
         _spawnQueue.Clear();
-        foreach (var group in ContentDb.Waves[WaveIndex].Groups)
+        foreach (var group in GameContent.Db.Waves[WaveIndex].Groups)
         {
             for (int i = 0; i < group.Count; i++)
             {
@@ -242,13 +243,13 @@ public partial class Main : Node2D
 
     void WaveCleared()
     {
-        int reward = ContentDb.Waves[WaveIndex].Reward;
+        int reward = GameContent.Db.Waves[WaveIndex].Reward;
         Gold += reward;
         WaveIndex++;
-        if (WaveIndex >= ContentDb.Waves.Count)
+        if (WaveIndex >= GameContent.Db.Waves.Count)
         {
             Phase = Phase.Over;
-            _hud.ShowEnd("Gewonnen!", $"Das Ei hat alle {ContentDb.Waves.Count} Wellen überlebt.");
+            _hud.ShowEnd("Gewonnen!", $"Das Ei hat alle {GameContent.Db.Waves.Count} Wellen überlebt.");
             return;
         }
         Phase = Phase.Build;
@@ -264,7 +265,7 @@ public partial class Main : Node2D
         Shake(16f);
         if (IsInstanceValid(_egg) && !_egg.IsBroken)
             _egg.Break();
-        _hud.ShowEnd("Das Ei ist kaputt!", $"{reason}\nDu hast {WaveIndex} von {ContentDb.Waves.Count} Wellen geschafft.");
+        _hud.ShowEnd("Das Ei ist kaputt!", $"{reason}\nDu hast {WaveIndex} von {GameContent.Db.Waves.Count} Wellen geschafft.");
     }
 
     void Restart()
@@ -386,7 +387,7 @@ public partial class Main : Node2D
     UnitBody CreateUnit(UnitDef def, Vector2 position, float rotation)
     {
         var unit = new UnitBody();
-        unit.Setup(def, ContentDb.Game);
+        unit.Setup(def, GameContent.Db.Game);
         unit.Position = position;
         unit.Rotation = rotation;
         _unitsRoot.AddChild(unit);
@@ -461,7 +462,7 @@ public partial class Main : Node2D
 
     int RefundFor(UnitBody unit) => _heldIsNew
         ? unit.Def.Cost
-        : Mathf.RoundToInt(unit.Def.Cost * ContentDb.Game.SellRefund * unit.Hp / unit.MaxHp);
+        : Mathf.RoundToInt(unit.Def.Cost * GameContent.Db.Game.SellRefund * unit.Hp / unit.MaxHp);
 
     void Drop(bool sell)
     {

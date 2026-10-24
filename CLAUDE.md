@@ -46,6 +46,11 @@ are in the `session-ritual` skill.
   Pause only for: destructive actions, real scope changes, a playtest only a human can run, or a
   design fork worth an ADR. **An ADR is written only after he has agreed to the decision.**
 - **Sezgin is a beginner:** explain simply, one testable step at a time, complete runnable code.
+- **When a round ends with a playtest for him, start the game automatically** — don't ask (his
+  word, 2026-10-24). Close only this game's process if one runs (lesson
+  `close-only-this-games-process`), start `Spiel starten.bat` with PowerShell `Start-Process`
+  (Git Bash splits the name at the space), wait for the Godot window, read `logs\`, then give the
+  play script.
 - **Test-first only where it pays** (from M1): rules in the core with branches or an invariant get
   their tests first; Godot scripts, physics feel, drawings and content tuning are verified by the
   build, a headless boot and Sezgin playing. Details in the `tdd` skill.

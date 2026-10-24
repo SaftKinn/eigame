@@ -189,6 +189,19 @@ radius. Life 3 s, gone off screen.
 (`DirectSpaceState`) only in `_PhysicsProcess` — a pick from the mouse is kept as
 `_pendingPick` and done in the next physics step.
 
+### 5.7 Decided, not built: every food a job (ADR 003, M2)
+
+What changes once M2 is built (after M1), all numbers from content:
+- **Tomate** shoots no more: a bomb that bursts at any touch with a pest — damage to pests in its
+  radius, a push without damage to own food (the egg too).
+- **Käse** glues what comes to rest on its top; a hard blow tears it loose (cheese strings); it
+  sticks again at rest; picking up loosens it.
+- **Toast** is a shield wall: a pest striking it is thrown back, the toast takes a share of the push.
+- **Gurke**'s slices pierce up to N pests. **Senf** splashes less and leaves a puddle that slows
+  walkers (puddles don't stack). **Pfeffer** builds an itch; at N hits a pest sneezes — a push back
+  and a pause in attacking.
+- Each shop card names the job in a sentence; in play the job is seen, without frames.
+
 ---
 
 ## 6. The rules core (ADR 002; M1, not built yet)

@@ -54,7 +54,9 @@ fun, without any frame animation?
   Pfeffer makes pests sneeze (a push back, a short pause in attacking); Tomate bursts like a bomb
   when it rolls onto a pest.
 - **Before building:** `/grill-me` proposal A — each job's rule, what is physics and what is the
-  core's (ADR 002), how strong, how it is seen without frames → ADR 003.
+  core's (ADR 002), how strong, how it is seen without frames → ADR 003. *(Done 2026-10-24: ADR 003
+  — the tomato a bomb that no longer shoots, cheese glue that tears, toast a shield wall; all six
+  built in one step, his pick.)*
 - **Verification (tests):** each rule of the core with its edge cases — how effects stack, end,
   and meet each other.
 - **Verification (live):** Sezgin can say what each food is for; buying is a choice between jobs;

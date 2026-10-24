@@ -114,6 +114,13 @@ Extend the table with every new folder.
   `[sneeze]`, `[pierce]`, `[puddle]`): a job that never prints was never tried.
 - **Warnings are errors in the core:** a mutation that makes code unreachable (`if (false)`)
   does not build — no test runs, and a grep for "Bestanden" finds nothing. Mutate so it compiles.
+- **Tuning the difficulty** (2026-10-24): a scratch copy with a partial `Main` of its own
+  (`SmokeHarness.cs`, three hooks into `Main`: build the tower in `_Ready`, start every wave 2.5 s
+  into a build phase, quit at won/lost) places a fixed tower by size — `-- --tower=small` (115
+  gold), `mid` (250), `big` (390), `bigless` (345) — and prints the wave it was lost in and the
+  gold after each wave; each tower twice, ~25 s for six runs. The target he set: small loses early,
+  mid around wave 4, big wins wave 5 only just. Its towers are flat; his are taller and so
+  stronger. Change content in the copy, measure, then copy the files over and `git diff` them.
 - **A mutation check** shows the tests can fail: break a rule on purpose (in a copy, or restore
   it with `git checkout -- <file>` once it is committed), see which tests turn red, put it back,
   see green again.

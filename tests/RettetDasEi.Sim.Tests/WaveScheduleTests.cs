@@ -47,10 +47,10 @@ public class WaveScheduleTests
     [Fact]
     public void Every_shipped_wave_comes_exactly_as_the_prototype_queued_it()
     {
-        // M1 moves the queue without a change in behaviour (ADR 002). The reference below is the
+        // M1 moved the queue without a change in behaviour (ADR 002). The reference below is the
         // prototype's code from Main.TryStartWave as it was (commit 3c88904). It matters where two
-        // pests come at the same time — in wave 3 a fly (4 + 2 × 2) and a meatball (8) at 8 s:
-        // List.Sort is not stable, so the order is whatever that sort made of the same input.
+        // pests come at the same time: List.Sort is not stable, so the order is whatever that sort
+        // made of the same input. Holds for whatever the waves are tuned to.
         var dir = Path.Combine(AppContext.BaseDirectory, "content");
         var db = ContentDb.Load(name => File.ReadAllText(Path.Combine(dir, name)));
 
@@ -59,7 +59,6 @@ public class WaveScheduleTests
             var expected = PrototypeQueue(wave).Select(q => new Spawn(q.Time, q.Enemy, q.Dir));
             Assert.Equal(expected, WaveSchedule.Build(wave));
         }
-        Assert.Equal(2, WaveSchedule.Build(db.Waves[2]).Count(s => s.Time == 8f));
     }
 
     static List<(float Time, string Enemy, float Dir)> PrototypeQueue(WaveDef wave)

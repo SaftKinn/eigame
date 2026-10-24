@@ -68,8 +68,9 @@ numbers are guesses — expect tuning (all in `units.json`).
    **Pfeffer:** a pest trembles more and more, then "Hatschi!", a hop back and a pause.
 5. **Tomate:** hold it — the red circle. Lay it in the pests' way: "Platsch!", pests hurt, your
    food shoved (a tomato beside the egg is a risk).
-6. **Overall:** does each food feel different now? Is one useless or a must? Is it too easy (the
-   smoke run won all five waves with a fixed tower)?
+6. **Overall:** does each food feel different now? Is one useless or a must? **Difficulty after
+   the tuning:** waves 1–2 relaxed, from wave 3 the tower has to be good, wave 5 only just — and
+   sometimes lost? Less gold now (100 to start, little per kill).
 His words → `/playtest-triage` (tuning in `units.json`) or M2 closed; then M3 (recipes, `/grill-me` first).
 
 ## Decision log
@@ -120,13 +121,21 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
   is stacking too slippery, sticky or jittery; does the tower topple too easily or never; is the
   egg on top too safe or too fragile; is "higher shoots further" a real temptation. Ask with M2's
   round.
-- **M2: too easy now?** The feared lack of damage did not show — a fixed six-food tower won all
-  five waves in the smoke run and no pest reached it. If he finds it too easy: more or tougher
-  pests in `waves.json`, not weaker jobs. Note: the cheese glue makes the egg hard to knock off
-  (only a meatball or the pudding tears it).
+- **M2: difficulty.** He found it too easy ("ich gewinne eigentlich immer"); tuned the same day
+  (Playtest notes). Open: is wave 5 now "nur knapp" for him? The cheese glue still makes the egg
+  hard to knock off (only a meatball or the pudding tears it).
 
 ## Playtest notes
 
+- **2026-10-24 — M2, third answer:** "es war zu leicht, also ich gewinne eigentlich immer" → his
+  picks: both levers (harder waves and less gold), "Welle 5 nur knapp". Tuning round (measured with
+  fixed towers in a scratch copy, see `docs/conventions.md`): startGold 120 → 100; pests' hp
+  ant 22 → 40, meatball 70 → 150, fly 12 → 20, pudding 300 → 600; kill gold 4/9/5/40 → 1/4/2/15;
+  rewards 30/40/50/60 → 20/25/30/40; waves denser and bigger (wave 1: 10 ants; wave 4 with a
+  pudding; wave 5 two puddings, 24 ants, 14 flies, 8 meatballs). Before: a 115-gold tower won
+  everything. After: 115 gold loses in wave 3, 250 in wave 4, 390 (about all the gold a game
+  gives by wave 5) wins, 345 loses wave 5 two times in three. His towers are taller than the
+  harness's flat ones — expect it a little easier for him.
 - **2026-10-24 — M2, second round:** won all five waves with a big glued tower (screenshot).
   "Der Klebebalken gefällt mir doch nicht ganz, mach es wie vorher" → seam out. "Seitliche
   Verklebung soll doch nicht gehen … als wäre er in seiner Wachsschale" → wax rind, only the cut

@@ -1,5 +1,5 @@
 {
-  "startGold": 120,
+  "startGold": 100,
   "rangePerHeight": 0.6,
   "eggUnit": "egg",
   "unitLinearDamp": 0.05,

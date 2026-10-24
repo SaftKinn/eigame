@@ -6,8 +6,8 @@ description: Use when a change to the rules core (sim/RettetDasEi.Sim — gold, 
 # Test-driven a change to the rules core
 
 ADR 002 makes the rules core the TDD target: plain functions, no engine, exact outcomes. Where it
-pays, the test leads. **Before M1 there is no core and no test project** — then this skill does
-not apply; say so and verify by build and play.
+pays, the test leads. The core and its test project exist since M1 (2026-10-24); `TestContent`
+is the tests' own content.
 
 ## When it pays — and when it doesn't
 

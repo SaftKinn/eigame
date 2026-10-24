@@ -12,9 +12,9 @@ copy drifted, every time silently, and surfaced as a live inconsistency long aft
 ## How it applies here
 
 - **Range by height** is read by the shooter (`UnitBody.EffectiveRange`) and drawn by the range
-  overlay. Both must ask one function — in M1 it moves into the core as exactly one.
-- **The sell refund** is shown as a hint while dragging and paid on the drop: one function
-  (`Main.RefundFor` today, the core's from M1).
+  overlay (which reads `EffectiveRange`): one function, `Reach.Of` in the core since M1.
+- **The sell refund** is shown as a hint while dragging and paid on the drop: one function,
+  `Shop.Refund` (through `GameState.RefundFor` / `Sell`) since M1.
 - **Effects of proposal A** (a slow, a sneeze): what the pest does and what the HUD or a tooltip
   says it does read the same rule.
 

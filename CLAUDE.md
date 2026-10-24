@@ -80,7 +80,7 @@ stays in Godot. Godot reports facts (what touches what, where), the core answers
 (how much, how long, whether).
 
 **Where it stands:** the prototype (M0) was played on 2026-10-24 — "das Spiel ist cool", but every
-food feels the same. Next: M1 (the rules core), then M2 (every food a job — proposal A, grilled
+food feels the same. M1 (the rules core) is built, waiting for his round; then M2 (every food a job — proposal A, grilled
 into ADR 003: the tomato a bomb, cheese glue, toast a shield wall, piercing pickle, mustard puddle,
 pepper sneeze). Plan in `roadmap.md`, design in `architecture.md`. **If a design decision is unclear,
 `architecture.md` wins — and if you change a decision, update `architecture.md` in the same
@@ -133,9 +133,12 @@ Broad footguns. Area conventions, testing, hooks, runtime and troubleshooting li
 - **Windows runtime.** Sezgin runs Windows. Hooks are bash (Git Bash); keep `.sh` files and
   `tools/hooks/*` LF (`.gitattributes` enforces it). Texts with umlauts go through the Edit tool,
   never PowerShell or sed (lessons `powershell-5-eats-quotes-and-encodings`, `sed-in-git-bash-drops-crlf`).
-- **Hooks:** the Stop hook (`tools/hooks/check-on-change.sh`) builds when `game/scripts/` or
-  `game/content/` changed and boots headless for content; silent on green. `pre-commit` is the
-  same, blocking. Never `--no-verify`.
+- **Hooks:** the Stop hook (`tools/hooks/check-on-change.sh`) builds and tests when
+  `game/scripts/`, `game/content/`, `sim/` or `tests/` changed, and boots headless for content;
+  silent on green. `pre-commit` is the same, blocking. Never `--no-verify`.
+- **Tests:** `dotnet test tests/RettetDasEi.Sim.Tests` — no Godot, seconds; read the count.
+- **The core's namespace is `RettetDasEi.Sim`** — don't name a core type like a Godot one
+  (`Range`, `Colors`, …): Godot scripts have both in scope.
 - **Build:** `dotnet build game/RettetDasEi.csproj` (or Alt+B in the editor). Sezgin starts the
   game with **"Spiel starten.bat"** (logs in `logs\`).
 - **Commit messages:** imperative, scoped — `units: …`, `enemies: …`, `content: …`, `ui: …`,

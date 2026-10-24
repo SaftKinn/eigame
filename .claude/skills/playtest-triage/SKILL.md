@@ -33,8 +33,8 @@ second**. Most "feel" complaints are numbers in `game/content/`, not code.
      time vs. draw time.
    - **Design question** — "sollte Käse kleben?" → not a fix; add it to `## Open questions` or
      start `/grill-me`.
-3. **Fix** per class. Check: `dotnet build game/RettetDasEi.csproj` and a headless boot; from M1
-   `dotnet test tests/RettetDasEi.Sim.Tests`. Code in the core: tests first.
+3. **Fix** per class. Check: `dotnet test tests/RettetDasEi.Sim.Tests`, `dotnet build
+   game/RettetDasEi.csproj` and a headless boot. Code in the core: tests first.
 4. **Commit per round**, scoped: `content: …`, `units: …`, `enemies: …`, `sim(<area>): …`.
 5. **Record** via `session-ritual`: what changed and why, marked **play-unverified** — the next
    play session is the gate. Name exactly what Sezgin should check next time (which wave, what to

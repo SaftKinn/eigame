@@ -14,8 +14,8 @@ Extend the table with every new folder.
 
 | Path | What | ADR |
 |---|---|---|
-| `game/scripts/Main.cs` | the flow: phases, waves, gold, the shop's hand (buy, move, rotate, sell, drop), the queries pests and shooters ask (`GroundY`, `FindTarget`, `HighestUnit`, `UnitTouching`, `IsBlockedByEnemy`) | 001 |
-| `game/scripts/Content/` | `ContentDefs` (the JSON's shapes), `ContentDb` (load, validate) — into the core in M1 | 001, 002 |
+| `game/scripts/Main.cs` | the scene: reports what the physics saw to `GameState` and shows its events (`ReadEvents`); the shop's hand (buy, move, rotate, sell, drop); the queries pests and shooters ask (`GroundY`, `FindTarget`, `HighestUnit`, `UnitTouching`, `IsBlockedByEnemy`) | 001, 002 |
+| `game/scripts/Content/` | `GameContent` — `res://content/` read through the core's `ContentDb.Load` | 002 |
 | `game/scripts/Units/` | `UnitBody` (`RigidBody2D`: health, shooting, recoil, hold state), `UnitVisual` (picture or stand-in, flash), `HpBar` | 001 |
 | `game/scripts/Enemies/` | `Enemy` (moves along the ground or flies, attacks with impulses — not a body), `EnemyVisual` | 001 |
 | `game/scripts/Combat/` | `Projectile` (straight with lead, lob with splash) | 001 |
@@ -23,12 +23,16 @@ Extend the table with every new folder.
 | `game/scripts/Fx/`, `View/`, `World/` | crumbs and numbers; `DrawKit` — the stand-in drawings, magenta for unknown keys; the kitchen backdrop | 001 |
 | `game/content/` | all balancing JSON: `units.json`, `enemies.json`, `waves.json`, `game.json` | 001 |
 | `game/art/units/`, `game/art/enemies/` | pictures by visual key (`docs/art-prompts.md`) | 001 |
-| `sim/RettetDasEi.Sim/` | M1 — the rules core, no Godot | 002 |
-| `tests/RettetDasEi.Sim.Tests/` | M1 — xUnit tests for the core | 002 |
+| `sim/RettetDasEi.Sim/Content/` | `ContentDefs`, `ContentDb` (load through a file reader, validate), `HexColor` | 002 |
+| `sim/RettetDasEi.Sim/Rules/` | `GameState` (gold, shop, waves, phases), `GameEvent`, `WaveSchedule`, `Shop` (refund), `Reach` (range by height) | 002 |
+| `tests/RettetDasEi.Sim.Tests/` | xUnit tests for the core; `TestContent` (the tests' own content); `ContentFilesTests` (the shipped files) | 002 |
 | `tools/hooks/` | `check-on-change.sh` (Claude Stop hook), `pre-commit` (git) | — |
 
-## Rules core (`sim/RettetDasEi.Sim/`, from M1 — ADR 002)
+## Rules core (`sim/RettetDasEi.Sim/`, since M1 — ADR 002)
 
+- Namespace `RettetDasEi.Sim`; Godot scripts say `using RettetDasEi.Sim;`. Don't name a core
+  type like a Godot one (`Range`, `Colors`, `Timer`, …) — both namespaces are in scope there.
+- **Warnings are errors** in the core (`TreatWarningsAsErrors`).
 - **No `using Godot;` anywhere.** The project has no Godot reference; a Godot type needed there
   means the code belongs on the Godot side, or the core needs its own plain type.
 - **The boundary:** where something is and what touches what is Godot's; how much, how long,
@@ -40,7 +44,9 @@ Extend the table with every new folder.
 - **Iteration order is part of the outcome:** don't iterate a `Dictionary`/`HashSet` where order
   matters; sort or use lists.
 - **Hot paths allocate nothing:** no LINQ or `new List` inside per-pest loops of a step.
-- **Events, not callbacks:** the core appends events; the Godot side drains them once per frame.
+- **Events, not callbacks:** the core appends events (`GameEvent`); the Godot side drains them
+  (`GameState.DrainEvents`) — `Main.ReadEvents` right after each call into the core, so a pest
+  that is due appears in the same physics step, as in the prototype.
 - **Time** is the physics step's delta (120 Hz), passed in.
 - **New mechanic checklist:** content field (if tunable) → validation rule → pure logic in the
   core → test → an event if the view must react → a visual key if it is drawn.
@@ -54,8 +60,10 @@ Extend the table with every new folder.
 - Every entry that is drawn has a `visual` key. Its picture is `game/art/units/<key>.png` or
   `game/art/enemies/<key>.png` (sizes and facing in `docs/art-prompts.md`); until then `DrawKit`
   draws the stand-in — add the key's drawing there in the same change, or it renders magenta.
-- **After any edit:** until M1 the Stop hook starts the game headless for a moment and reports a
-  broken content file; from M1 `dotnet test` loads the real files and lists every problem.
+- **After any edit:** `dotnet test tests/RettetDasEi.Sim.Tests` — `ContentFilesTests` loads the
+  real files and lists every problem (the Stop hook runs it, and boots the game headless too).
+- A new content **file** needs its name in `ContentDb` (a constant, `Files`, a property read in
+  `Load`) and in `TestContent.Load` — a JSON file the loader does not know fails a test.
 - Tuning knobs and what they do:
   - **Toppling:** a pest's `push` (`enemies.json`) against a unit's `mass` and `friction`
     (`units.json`); `unitLinearDamp` / `unitAngularDamp` (`game.json`) calm the stack.
@@ -65,8 +73,8 @@ Extend the table with every new folder.
     `damage`, `attackCooldown`.
   - **Shooters:** `damage`, `cooldown`, `speed`, `splash`, `recoil` (a recoil shoves the shooter
     itself — a tall light shooter can shoot itself off the tower).
-- A new **required** field also goes into every entry of its file — and from M1 into the tests'
-  own content.
+- A new **required** field also goes into every entry of its file — and into `TestContent`, or
+  every test fails at load, not at its assertion.
 
 ## Godot side (`game/scripts/`)
 
@@ -86,13 +94,19 @@ Extend the table with every new folder.
 
 ## Testing
 
-- **Now (before M1):** `dotnet build game/RettetDasEi.csproj` and a headless boot —
+- `dotnet test tests/RettetDasEi.Sim.Tests` — no Godot needed, a few seconds (76 tests on
+  2026-10-24). Assert exact outcomes with explicit set-up; prefer a tiny scenario that isolates one
+  behaviour. Tests don't use the shipped content for logic (`TestContent`, its own small content),
+  so tuning never breaks a logic test; `ContentFilesTests` loads the shipped files to validate them.
+- The Godot side: `dotnet build game/RettetDasEi.csproj` and a headless boot —
   `<godot> --headless --path game --quit-after 300` must print no `ERROR` and no `Content is
-  broken`. The Stop hook does both (below). Everything else is verified by Sezgin playing.
-- **From M1:** `dotnet test tests/RettetDasEi.Sim.Tests` — no Godot needed, a few seconds. Assert
-  exact outcomes with explicit set-up; prefer a tiny scenario that isolates one behaviour. Tests
-  don't use the shipped content for logic (a test helper with its own small content), so tuning
-  never breaks a logic test; one test loads the shipped files to validate them.
+  broken`. A boot stays in the build phase; to see a wave run without a person, a **scratch
+  copy** of `game/` and `sim/` whose `Main` starts a wave by itself and prints every event, run
+  with `--headless --fixed-fps 60 --quit-after 3600` (done for M1 on 2026-10-24) — never such a
+  change in the repo.
+- **A mutation check** shows the tests can fail: break a rule on purpose (in a copy, or restore
+  it with `git checkout -- <file>` once it is committed), see which tests turn red, put it back,
+  see green again.
 - **Read the number of tests after every run**, not only the word "Bestanden" (lesson
   `look-whether-the-file-is-there-before-writing-it`).
 - No replay test of a whole wave: Godot's physics is not deterministic across runs (ADR 002).
@@ -100,10 +114,9 @@ Extend the table with every new folder.
 ## Hooks
 
 - **Stop hook** (`.claude/settings.json` → `bash tools/hooks/check-on-change.sh`): when something
-  under `game/scripts/`, `game/content/` (from M1 also `sim/`, `tests/`) differs from the last
-  commit, it builds; when content changed it also boots the game headless for a moment and looks
-  for content errors; from M1 it runs the tests. Silent on green; a failure is printed
-  (non-blocking).
+  under `game/scripts/`, `game/content/`, `sim/` or `tests/` differs from the last commit, it
+  builds; when content changed it also boots the game headless for a moment and looks for content
+  errors; then it runs the tests. Silent on green; a failure is printed (non-blocking).
 - **pre-commit** (`tools/hooks/pre-commit`, active through `git config core.hooksPath tools/hooks`
   — once per clone): the same check for what is staged, blocking. Never bypass it with
   `--no-verify` to get a commit through; fix the cause.

@@ -31,8 +31,8 @@ the skill when the code differs.
 ## Related: the hooks (not skills)
 
 `tools/hooks/check-on-change.sh` is wired as a `Stop` hook in `.claude/settings.json`. It builds
-**only when `game/scripts/` or `game/content/` changed** (from M1 also `sim/`, `tests/`), boots the
-game headless for a moment when content changed, runs the tests once they exist, and stays
+**only when `game/scripts/`, `game/content/`, `sim/` or `tests/` changed**, boots the game
+headless for a moment when content changed, runs the tests, and stays
 **silent on green**. `tools/hooks/pre-commit` does the same for what is staged, as a blocking git
 hook (`git config core.hooksPath tools/hooks`, once per clone).
 

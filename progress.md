@@ -12,20 +12,30 @@ on-demand._
   cool", but every food feels the same, only the shapes differ. The project is set up like Chief
   Wants His Cut (architecture, roadmap, skills, hooks, git). ADR 002: a rules core with tests, the
   physics stays in Godot. **ADR 003** (grilled the same day): every food a job — not built.
-- **Next:** M1 (the rules core and its tests, the existing rules moved without a change in
-  behaviour), then M2 (all six jobs of ADR 003 in one step, his pick).
-- **Open live gates — none.**
-- **Tests:** none yet (the test project comes with M1). Check now: `dotnet build` + the Stop
-  hook's headless boot.
+  **M1 built 2026-10-24:** content, gold, shop, waves, phases and range live in the core
+  (`sim/`), play-unverified.
+- **Next:** Sezgin plays one round of M1 (the script in `## Next concrete step`) — nothing may
+  feel different. Then M2 (all six jobs of ADR 003 in one step, his pick).
+- **Open live gates — one:** M1, "nothing changed" (his round).
+- **Tests:** 76, green (`dotnet test tests/RettetDasEi.Sim.Tests`).
 - **Git:** local repo on `main`, no remote yet (GitHub when he wants one).
 
 ## Current focus
 
-**M1 — the rules core** (`roadmap.md`, ADR 002): `sim/RettetDasEi.Sim` + `tests/RettetDasEi.Sim.Tests`,
-content, gold, waves and range moved over without a change in behaviour; gate: tests green and
-Sezgin finds nothing changed. **Then M2** — ADR 003 in one step.
+**M1 — the rules core** (`roadmap.md`, ADR 002): built; its live gate is his round. **Then M2** —
+ADR 003 in one step.
 
 ## Last session
+
+- **2026-10-24 (M1)** — The rules core built, one seam at a time, a commit each: `df9ac84`
+  (content: `ContentDb` loads through a file reader — `GameContent` in the game —, `HexColor` for
+  Godot's colour check, 45 tests) and `c4c6024` (`GameState` with gold, shop, waves, phases and
+  events; `WaveSchedule`, `Shop.Refund`, `Reach.Of`; `Main` reports and shows events; 76 tests).
+  Checked before the move: Godot's `Mathf.RoundToInt` rounds half to even, `Color.HtmlIsValid`'s
+  rule (both against GodotSharp 4.6.2 in a scratch program). A test compares every shipped wave
+  with the prototype's queue code (pests at the same time keep their order). A mutation check
+  turned 4 tests red. A headless smoke run of wave 1 (scratch copy that starts the wave and prints
+  events): six ants from the right at 1.0–10.0 s, the egg broken at 22 s, lost once, no errors.
 
 - **2026-10-24 (second session)** — Read this project and Chief Wants His Cut (roadmap,
   architecture, CLAUDE.md, conventions, settings, hooks, all skills). Set up the same structure
@@ -41,14 +51,15 @@ Sezgin finds nothing changed. **Then M2** — ADR 003 in one step.
 
 ## Next concrete step
 
-Build M1 (`roadmap.md`), one seam at a time (lesson `byte-exact-moves-stepwise-gates`):
-1. `sim/RettetDasEi.Sim` (net8.0, no Godot) and `tests/RettetDasEi.Sim.Tests` (xUnit) into the
-   solution; the game references the core; the hook then runs the tests.
-2. Content defs and `ContentDb` into the core (a file-reader function); tests: the shipped files
-   load, each bad entry is refused.
-3. Gold and the refund, then the wave schedule and the phases, then range by height — each with
-   its tests, `Main.cs` calling the core.
-4. Build, headless boot, then Sezgin plays a round: nothing may feel different.
+**Sezgin's round for M1** ("Spiel starten.bat") — does anything feel different from before?
+1. Start: 120 Gold, the egg on the board, the hint at the top.
+2. Buy a Käseblock and sell it straight back from the hand: 120 Gold again. Place one, then sell
+   it: you get its price × its health back.
+3. Push the egg onto the counter and press Space: the wave does not start, the red warning shows.
+4. Build a tower, egg on top, play waves 1–5: "Welle N!", pests from the right/both sides as
+   before, "+N" over a killed pest, "Welle N geschafft! +N Gold", and at the end "Gewonnen!".
+5. One round where the egg falls or breaks: "Das Ei ist kaputt!" with the right reason and count.
+His answer closes M1's live gate (or becomes a fix round); then M2 — ADR 003 in one step.
 
 ## Decision log
 
@@ -84,7 +95,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | Milestone | Status | Evidence |
 |---|---|---|
 | M0 — the prototype | **Closed 2026-10-24** | Built and played the same day; `dotnet build` green; his verdict: "Das Spiel ist cool. ABER jedes Essen fühlt sich gleich an, nur die Formen unterscheiden sich." |
-| M1 — the rules core | Next | — |
+| M1 — the rules core | **Built 2026-10-24**, live gate open | 76 tests green; build 0 warnings; headless boot clean; smoke run of wave 1 in a scratch copy — his round open |
 | M2 — every food a job | Grilled → ADR 003; built after M1 | — |
 | M3 — recipes | Later | — |
 | M4 — look and feel | Later | — |
@@ -123,4 +134,5 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
   live physics, rotate, sell, range by height, game over and win. Stand-in drawings in `DrawKit`;
   pictures plug in by visual key. ADR 001. Played by Sezgin the same day (M0 closed).
 - **2026-10-24** — Project set up like Chief Wants His Cut; ADR 002; git; proposal A grilled →
-  ADR 003 (see Last session).
+  ADR 003.
+- **2026-10-24** — M1 built: the rules core with 76 tests (see Last session).

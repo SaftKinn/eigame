@@ -64,14 +64,14 @@ Runs, unlocks and saves wait for the prototype rule in `CLAUDE.md` (Part 2 of `r
 rettet-das-ei/
 ├── game/                           Godot project (open THIS folder in the editor)
 │   ├── project.godot               1920×1080, stretch canvas_items, aspect keep; physics 120 Hz, 24 iterations
-│   ├── RettetDasEi.csproj          Godot.NET.Sdk 4.6.2 — everything for now; references the core from M1
+│   ├── RettetDasEi.csproj          Godot.NET.Sdk 4.6.2 — physics, hand, view; references the core (ADR 002)
 │   ├── RettetDasEi.sln             the solution (Godot expects it next to project.godot)
 │   ├── content/*.json              ALL balancing: units, enemies, waves, game (global tuning)
 │   ├── art/units/, art/enemies/    pictures by visual key (docs/art-prompts.md); empty so far
 │   ├── scenes/main.tscn            the one scene; Main builds everything in code
 │   └── scripts/
-│       ├── Main.cs                 the flow: phases, waves, gold, the shop's hand, queries for others
-│       ├── Content/                ContentDefs (the JSON's shapes), ContentDb (load + validate) — moves to the core in M1
+│       ├── Main.cs                 the scene: reports to the core, shows its events; the shop's hand, queries for others
+│       ├── Content/                GameContent — reads res://content/ through the core's loader
 │       ├── Units/                  UnitBody (RigidBody2D: health, shooting, drag state), UnitVisual, HpBar
 │       ├── Enemies/                Enemy (moves, attacks with impulses), EnemyVisual
 │       ├── Combat/                 Projectile (straight with lead, lob with splash)
@@ -79,8 +79,10 @@ rettet-das-ei/
 │       ├── Fx/                     Fx (crumbs, numbers), FloatingText
 │       ├── View/                   DrawKit — the stand-in drawings, magenta for unknown keys
 │       └── World/                  KitchenBackdrop
-├── sim/RettetDasEi.Sim/            M1 — the rules core, NO Godot reference (ADR 002)
-├── tests/RettetDasEi.Sim.Tests/    M1 — xUnit, runs without Godot
+├── sim/RettetDasEi.Sim/            the rules core, NO Godot reference (ADR 002; M1)
+│   ├── Content/                    ContentDefs (the JSON's shapes), ContentDb (load + validate), HexColor
+│   └── Rules/                      GameState (gold, shop, waves, phases), GameEvent, WaveSchedule, Shop, Reach
+├── tests/RettetDasEi.Sim.Tests/    xUnit, runs without Godot; TestContent — the tests' own small content
 ├── docs/                           decisions/ (ADRs), lessons/, conventions.md, art-prompts.md
 ├── tools/hooks/                    check-on-change.sh (Claude Stop hook) + pre-commit
 ├── .claude/                        settings.json (Stop hook) + project skills
@@ -100,18 +102,19 @@ The folder → governing ADR map is in `docs/conventions.md`.
 | Language | **C# 12 / .NET 8** | Godot 4.6's .NET target; SDK 8.0 installed. |
 | Physics | **Godot's built-in 2D physics**, 120 ticks/s, 24 solver iterations | ADR 001 point 3; if tall stacks jitter, first more ticks/iterations/damping, then another backend. |
 | Content | **JSON** via `System.Text.Json` (BCL) | Diffable, editable by an agent, testable without Godot. |
-| Core math (M1) | `System.Numerics` | Keeps the core Godot-free. |
-| Tests (M1) | **xUnit** | `dotnet test` without the editor. |
+| Core math | `System.Numerics` when vectors are needed | Keeps the core Godot-free. |
+| Tests | **xUnit** 2.9.2 | `dotnet test tests/RettetDasEi.Sim.Tests` without the editor. |
 
-**Dependencies:** none beyond Godot.NET.Sdk and the BCL. A new NuGet package needs a line here
-and in its commit message.
+**Dependencies:** the game: Godot.NET.Sdk and the BCL. The core: the BCL only. The tests: xunit,
+xunit.runner.visualstudio, Microsoft.NET.Test.Sdk (the versions Chief Wants His Cut uses). A new
+NuGet package needs a line here and in its commit message.
 
 ---
 
 ## 5. The game as built (prototype 0.1, played 2026-10-24)
 
-Everything below lives in `game/scripts/` today. What ADR 002 moves into the core is marked
-**→ core (M1)**.
+What is marked **→ core (M1)** lives in `sim/` since M1 (2026-10-24, ADR 002; §6) and is called
+by `Main`; the rest is `game/scripts/`.
 
 ### 5.1 Flow and phases (`Main.cs`)
 
@@ -204,23 +207,30 @@ What changes once M2 is built (after M1), all numbers from content:
 
 ---
 
-## 6. The rules core (ADR 002; M1, not built yet)
+## 6. The rules core (ADR 002; built in M1, 2026-10-24, play-unverified)
 
 `sim/RettetDasEi.Sim` — no `using Godot;`. Godot reports facts and gives commands; the core holds
 a small state, answers with values and appends events.
 
-- **Content:** the defs and `ContentDb` move over; `ContentDb.Load(readFile)` takes a function
-  that reads a file (Godot's `FileAccess` in the game, `File.ReadAllText` in tests). All
-  problems are reported at once; unknown properties are errors.
-- **The game's state:** gold, the wave index, the phase, the spawn schedule and the wave clock.
-  Commands: buy, sell (with the refund rule), start a wave, a time step (the physics step's
-  delta), a pest killed, the egg broken or on the counter. Events: a pest is due (which, from
-  which side), a wave cleared (reward), won, lost (why).
-- **Attack numbers:** range by height as one function; from M2 on every effect of proposal A
-  (state per pest: slowed, sneezing — with their timers ticked by the step).
-- **Recipes (M3):** a function of "which piece rests on which" → the recipes found.
+- **Content** (`Content/`): `ContentDb.Load(readFile)` takes a function that reads a file by name
+  (`GameContent` in the game: Godot's `FileAccess` on `res://content/`; tests: `File.ReadAllText`
+  or `TestContent`'s strings). `ContentDb.Files` lists every file it reads. All problems are
+  reported at once ("Content is broken: …"); unknown properties and missing fields are errors.
+  `HexColor.IsValid` is Godot's `Color.HtmlIsValid` without Godot (an optional `#`, 3/4/6/8 hex digits).
+- **The game's state** (`Rules/GameState`): gold, the wave index, the phase (`Phase`: Build, Wave,
+  Over), the running wave's schedule and clock. Commands: `TryBuy` (→ `BuyResult`), `RefundFor` /
+  `Sell`, `PestKilled`, `CanStartWave` / `TryStartWave` (with whether the egg is on the counter),
+  `Step(dt)` (the physics step's delta), `CheckCleared(pestsAlive)`, `Lose(LossReason)`. Events
+  (`GameEvent`): `WaveStarted`, `SpawnDue` (which pest, from which side), `WaveCleared` (number,
+  reward), `Won`, `Lost` (why) — `Main` drains them right after each call, in the same physics
+  step, so the order of what happens is the prototype's.
+- **Pure rules:** `WaveSchedule.Build` (keeps the prototype's `List.Sort`: pests at the same time
+  keep their order); `Shop.Refund` (half to even, like Godot's `Mathf.RoundToInt`); `Reach.Of`
+  (range by height — the shooter and the range overlay ask it).
+- **Next:** from M2 every effect of proposal A (ADR 003; state per pest: slowed, itching — timers
+  ticked by `Step`); recipes (M3): a function of "which piece rests on which".
 - **What it does not know:** positions in the world beyond what a rule needs, shapes, contacts,
-  pictures. A random decision that is a rule draws from a seeded `Rng`.
+  pictures, the hand. A random decision that is a rule will draw from a seeded `Rng` (none yet).
 
 The pattern every core module follows: a state object and functions that advance it by a
 command or a fixed step; no hidden state outside it; what follows from content and state is a
@@ -251,7 +261,8 @@ are English `snake_case`; `name` and `description` are German.
 
 Validated: shapes, projectile kinds, movements and sides from fixed lists; positive sizes, mass,
 health, speeds, cooldowns; colours parse; the egg exists and is not in the shop; a wave has
-groups and names known pests. From M1 a test loads the shipped files.
+groups and names known pests. `ContentFilesTests` loads the shipped files and checks that every
+JSON file in the folder is one the loader reads.
 
 ---
 

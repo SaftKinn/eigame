@@ -41,6 +41,9 @@ fun, without any frame animation?
   wave, cleared, won, lost); range by height as one function.
 - Godot calls the core and reads its events; `Main.cs` keeps the physics, the hand and the view.
 - The Stop hook and the pre-commit hook run the tests.
+- **Built 2026-10-24** (commits `df9ac84`, `c4c6024`): `GameState`, `WaveSchedule`, `Shop`, `Reach`,
+  `ContentDb` in the core; 76 tests; a headless smoke run of wave 1 in a scratch copy.
+  *The tests' gate is met; the live gate is open.*
 - **Verification (tests):** the shipped content loads; each kind of bad entry is rejected with a
   message naming file and id; the refund rule; the schedule (times, sides — "both" alternates,
   the first from the right — sorted); every phase change (a wave cannot start with the egg on the

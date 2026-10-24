@@ -52,4 +52,6 @@ confirms or refutes them. Lessons learned in this project go under their own hea
 
 ### Learned in this project
 
-_None yet._
+- [grep-q-in-a-pipe-with-pipefail](grep-q-in-a-pipe-with-pipefail.md) — `echo | grep -q` under
+  `pipefail` reported a found error as missing (SIGPIPE); match with a here-string, and try every
+  check against the failure it is meant to catch.

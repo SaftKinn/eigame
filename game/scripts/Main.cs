@@ -5,12 +5,12 @@ using RettetDasEi.Sim;
 
 namespace RettetDasEi;
 
-public enum Phase { Build, Wave, Over }
-
 /// <summary>
 /// The whole prototype in one scene, built from code: the kitchen, the tower of food, the waves
 /// of pests and the shop. Between waves food is bought and stacked by hand (the physics runs the
 /// whole time); during a wave the food shoots by itself. The egg must not touch the counter.
+/// Gold, the waves and the phases are the rules core's (<see cref="GameState"/>, ADR 002): this
+/// scene reports what the physics saw and shows what the core decided.
 /// </summary>
 public partial class Main : Node2D
 {
@@ -27,17 +27,15 @@ public partial class Main : Node2D
     const float BoardRamp = 24f;
     const float RotateStep = Mathf.Pi / 12f;
 
-    public Phase Phase { get; private set; } = Phase.Build;
-    public int Gold { get; private set; }
-    public int WaveIndex { get; private set; }
+    public Phase Phase => _game.Phase;
     public IReadOnlyList<Enemy> Enemies => _enemies;
     public UnitBody? HeldUnit => _held;
     public Node2D FxRoot { get; private set; } = null!;
 
     readonly List<Enemy> _enemies = new();
     readonly List<UnitBody> _units = new();
-    readonly List<(float Time, string Enemy, float Dir)> _spawnQueue = new();
 
+    GameState _game = null!;
     UnitBody _egg = null!;
     StaticBody2D _counter = null!;
     Node2D _unitsRoot = null!;
@@ -46,7 +44,6 @@ public partial class Main : Node2D
     Camera2D _camera = null!;
     Hud _hud = null!;
 
-    float _waveTime;
     float _shake;
     bool _fast;
 
@@ -61,7 +58,7 @@ public partial class Main : Node2D
         I = this;
         Engine.TimeScale = 1.0;
         GameContent.Load();
-        Gold = GameContent.Db.Game.StartGold;
+        _game = new GameState(GameContent.Db);
 
         AddChild(new KitchenBackdrop { ZIndex = -10 });
         _counter = AddStatic(new Vector2(ScreenWidth / 2f, CounterTop + 150f), new Vector2(ScreenWidth + 400f, 300f));
@@ -118,7 +115,7 @@ public partial class Main : Node2D
         _camera.Offset = _shake > 0.01f
             ? new Vector2((float)GD.RandRange(-1.0, 1.0), (float)GD.RandRange(-1.0, 1.0)) * _shake
             : Vector2.Zero;
-        _hud.Refresh(Gold, WaveIndex, GameContent.Db.Waves.Count, Phase, CanStartWave(), EggOnCounter(), _fast);
+        _hud.Refresh(_game.Gold, _game.WaveIndex, _game.WaveCount, Phase, CanStartWave(), EggOnCounter(), _fast);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -140,21 +137,45 @@ public partial class Main : Node2D
         if (Phase != Phase.Wave)
             return;
 
-        _waveTime += (float)delta;
-        while (_spawnQueue.Count > 0 && _spawnQueue[0].Time <= _waveTime)
-        {
-            var spawn = _spawnQueue[0];
-            _spawnQueue.RemoveAt(0);
-            SpawnEnemy(GameContent.Db.Enemy(spawn.Enemy), spawn.Dir);
-        }
+        _game.Step((float)delta);
+        ReadEvents();
 
         if (EggOnCounter())
         {
-            GameOver("Das Ei ist auf die Theke gefallen!");
+            _game.Lose(LossReason.EggOnCounter);
+            ReadEvents();
             return;
         }
-        if (_spawnQueue.Count == 0 && _enemies.Count == 0)
-            WaveCleared();
+        _game.CheckCleared(_enemies.Count);
+        ReadEvents();
+    }
+
+    /// <summary>Shows what the core decided — at once, in the same physics step, as the prototype did.</summary>
+    void ReadEvents()
+    {
+        foreach (var e in _game.DrainEvents())
+        {
+            switch (e)
+            {
+                case GameEvent.WaveStarted started:
+                    _hud.ShowMessage($"Welle {started.Number}!", 2f);
+                    break;
+                case GameEvent.SpawnDue due:
+                    SpawnEnemy(GameContent.Db.Enemy(due.Enemy), due.Dir);
+                    break;
+                case GameEvent.WaveCleared cleared:
+                    _hud.ShowMessage(cleared.Reward > 0
+                        ? $"Welle {cleared.Number} geschafft! +{cleared.Reward} Gold"
+                        : $"Welle {cleared.Number} geschafft!", 3.5f);
+                    break;
+                case GameEvent.Won:
+                    _hud.ShowEnd("Gewonnen!", $"Das Ei hat alle {_game.WaveCount} Wellen überlebt.");
+                    break;
+                case GameEvent.Lost lost:
+                    ShowLost(lost.Reason);
+                    break;
+            }
+        }
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -196,8 +217,7 @@ public partial class Main : Node2D
 
     // ------------------------------------------------------------- waves
 
-    bool CanStartWave() =>
-        Phase == Phase.Build && _held == null && !EggOnCounter() && WaveIndex < GameContent.Db.Waves.Count;
+    bool CanStartWave() => _held == null && _game.CanStartWave(EggOnCounter());
 
     bool EggOnCounter() => IsInstanceValid(_egg) && !_egg.IsBroken && !_egg.IsHeld && _egg.IsTouching(_counter);
 
@@ -210,24 +230,8 @@ public partial class Main : Node2D
             return;
         }
 
-        Phase = Phase.Wave;
-        _waveTime = 0f;
-        _spawnQueue.Clear();
-        foreach (var group in GameContent.Db.Waves[WaveIndex].Groups)
-        {
-            for (int i = 0; i < group.Count; i++)
-            {
-                float dir = group.Side switch
-                {
-                    "left" => 1f,
-                    "right" => -1f,
-                    _ => i % 2 == 0 ? -1f : 1f,
-                };
-                _spawnQueue.Add((group.Start + i * group.Interval, group.Enemy, dir));
-            }
-        }
-        _spawnQueue.Sort((a, b) => a.Time.CompareTo(b.Time));
-        _hud.ShowMessage($"Welle {WaveIndex + 1}!", 2f);
+        _game.TryStartWave(EggOnCounter());
+        ReadEvents();
     }
 
     void SpawnEnemy(EnemyDef def, float dir)
@@ -241,31 +245,14 @@ public partial class Main : Node2D
         _enemies.Add(enemy);
     }
 
-    void WaveCleared()
+    /// <summary>The core has ended the game (it is Over already, so the egg's own break does not lose twice).</summary>
+    void ShowLost(LossReason reason)
     {
-        int reward = GameContent.Db.Waves[WaveIndex].Reward;
-        Gold += reward;
-        WaveIndex++;
-        if (WaveIndex >= GameContent.Db.Waves.Count)
-        {
-            Phase = Phase.Over;
-            _hud.ShowEnd("Gewonnen!", $"Das Ei hat alle {GameContent.Db.Waves.Count} Wellen überlebt.");
-            return;
-        }
-        Phase = Phase.Build;
-        _hud.ShowMessage(reward > 0 ? $"Welle {WaveIndex} geschafft! +{reward} Gold" : $"Welle {WaveIndex} geschafft!", 3.5f);
-    }
-
-    void GameOver(string reason)
-    {
-        if (Phase == Phase.Over)
-            return;
-        Phase = Phase.Over;
-        _spawnQueue.Clear();
+        string why = reason == LossReason.EggOnCounter ? "Das Ei ist auf die Theke gefallen!" : "Das Ei ist zerbrochen!";
         Shake(16f);
         if (IsInstanceValid(_egg) && !_egg.IsBroken)
             _egg.Break();
-        _hud.ShowEnd("Das Ei ist kaputt!", $"{reason}\nDu hast {WaveIndex} von {GameContent.Db.Waves.Count} Wellen geschafft.");
+        _hud.ShowEnd("Das Ei ist kaputt!", $"{why}\nDu hast {_game.WaveIndex} von {_game.WaveCount} Wellen geschafft.");
     }
 
     void Restart()
@@ -365,7 +352,7 @@ public partial class Main : Node2D
     public void OnEnemyKilled(Enemy enemy)
     {
         _enemies.Remove(enemy);
-        Gold += enemy.Def.Gold;
+        _game.PestKilled(enemy.Def);
         Fx.Number(FxRoot, enemy.GlobalPosition + new Vector2(0f, -enemy.Def.Radius - 44f), $"+{enemy.Def.Gold}", Fx.GoldColor, 26);
     }
 
@@ -378,8 +365,11 @@ public partial class Main : Node2D
             _hud.ShowSellHint(null);
         }
         WakeAll();
-        if (unit.IsEgg && Phase != Phase.Over)
-            GameOver("Das Ei ist zerbrochen!");
+        if (unit.IsEgg)
+        {
+            _game.Lose(LossReason.EggBroken);
+            ReadEvents();
+        }
     }
 
     // ------------------------------------------------------ shop and hand
@@ -397,19 +387,18 @@ public partial class Main : Node2D
 
     void BuyFromShop(UnitDef def)
     {
-        if (Phase != Phase.Build)
-        {
-            _hud.ShowMessage("Kaufen geht nur zwischen den Wellen.", 2f);
-            return;
-        }
+        // Something in the hand means a build phase (a wave never starts while one is held).
         if (_held != null)
             return;
-        if (Gold < def.Cost)
+        switch (_game.TryBuy(def))
         {
-            _hud.ShowMessage("Nicht genug Gold.", 2f);
-            return;
+            case BuyResult.NotBetweenWaves:
+                _hud.ShowMessage("Kaufen geht nur zwischen den Wellen.", 2f);
+                return;
+            case BuyResult.TooDear:
+                _hud.ShowMessage("Nicht genug Gold.", 2f);
+                return;
         }
-        Gold -= def.Cost;
         var mouse = GetGlobalMousePosition();
         var unit = CreateUnit(def, mouse, 0f);
         StartHold(unit, true, mouse);
@@ -460,9 +449,7 @@ public partial class Main : Node2D
             Drop(sell);
     }
 
-    int RefundFor(UnitBody unit) => _heldIsNew
-        ? unit.Def.Cost
-        : Mathf.RoundToInt(unit.Def.Cost * GameContent.Db.Game.SellRefund * unit.Hp / unit.MaxHp);
+    int RefundFor(UnitBody unit) => _game.RefundFor(unit.Def, _heldIsNew, unit.Hp, unit.MaxHp);
 
     void Drop(bool sell)
     {
@@ -472,8 +459,7 @@ public partial class Main : Node2D
 
         if (sell)
         {
-            int refund = RefundFor(unit);
-            Gold += refund;
+            int refund = _game.Sell(unit.Def, _heldIsNew, unit.Hp, unit.MaxHp);
             _units.Remove(unit);
             unit.QueueFree();
             if (!_heldIsNew)

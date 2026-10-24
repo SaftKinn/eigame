@@ -24,10 +24,10 @@ public partial class UnitBody : RigidBody2D
 
     public float BoundRadius => Mathf.Max(Def.Width, Def.Height) * 0.5f;
 
-    /// <summary>Higher up shoots further: the core rule of the tower.</summary>
+    /// <summary>Higher up shoots further: the core rule of the tower (<see cref="Reach.Of"/>).</summary>
     public float EffectiveRange => Def.Attack == null
         ? 0f
-        : Def.Attack.Range + Mathf.Max(0f, Main.BoardTop - GlobalPosition.Y) * GameContent.Db.Game.RangePerHeight;
+        : Reach.Of(Def.Attack, GameContent.Db.Game, Main.BoardTop - GlobalPosition.Y);
 
     UnitVisual _visual = null!;
     HpBar _hpBar = null!;

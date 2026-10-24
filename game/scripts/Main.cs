@@ -30,10 +30,15 @@ public partial class Main : Node2D
     public Phase Phase => _game.Phase;
     public IReadOnlyList<Enemy> Enemies => _enemies;
     public UnitBody? HeldUnit => _held;
+    public IReadOnlyList<UnitBody> Units => _units;
     public Node2D FxRoot { get; private set; } = null!;
+    /// <summary>The cheese's glue between pieces (ADR 003).</summary>
+    public GlueBonds Glue { get; private set; } = null!;
 
     readonly List<Enemy> _enemies = new();
     readonly List<UnitBody> _units = new();
+    readonly List<Puddle> _puddles = new();
+    Node2D _puddlesRoot = null!;
 
     GameState _game = null!;
     UnitBody _egg = null!;
@@ -66,7 +71,10 @@ public partial class Main : Node2D
         AddStatic(new Vector2(-20f, 0f), new Vector2(40f, 4000f));
         AddStatic(new Vector2(ScreenWidth + 20f, 0f), new Vector2(40f, 4000f));
 
+        _puddlesRoot = AddLayer("Puddles", -1);
         _unitsRoot = AddLayer("Units", 0);
+        Glue = new GlueBonds { Name = "Glue" };
+        AddChild(Glue);
         _enemiesRoot = AddLayer("Enemies", 1);
         _projectilesRoot = AddLayer("Projectiles", 2);
         AddChild(new RangeOverlay { ZIndex = 3 });
@@ -120,6 +128,8 @@ public partial class Main : Node2D
 
     public override void _PhysicsProcess(double delta)
     {
+        _puddles.RemoveAll(p => p.Done);
+
         if (_pendingPick is Vector2 pick)
         {
             _pendingPick = null;
@@ -348,6 +358,68 @@ public partial class Main : Node2D
     }
 
     public void Shake(float amount) => _shake = Mathf.Max(_shake, amount);
+
+    // ------------------------------------------------- the food's jobs (ADR 003)
+
+    public void AddPuddle(PuddleDef def, float x)
+    {
+        var puddle = new Puddle();
+        puddle.Setup(def, new Vector2(x, GroundY(x)));
+        _puddlesRoot.AddChild(puddle);
+        _puddles.Add(puddle);
+    }
+
+    /// <summary>Tells a walker's effects every puddle it stands in; the core picks the strongest.</summary>
+    public void ApplyPuddles(Enemy enemy)
+    {
+        foreach (var puddle in _puddles)
+            if (!puddle.Done && Mathf.Abs(enemy.Position.X - puddle.Position.X) <= puddle.Def.Radius + enemy.Def.Radius * 0.5f)
+                enemy.Effects.InPuddle(puddle.Def);
+    }
+
+    /// <summary>Whether a living pest touches this piece (a few pixels of slack: pests stop just short).</summary>
+    public bool PestTouches(UnitBody unit)
+    {
+        foreach (var enemy in _enemies)
+            if (!enemy.IsDead && enemy.GlobalPosition.DistanceTo(unit.GlobalPosition) <= enemy.Def.Radius + unit.BoundRadius + 8f)
+                return true;
+        return false;
+    }
+
+    /// <summary>
+    /// A tomato bursts: pests within its radius take its damage, own food within it is pushed away
+    /// without damage — the egg too (ADR 003; how much is the core's <see cref="Bomb"/>).
+    /// </summary>
+    public void Burst(UnitBody bomb)
+    {
+        var def = bomb.Def.Bomb!;
+        var center = bomb.GlobalPosition;
+
+        var victims = new List<Enemy>();
+        foreach (var enemy in _enemies)
+            if (!enemy.IsDead && Bomb.Hits(def, enemy.GlobalPosition.DistanceTo(center), enemy.Def.Radius))
+                victims.Add(enemy);
+        foreach (var enemy in victims)
+            enemy.TakeDamage(def.Damage);
+
+        foreach (var unit in _units)
+        {
+            if (unit == bomb || unit.IsHeld || unit.IsBroken)
+                continue;
+            var away = unit.GlobalPosition - center;
+            float push = Bomb.PushAt(def, away.Length(), unit.BoundRadius);
+            if (push <= 0f)
+                continue;
+            var direction = away.LengthSquared() > 1f ? away.Normalized() : Vector2.Up;
+            unit.Shove((direction + Vector2.Up * 0.4f).Normalized() * push);
+        }
+
+        Fx.Crumbs(FxRoot, center, Color.FromHtml(bomb.Def.Fill), 40, 460f);
+        Fx.Crumbs(FxRoot, center, new Color(1f, 0.9f, 0.6f), 14, 300f);
+        Fx.Number(FxRoot, center + new Vector2(0f, -70f), "Platsch!", new Color(1f, 0.55f, 0.45f), 34);
+        Shake(10f);
+        bomb.Break();
+    }
 
     public void OnEnemyKilled(Enemy enemy)
     {

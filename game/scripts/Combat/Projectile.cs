@@ -6,7 +6,8 @@ namespace RettetDasEi;
 
 /// <summary>
 /// A pickle slice, a pepper burst, a seed or a blob of mustard. Straight shots aim a little
-/// ahead of their target; lobbed ones pick an arc and splash where they land.
+/// ahead of their target and fly on through as many pests as they pierce; lobbed ones pick an
+/// arc, splash where they land and may leave a puddle. A hit with an itch tickles (ADR 003).
 /// </summary>
 public partial class Projectile : Node2D
 {
@@ -18,6 +19,7 @@ public partial class Projectile : Node2D
     float _life = 3f;
     float _spin;
     bool _done;
+    readonly List<Enemy> _hit = new();
 
     public void Setup(AttackDef attack, Vector2 from, Enemy target)
     {
@@ -57,7 +59,7 @@ public partial class Projectile : Node2D
         Enemy? hit = null;
         foreach (var enemy in Main.I.Enemies)
         {
-            if (!enemy.IsDead && enemy.GlobalPosition.DistanceTo(GlobalPosition) <= enemy.Def.Radius + HitRadius)
+            if (!enemy.IsDead && !_hit.Contains(enemy) && enemy.GlobalPosition.DistanceTo(GlobalPosition) <= enemy.Def.Radius + HitRadius)
             {
                 hit = enemy;
                 break;
@@ -65,8 +67,21 @@ public partial class Projectile : Node2D
         }
         if (hit != null)
         {
-            Impact(hit);
-            return;
+            if (_lob || _attack.Splash > 0f)
+            {
+                Impact(hit);
+                return;
+            }
+            // A straight shot: this pest is hit, and the core says whether the shot flies on.
+            _hit.Add(hit);
+            Strike(hit);
+            Fx.Crumbs(Main.I.FxRoot, GlobalPosition, DrawKit.ProjectileColor(_attack.Visual), 5, 150f);
+            if (!Pierce.FliesOn(_attack, _hit.Count))
+            {
+                _done = true;
+                QueueFree();
+                return;
+            }
         }
         if (_lob && Position.Y >= Main.I.GroundY(Position.X))
         {
@@ -92,16 +107,26 @@ public partial class Projectile : Node2D
                 if (!enemy.IsDead && enemy.GlobalPosition.DistanceTo(GlobalPosition) <= _attack.Splash + enemy.Def.Radius)
                     victims.Add(enemy);
             foreach (var enemy in victims)
-                enemy.TakeDamage(_attack.Damage);
+                Strike(enemy);
             Fx.Crumbs(Main.I.FxRoot, GlobalPosition, color, 16, 260f);
             Main.I.Shake(3f);
         }
         else if (direct != null)
         {
-            direct.TakeDamage(_attack.Damage);
+            Strike(direct);
             Fx.Crumbs(Main.I.FxRoot, GlobalPosition, color, 5, 150f);
         }
+        if (_attack.Puddle != null)
+            Main.I.AddPuddle(_attack.Puddle, GlobalPosition.X);
         QueueFree();
+    }
+
+    /// <summary>The damage, then the itch if this attack has one and the pest is still alive.</summary>
+    void Strike(Enemy enemy)
+    {
+        enemy.TakeDamage(_attack.Damage);
+        if (_attack.Itch != null && !enemy.IsDead)
+            enemy.AddItch(_attack.Itch);
     }
 
     public override void _Draw()

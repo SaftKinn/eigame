@@ -33,6 +33,7 @@ public partial class UnitBody : RigidBody2D
     HpBar _hpBar = null!;
     float _cooldown;
     Tween? _shot;
+    Tween? _spring;
 
     public void Setup(UnitDef def, GameDef game)
     {
@@ -97,6 +98,12 @@ public partial class UnitBody : RigidBody2D
 
     public override void _PhysicsProcess(double delta)
     {
+        // A bomb shoots nothing; it bursts as soon as a pest touches it (ADR 003).
+        if (Def.Bomb != null && !IsBroken && !IsHeld && Main.I.Phase == Phase.Wave && Main.I.PestTouches(this))
+        {
+            Main.I.Burst(this);
+            return;
+        }
         if (IsBroken || IsHeld || Def.Attack == null || Main.I.Phase != Phase.Wave)
             return;
         _cooldown -= (float)delta;
@@ -159,7 +166,31 @@ public partial class UnitBody : RigidBody2D
             return;
         Sleeping = false;
         ApplyImpulse(impulse, atGlobal - GlobalPosition);
+        Main.I.Glue.Blow(this, impulse.Length());
         TakeDamage(damage);
+    }
+
+    /// <summary>A push without damage — a tomato bursting nearby.</summary>
+    public void Shove(Vector2 impulse)
+    {
+        if (IsBroken || IsHeld)
+            return;
+        Sleeping = false;
+        ApplyCentralImpulse(impulse);
+        Main.I.Glue.Blow(this, impulse.Length());
+    }
+
+    /// <summary>The toast's spring: squash against the blow, then bounce back.</summary>
+    public void SpringBack()
+    {
+        if (IsBroken)
+            return;
+        _spring?.Kill();
+        _spring = CreateTween();
+        _spring.TweenProperty(_visual, "scale", new Vector2(0.8f, 1.15f), 0.06);
+        _spring.TweenProperty(_visual, "scale", Vector2.One, 0.4)
+            .SetTrans(Tween.TransitionType.Elastic).SetEase(Tween.EaseType.Out);
+        Fx.Crumbs(Main.I.FxRoot, GlobalPosition, new Color(0.95f, 0.8f, 0.5f), 8, 200f);
     }
 
     public void TakeDamage(float damage)
@@ -190,6 +221,7 @@ public partial class UnitBody : RigidBody2D
             Fx.Crumbs(fx, GlobalPosition, Color.FromHtml(Def.Fill), 18, 300f);
         }
         Main.I.Shake(IsEgg ? 14f : 5f);
+        Main.I.Glue.Loosen(this, strings: false);
         Main.I.OnUnitBroken(this);
         QueueFree();
     }
@@ -200,6 +232,8 @@ public partial class UnitBody : RigidBody2D
 
     public void BeginHold()
     {
+        // Picking up always loosens the glue; what lay on it falls (ADR 003).
+        Main.I.Glue.Loosen(this, strings: true);
         IsHeld = true;
         _shot?.Kill();
         _visual.Scale = Vector2.One;

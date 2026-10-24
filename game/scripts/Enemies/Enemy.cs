@@ -15,8 +15,11 @@ public partial class Enemy : Node2D
     const float Strike = 0.08f;
     const float Recover = 0.34f;
     const float HopCycle = 1.1f;
+    const float KnockSeconds = 0.32f;
 
     public EnemyDef Def { get; private set; } = null!;
+    /// <summary>The itch, the sneeze and the slow — the rules core's (ADR 002, 003).</summary>
+    public PestEffects Effects { get; } = new();
     /// <summary>+1 walks right (came from the left), -1 walks left.</summary>
     public float Dir { get; private set; }
     public float Hp { get; private set; }
@@ -33,6 +36,11 @@ public partial class Enemy : Node2D
     UnitBody? _target;
     float _t;
     float _hopT;
+    float _knockT;
+    float _knockTime;
+    float _knockDistance;
+    Vector2 _knockFrom;
+    Vector2 _knockTo;
 
     public void Setup(EnemyDef def, float dir)
     {
@@ -58,19 +66,44 @@ public partial class Enemy : Node2D
             IdleMotion();
             return;
         }
-        if (_attacking)
+
+        // The food's jobs (ADR 003): the core keeps the itch, the sneeze and the slow; the
+        // puddles it stands in are reported every step.
+        Effects.Step(dt);
+        Effects.ClearPuddles();
+        if (!IsFlyer)
+            Main.I.ApplyPuddles(this);
+
+        if (_knockT < _knockTime)
+            KnockStep(dt);
+        else if (Effects.Sneezing)
+        {
+            Velocity = Vector2.Zero;
+            IdleMotion();
+        }
+        else if (_attacking)
             AttackStep(dt);
         else if (IsFlyer)
             FlyStep(dt);
         else
             WalkStep(dt);
+        Tremble();
+    }
+
+    /// <summary>The itch is seen: the closer the next sneeze, the more it trembles.</summary>
+    void Tremble()
+    {
+        float share = Effects.ItchShare;
+        if (share > 0f)
+            _visual.Position += new Vector2((float)GD.RandRange(-1.0, 1.0), (float)GD.RandRange(-1.0, 1.0)) * share * 5f;
     }
 
     // ---------------------------------------------------------------- moving
 
     void WalkStep(float dt)
     {
-        float step = Def.Speed * dt;
+        float speed = Def.Speed * Effects.SpeedFactor;
+        float step = speed * dt;
         float lift = 0f;
         if (Def.Movement == "hop")
         {
@@ -86,7 +119,7 @@ public partial class Enemy : Node2D
             else
             {
                 float q = (p - 0.3f) / 0.7f;
-                step = Def.Speed * dt / 0.7f;
+                step = speed * dt / 0.7f;
                 lift = Mathf.Sin(q * Mathf.Pi) * Def.Radius * 0.9f;
                 _visual.Scale = new Vector2(0.94f, 1.06f);
             }
@@ -108,7 +141,7 @@ public partial class Enemy : Node2D
         }
 
         Position = new Vector2(nextX, Main.I.GroundY(nextX) - Def.Radius);
-        Velocity = new Vector2(Dir * Def.Speed, 0f);
+        Velocity = new Vector2(Dir * speed, 0f);
         if ((Dir > 0f && Position.X > Main.ScreenWidth + 90f) || (Dir < 0f && Position.X < -90f))
             SetDir(-Dir);
 
@@ -217,6 +250,8 @@ public partial class Enemy : Node2D
             {
                 _struck = true;
                 DoStrike();
+                if (!_attacking)
+                    return; // a shield threw it back
             }
         }
         else if (_attackT < Windup + Strike + Recover)
@@ -260,9 +295,75 @@ public partial class Enemy : Node2D
         // Walkers shove forward and a little upward — that is what tips a tower over.
         var push = IsFlyer ? direction : new Vector2(Dir, -0.35f).Normalized();
         var contact = Position + direction * Def.Radius;
-        food.TakeHit(Def.Damage, push * Def.Push, contact);
-        Main.I.Shake(Mathf.Clamp(Def.Push / 150f, 1f, 12f));
+        var shield = food.Def.Shield;
+        float strength = Shield.PushOn(shield, Def.Push);
+        food.TakeHit(Def.Damage, push * strength, contact);
+        Main.I.Shake(Mathf.Clamp(strength / 150f, 1f, 12f));
         Fx.Crumbs(Main.I.FxRoot, contact, Colors.White, 6, 140f);
+        if (shield != null)
+        {
+            // The toast springs back and throws the pest off (ADR 003).
+            food.SpringBack();
+            KnockBack(shield.ThrowBack);
+        }
+    }
+
+    // ------------------------------------------------- thrown back, sneezing
+
+    /// <summary>Thrown back <paramref name="distance"/> pixels in a short hop; it has to come on again.</summary>
+    void KnockBack(float distance)
+    {
+        if (distance <= 0f)
+            return;
+        var back = -AttackDirection();
+        if (!IsFlyer)
+            back = new Vector2(-Dir, 0f);
+        StopAttack();
+        _knockFrom = Position;
+        _knockTo = Position + back * distance;
+        _knockTo.X = Mathf.Clamp(_knockTo.X, -80f, Main.ScreenWidth + 80f);
+        _knockDistance = distance;
+        _knockT = 0f;
+        _knockTime = KnockSeconds;
+        Velocity = Vector2.Zero;
+    }
+
+    void KnockStep(float dt)
+    {
+        _knockT += dt;
+        float p = Mathf.Clamp(_knockT / _knockTime, 0f, 1f);
+        float e = EaseOut(p);
+        if (IsFlyer)
+        {
+            Position = _knockFrom.Lerp(_knockTo, e);
+            Hover();
+        }
+        else
+        {
+            float x = Mathf.Lerp(_knockFrom.X, _knockTo.X, e);
+            Position = new Vector2(x, Main.I.GroundY(x) - Def.Radius);
+            float arc = Mathf.Sin(p * Mathf.Pi) * Mathf.Min(_knockDistance * 0.4f, 40f);
+            _visual.Position = new Vector2(0f, -arc);
+            _visual.Rotation = Dir * 0.35f * Mathf.Sin(p * Mathf.Pi);
+        }
+        Velocity = Vector2.Zero;
+        if (p >= 1f)
+            _visual.Rotation = 0f;
+    }
+
+    /// <summary>A pepper hit: the core counts the itch and says when it sneezes.</summary>
+    public void AddItch(ItchDef itch)
+    {
+        if (IsDead || !Effects.AddItch(itch))
+            return;
+        KnockBack(itch.Push);
+        var tween = CreateTween();
+        tween.TweenProperty(_visual, "scale", new Vector2(1.3f, 0.72f), 0.08);
+        tween.TweenProperty(_visual, "scale", Vector2.One, 0.35)
+            .SetTrans(Tween.TransitionType.Elastic).SetEase(Tween.EaseType.Out);
+        var face = GlobalPosition + new Vector2(Dir * Def.Radius, -Def.Radius * 0.3f);
+        Fx.Crumbs(Main.I.FxRoot, face, new Color(0.9f, 0.88f, 0.82f), 14, 220f);
+        Fx.Number(Main.I.FxRoot, GlobalPosition + new Vector2(0f, -Def.Radius - 40f), "Hatschi!", new Color(0.85f, 0.95f, 1f), 24);
     }
 
     Vector2 AttackDirection()

@@ -1,0 +1,25 @@
+# Normalize line endings in the repo; checkout follows the platform.
+* text=auto
+
+# Shell scripts and git hooks must stay LF, or Git Bash on Windows fails with "\r: command not found".
+*.sh text eol=lf
+tools/hooks/* text eol=lf
+
+# Godot text resources: keep LF so diffs don't churn between machines.
+*.gd text eol=lf
+*.tscn text eol=lf
+*.tres text eol=lf
+*.godot text eol=lf
+*.import text eol=lf
+
+# Visual Studio solutions are CRLF by convention.
+*.sln text eol=crlf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.ogg binary
+*.wav binary
+*.ttf binary
+*.otf binary
+*.aseprite binary

@@ -1,0 +1,9 @@
+{
+  "startGold": 120,
+  "rangePerHeight": 0.6,
+  "eggUnit": "egg",
+  "unitLinearDamp": 0.05,
+  "unitAngularDamp": 0.8,
+  "sellRefund": 1.0,
+  "lobGravity": 980
+}

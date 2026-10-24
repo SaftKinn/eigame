@@ -1,0 +1,35 @@
+# Godot
+.godot/
+/game/android/
+/export/
+/game/export/
+export_presets.cfg
+*.translation
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+*.DotSettings.user
+mono_crash.*.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code: commit the skills and shared settings, keep everything else local
+.claude/**
+!.claude/skills
+!.claude/skills/**
+!.claude/settings.json
+.claude/settings.local.json
+
+# Generated pictures nobody has picked from yet
+/art-inbox/
+
+# Logs of "Spiel starten.bat"
+/logs/

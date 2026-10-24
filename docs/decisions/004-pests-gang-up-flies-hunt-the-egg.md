@@ -43,3 +43,13 @@ front one ever attacked; flyers flew at the highest piece and bit the first thin
   can have before wave 3 — lost wave 3 every time in the harness; his taller towers may do better.
   Wave 3 is the first thing to watch.
 - Steering is Godot's (where the way is free); when to give up is the core's.
+
+## Addendum (2026-10-24): no blocking at all
+
+He saw ants wait behind one the pepper had made sneeze: "es soll allgemein kein Block geben".
+Walkers no longer block each other in any state (`Main.IsBlockedByEnemy` is gone): each walks
+until it touches food. Measured: everything fell a wave earlier (crowds of 10–11; 390 gold lost
+wave 5) — the queue had spread them out. Lowering the ant's and meatball's push changed nothing;
+smaller waves did (about a quarter fewer pests, a little more time between them), with the wave
+rewards raised (25/35/40/50) so the gold a game gives by wave 5 stays near 375. Measured after:
+115 gold loses wave 3, 250 wave 4, 345 wave 5, 390 wins one run in two.

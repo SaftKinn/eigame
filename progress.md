@@ -14,7 +14,8 @@ on-demand._
   bursts. Rounds with him since: a glued tower jumping by itself (fixed: the pair's collision
   off); the cheese in red wax, only its cut face sticks; "klebt hier" while holding; a picked-up
   piece snaps to the 15° step; "too easy" → harder waves and less gold, aimed at "wave 5 only
-  just"; **ADR 004:** pests gang up (a heap), flies hunt the egg round the food.
+  just"; **ADR 004:** pests gang up (a heap), never block each other, flies hunt the egg round
+  the food.
 - **Next:** Sezgin plays (the script in `## Next concrete step`) — wave 3 first; his words → a
   tuning round (`/playtest-triage`) or M2 closed. Then M3 (recipes, grill first).
 - **Open live gates — one:** M2, every food a job, with the difficulty and ADR 004 (his round).
@@ -71,7 +72,8 @@ numbers are guesses — expect tuning (all in `units.json`).
    the tuning:** waves 1–2 relaxed, from wave 3 the tower has to be good, wave 5 only just — and
    sometimes lost? Less gold now (100 to start, little per kill). **Wave 3 above all** — the
    harness lost it even with all the gold one can have by then.
-7. **Pests (ADR 004):** do walkers pile up at the tower and attack together (a heap)? Do flies fly
+7. **Pests (ADR 004):** nobody waits behind anybody any more — does a sneezing or thrown-back pest
+   get passed? Do walkers pile up at the tower and attack together (a heap)? Do flies fly
    round the food to the egg — and bite their way in when it is built in? Is an egg on top now
    too easy a target?
 His words → `/playtest-triage` (tuning in `units.json`) or M2 closed; then M3 (recipes, `/grill-me` first).
@@ -133,6 +135,11 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 
 ## Playtest notes
 
+- **2026-10-24 — M2, fifth answer:** "wenn der Pfefferstreuer einen anschießt und er zurück
+  genockt wird, sollte eine andere Ameise vorgehen können" — then: "es soll allgemein kein Block
+  geben" → walkers never block each other (ADR 004 addendum). Retuned: waves about a quarter
+  smaller, rewards 25/35/40/50. Measured: 115 gold loses wave 3, 250 wave 4, 345 wave 5, 390
+  wins one run in two.
 - **2026-10-24 — M2, fourth answer:** "Gegner sollen sich stacken und angreifen, nicht immer nur
   einer. Außerdem sollen die Fliegen um Bauteile rumfliegen und direkt das Ei angreifen" → his
   picks: a crowd (not climbing); flies bite what blocks them after ~2 s → ADR 004. Measured: crowds

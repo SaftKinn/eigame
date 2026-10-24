@@ -141,12 +141,6 @@ public partial class Enemy : Node2D
             BeginAttack(food);
             return;
         }
-        if (Main.I.IsBlockedByEnemy(this, nextX))
-        {
-            Velocity = Vector2.Zero;
-            IdleMotion();
-            return;
-        }
 
         Position = new Vector2(nextX, Main.I.GroundY(nextX) - Def.Radius);
         Velocity = new Vector2(Dir * speed, 0f);

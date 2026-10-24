@@ -362,23 +362,6 @@ public partial class Main : Node2D
         return index;
     }
 
-    /// <summary>
-    /// Walkers queue up behind each other while they walk — but never behind one that is
-    /// attacking: they push in and attack with it (his word, 2026-10-24).
-    /// </summary>
-    public bool IsBlockedByEnemy(Enemy me, float nextX)
-    {
-        foreach (var other in _enemies)
-        {
-            if (other == me || other.IsDead || other.IsFlyer || other.IsAttacking || other.Dir != me.Dir)
-                continue;
-            float ahead = (other.Position.X - nextX) * me.Dir;
-            if (ahead > 0f && ahead < (me.Def.Radius + other.Def.Radius) * 0.6f)
-                return true;
-        }
-        return false;
-    }
-
     public void SpawnProjectile(AttackDef attack, Vector2 from, Enemy target)
     {
         var projectile = new Projectile();

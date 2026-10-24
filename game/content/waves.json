@@ -1,21 +1,21 @@
 [
-  { "reward": 20, "groups": [
-    { "enemy": "ant", "count": 10, "start": 0.5, "interval": 1.0, "side": "right" } ] },
   { "reward": 25, "groups": [
-    { "enemy": "ant", "count": 14, "start": 0.5, "interval": 0.8, "side": "both" },
-    { "enemy": "meatball", "count": 3, "start": 4.0, "interval": 4.0, "side": "right" } ] },
-  { "reward": 30, "groups": [
-    { "enemy": "ant", "count": 14, "start": 0.5, "interval": 0.8, "side": "both" },
-    { "enemy": "fly", "count": 6, "start": 4.0, "interval": 1.5, "side": "both" },
-    { "enemy": "meatball", "count": 4, "start": 5.0, "interval": 3.0, "side": "both" } ] },
+    { "enemy": "ant", "count": 8, "start": 0.5, "interval": 1.2, "side": "right" } ] },
+  { "reward": 35, "groups": [
+    { "enemy": "ant", "count": 10, "start": 0.5, "interval": 1.0, "side": "both" },
+    { "enemy": "meatball", "count": 2, "start": 4.0, "interval": 5.0, "side": "right" } ] },
   { "reward": 40, "groups": [
-    { "enemy": "ant", "count": 22, "start": 0.5, "interval": 0.55, "side": "both" },
-    { "enemy": "meatball", "count": 6, "start": 3.0, "interval": 2.5, "side": "both" },
-    { "enemy": "fly", "count": 12, "start": 2.0, "interval": 0.9, "side": "both" },
+    { "enemy": "ant", "count": 12, "start": 0.5, "interval": 0.9, "side": "both" },
+    { "enemy": "fly", "count": 6, "start": 4.0, "interval": 1.5, "side": "both" },
+    { "enemy": "meatball", "count": 3, "start": 5.0, "interval": 3.5, "side": "both" } ] },
+  { "reward": 50, "groups": [
+    { "enemy": "ant", "count": 16, "start": 0.5, "interval": 0.7, "side": "both" },
+    { "enemy": "meatball", "count": 4, "start": 3.0, "interval": 3.0, "side": "both" },
+    { "enemy": "fly", "count": 8, "start": 2.0, "interval": 1.2, "side": "both" },
     { "enemy": "pudding", "count": 1, "start": 12.0, "interval": 1.0, "side": "right" } ] },
   { "reward": 0, "groups": [
     { "enemy": "pudding", "count": 2, "start": 2.0, "interval": 12.0, "side": "both" },
-    { "enemy": "ant", "count": 24, "start": 0.5, "interval": 0.6, "side": "both" },
-    { "enemy": "fly", "count": 14, "start": 4.0, "interval": 0.9, "side": "both" },
-    { "enemy": "meatball", "count": 8, "start": 6.0, "interval": 2.2, "side": "both" } ] }
+    { "enemy": "ant", "count": 18, "start": 0.5, "interval": 0.7, "side": "both" },
+    { "enemy": "fly", "count": 10, "start": 4.0, "interval": 1.1, "side": "both" },
+    { "enemy": "meatball", "count": 6, "start": 6.0, "interval": 2.6, "side": "both" } ] }
 ]

@@ -157,9 +157,9 @@ of its radius + 3 px on the units' layer) and pushes with impulses, so it can ne
 launched by the stack.
 
 - **Moving:** walkers follow the ground (`Main.GroundY`: board, ramp, counter) — *waddle* tilts,
-  *roll* spins with the distance, *hop* squats and leaps; walkers queue behind one that walks
-  (`IsBlockedByEnemy`) but **never behind one that attacks — they push in and attack with it**
-  (ADR 004), drawn as a heap (`Main.CrowdIndex`); they turn round beyond the screen's edge. *Fly*
+  *roll* spins with the distance, *hop* squats and leaps; **walkers never block each other** —
+  each walks until it touches food, so they arrive and attack together (ADR 004 and its
+  addendum), drawn as a heap (`Main.CrowdIndex`); they turn round beyond the screen's edge. *Fly*
   **hunts the egg** (`Main.Egg`; the highest piece once there is no egg): it steers round food
   in its way (turns of 30–150°, upward first, the side kept), bites the egg on touching it even
   among other pieces (`UnitTouching`'s `prefer`), and after `flyPatience` seconds without a way

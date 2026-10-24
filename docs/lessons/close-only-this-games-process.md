@@ -16,19 +16,23 @@ one afternoon two of them were a headless export of another project. They had no
 - Pick the process by its command line. Chief Wants His Cut also starts with `--path game`, so a
   relative `game` says nothing about which project. **Claude starts this game with the absolute
   path** (`--path "C:\Users\kings\Desktop\Claude\rettet-das-ei\game"`) and closes what matches it;
-  a game started by "Spiel starten.bat" (relative `--path game`) is told apart by its parent, the
-  `cmd.exe` running that `.bat` (the snippet is untried here as of 2026-10-24 — read its count line
-  the first time):
+  a game started by "Spiel starten.bat" (relative `--path game`) is two processes: the
+  `…_console.exe`, whose parent is the `cmd.exe` running that `.bat`, and the window
+  `…_mono_win64.exe`, whose parent is that console exe — so look at the parent **and the
+  grandparent** (2026-10-24: a parent-only match found the console, whose `CloseMainWindow` does
+  nothing, and missed the window). Close the window; the console ends with it:
 
   ```powershell
-  $all = Get-CimInstance Win32_Process -Filter "Name like 'Godot_v%mono%'" |
-      Where-Object { $_.CommandLine -notmatch '--headless' }
-  $mine = $all | Where-Object {
-      $_.CommandLine -match 'rettet-das-ei\\game' -or
-      (Get-CimInstance Win32_Process -Filter "ProcessId=$($_.ParentProcessId)").CommandLine -match 'rettet-das-ei'
-  }
+  function Cmd($id) { (Get-CimInstance Win32_Process -Filter "ProcessId=$id") }
+  $all = @(Get-CimInstance Win32_Process -Filter "Name like 'Godot_v%mono%'" |
+      Where-Object { $_.CommandLine -notmatch '--headless' })
+  $mine = @($all | Where-Object {
+      $parent = Cmd $_.ParentProcessId
+      $grand = if ($parent) { Cmd $parent.ParentProcessId }
+      $_.CommandLine -match 'rettet-das-ei\\game' -or $parent.CommandLine -match 'rettet-das-ei' -or $grand.CommandLine -match 'rettet-das-ei'
+  })
   "$($all.Count) Godot, $($mine.Count) of this game"
-  foreach ($p in $mine) { [void](Get-Process -Id $p.ProcessId).CloseMainWindow() }
+  foreach ($p in $mine) { [void](Get-Process -Id $p.ProcessId -ErrorAction SilentlyContinue).CloseMainWindow() }
   ```
 
 - Close, never kill: `CloseMainWindow` ends the game as a click on its window's cross does.

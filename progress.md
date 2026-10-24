@@ -16,11 +16,14 @@ on-demand._
   piece snaps to the 15° step; "too easy" → harder waves and less gold, aimed at "wave 5 only
   just"; **ADR 004:** pests gang up (a heap), never block each other, flies hunt the egg round
   the food; **ADR 005:** food but cheese slippery, real recoil — a high stack needs a base.
-- **Next:** Sezgin plays (the script in `## Next concrete step`) — wave 3 first; his words → a
-  tuning round (`/playtest-triage`) or M2 closed. Then M3 (recipes, grill first).
-- **Open live gates — one:** M2, every food a job, with the difficulty and ADR 004 (his round).
+- **Next:** Sezgin plays (he will, later — the script in `## Next concrete step`); his words → a
+  tuning round (`/playtest-triage`) or M2 closed. Likely next tuning: waves 4–5 measured against
+  his own tower (`tools/tuning`, tower `his`), not the flat ones. Then M3 (recipes,
+  grill first).
+- **Open live gates — one:** M2, every food a job, with the difficulty, ADR 004 and ADR 005
+  (his round). When a playtest is due, start the game for him (CLAUDE.md).
 - **Tests:** 116, green (`dotnet test tests/RettetDasEi.Sim.Tests`).
-- **Git:** local repo on `main`, no remote yet (GitHub when he wants one).
+- **Git:** `main`, remote `origin` = github.com/SaftKinn/eigame (since 2026-10-24).
 
 ## Current focus
 
@@ -28,6 +31,16 @@ on-demand._
 numbers are guesses — expect tuning (all in `units.json`).
 
 ## Last session
+
+- **2026-10-24 (M2's rounds with him)** — Six answers of his turned into rounds, each measured,
+  committed and the game started for him (details in `## Playtest notes`): the glue's jumping
+  (pins vs contact, measured from his recording, lesson `a-joint-and-a-contact-on-one-pair-fight`);
+  the cheese in wax, only its cut face sticks; a held piece snaps to 15°; harder waves and less
+  gold; ADR 004 (a crowd, no blocking at all, flies hunt the egg); ADR 005 (slippery food, real
+  recoil). A tuning harness (`tools/tuning`) plays fixed towers through the waves
+  (`docs/conventions.md`); his own winning tower rebuilt in it showed the flat towers
+  underestimate a good builder (lesson `measure-difficulty-with-his-tower`). Remote added and
+  pushed.
 
 - **2026-10-24 (M2)** — The six jobs built in one step (his pick). `5daa544`: content fields
   (`bomb`, `glue`, `shield` on units; `pierce` required, `puddle`, `itch` on attacks), their
@@ -41,17 +54,6 @@ numbers are guesses — expect tuning (all in `units.json`).
   meatball tearing the egg off the cheese (480 ≥ 400) and the egg falling — no errors. The five
   shipped waves against a fixed tower of all six (160 gold, placed for free): all won, no pest
   reached the tower.
-
-- **2026-10-24 (M1)** — The rules core built, one seam at a time, a commit each: `df9ac84`
-  (content: `ContentDb` loads through a file reader — `GameContent` in the game —, `HexColor` for
-  Godot's colour check, 45 tests) and `c4c6024` (`GameState` with gold, shop, waves, phases and
-  events; `WaveSchedule`, `Shop.Refund`, `Reach.Of`; `Main` reports and shows events; 76 tests).
-  Checked before the move: Godot's `Mathf.RoundToInt` rounds half to even, `Color.HtmlIsValid`'s
-  rule (both against GodotSharp 4.6.2 in a scratch program). A test compares every shipped wave
-  with the prototype's queue code (pests at the same time keep their order). A mutation check
-  turned 4 tests red. A headless smoke run of wave 1 (scratch copy that starts the wave and prints
-  events): six ants from the right at 1.0–10.0 s, the egg broken at 22 s, lost once, no errors.
-  His round: "hat gepasst" — M1 closed.
 
 ## Next concrete step
 

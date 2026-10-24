@@ -58,3 +58,6 @@ confirms or refutes them. Lessons learned in this project go under their own hea
 - [a-joint-and-a-contact-on-one-pair-fight](a-joint-and-a-contact-on-one-pair-fight.md) — The
   cheese's pins plus the pair's contact made a resting stack jump (836 px/s); collision off between
   joined bodies. Measure a resting scene's fastest body before naming a physics cause.
+- [measure-difficulty-with-his-tower](measure-difficulty-with-his-tower.md) — Flat harness towers
+  lost "only just" while his compact tall tower won with gold to spare; rebuild his tower from a
+  screenshot and tune against it.

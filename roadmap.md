@@ -63,6 +63,9 @@ fun, without any frame animation?
 - **Built 2026-10-24** (commits `5daa544`, `72b0922`; ADR 003's addendum): 111 tests; headless
   smoke runs in a scratch copy fired every job; a fixed six-food tower wins the five waves.
   *The tests' gate is met; the live gate is open.*
+- **His rounds the same day** turned it further (`progress.md`, Playtest notes): the glue held
+  still and in wax, harder waves and less gold, pests that gang up and flies that hunt the egg
+  (ADR 004), slippery food and real recoil (ADR 005). The live gate now covers all of it.
 - **Verification (tests):** each rule of the core with its edge cases — how effects stack, end,
   and meet each other.
 - **Verification (live):** Sezgin can say what each food is for; buying is a choice between jobs;

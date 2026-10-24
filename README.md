@@ -31,4 +31,5 @@ See [`SETUP.md`](SETUP.md). Short version: double-click **`Spiel starten.bat`** 
 | `architecture.md`, `roadmap.md` | the design as built, the milestones with their gates |
 | `docs/` | decisions (ADRs), lessons, conventions, the GPT prompts |
 | `tools/hooks/` | the check after every change (Claude Stop hook) and before every commit |
+| `tools/tuning/` | fixed towers play the waves by themselves — how difficulty is measured (`docs/conventions.md`) |
 | `.claude/` | Claude Code settings and the project skills |

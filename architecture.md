@@ -86,6 +86,7 @@ rettet-das-ei/
 ├── tests/RettetDasEi.Sim.Tests/    xUnit, runs without Godot; TestContent — the tests' own small content
 ├── docs/                           decisions/ (ADRs), lessons/, conventions.md, art-prompts.md
 ├── tools/hooks/                    check-on-change.sh (Claude Stop hook) + pre-commit
+├── tools/tuning/                   the tuning harness: fixed towers play the waves in a copy (tuning-run/, git-ignored)
 ├── .claude/                        settings.json (Stop hook) + project skills
 ├── Spiel starten.bat               builds, imports, starts; logs in logs\
 └── logs/                           git-ignored: dotnet-build.log, import.log, run.log

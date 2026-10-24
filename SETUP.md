@@ -61,4 +61,4 @@ Godot imports them.
 
 - [x] Play the prototype (2026-10-24: "cool", every food feels the same → M2)
 - [x] `git init` (2026-10-24)
-- [ ] If wanted, a GitHub repository (private) as the remote
+- [x] A GitHub repository as the remote: `origin` = https://github.com/SaftKinn/eigame (2026-10-24)

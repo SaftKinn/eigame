@@ -27,6 +27,7 @@ Extend the table with every new folder.
 | `sim/RettetDasEi.Sim/Rules/` | `GameState` (gold, shop, waves, phases), `GameEvent`, `WaveSchedule`, `Shop` (refund), `Reach` (range by height); `PestEffects`, `Jobs` (`Bomb`, `Glue`, `Shield`, `Pierce`) | 002, 003 |
 | `tests/RettetDasEi.Sim.Tests/` | xUnit tests for the core; `TestContent` (the tests' own content); `ContentFilesTests` (the shipped files) | 002 |
 | `tools/hooks/` | `check-on-change.sh` (Claude Stop hook), `pre-commit` (git) | — |
+| `tools/tuning/` | `setup.sh`, `run.sh`, `SmokeHarness.cs` — fixed towers play the waves in a copy (`tuning-run/`, git-ignored) | — |
 
 ## Rules core (`sim/RettetDasEi.Sim/`, since M1 — ADR 002)
 
@@ -76,7 +77,7 @@ Extend the table with every new folder.
   - **Stability (ADR 005):** a stack slides when the recoil a second (shots a second × `recoil`)
     passes grip × mass × 980, and tips over its base when that times the height passes mass ×
     980 × half the base's width. Food but cheese and egg grips at 0.5 on purpose. Measure with
-    the harness's `--tower=pepperweak` / `pepperstrong` (tilt and drift of the cheese) and `his`.
+    the tuning harness's `pepperweak` / `pepperstrong` (tilt and drift of the cheese) and `his`.
   - **The jobs (ADR 003):** the tomato's `bomb` (`damage`, `radius`, `push` — mind the egg: a
     light piece flies far), the cheese's `glue` (`tearImpulse` against the pests' `push`: below
     it a blow does not tear; `restSpeed`, `regrabSeconds`), the toast's `shield` (`pushShare`,
@@ -118,17 +119,20 @@ Extend the table with every new folder.
   `[sneeze]`, `[pierce]`, `[puddle]`): a job that never prints was never tried.
 - **Warnings are errors in the core:** a mutation that makes code unreachable (`if (false)`)
   does not build — no test runs, and a grep for "Bestanden" finds nothing. Mutate so it compiles.
-- **Tuning the difficulty** (2026-10-24): a scratch copy with a partial `Main` of its own
-  (`SmokeHarness.cs`, three hooks into `Main`: build the tower in `_Ready`, start every wave 2.5 s
-  into a build phase, quit at won/lost) places a fixed tower by size — `-- --tower=small` (115
-  gold), `mid` (250), `big` (390), `bigless` (345) — and prints the wave it was lost in and the
-  gold after each wave; each tower twice, ~25 s for six runs. Since ADR 004 also `w3` (180 gold,
-  the most one can have before wave 3), the largest crowd per wave and how many fly bites went to
-  the egg. The scratchpad keeps `setup-tune.sh` (a fresh copy with the harness hooked in) and
-  `run.sh <label> [towers]`. The target he set: small loses early, mid around wave 4, big wins
-  wave 5 only just. Its towers are flat; his are taller and so stronger — and runs differ from
-  each other (physics): don't tune a number on one run, and stop when a change shows nothing.
-  Change content in the copy, measure, then copy the files over and `git diff` them.
+- **Tuning the difficulty** (2026-10-24): `bash tools/tuning/setup.sh` copies `game/` and `sim/`
+  to `tuning-run/` (git-ignored) and hooks `tools/tuning/SmokeHarness.cs` (a partial `Main`) into
+  that copy — three hooks: build a fixed tower in `_Ready`, start every wave 2.5 s into a build
+  phase, quit at won/lost. Then `cd tuning-run && bash run.sh <label> [towers]` plays each tower
+  twice (~4 s a run) and prints the wave it was lost in, the gold after each wave, the largest
+  crowd, a probe's tilt and drift, and how many fly bites went to the egg. Towers: `small` (115
+  gold), `w3` (180, the most one can have before wave 3), `mid` (250), `bigless` (345), `big`
+  (390) — flat, shooters on the board —, **`his`** (245, his winning tower of 2026-10-24: the
+  reference for "only just", lesson `measure-difficulty-with-his-tower`), `pepperweak` /
+  `pepperstrong` (ADR 005). The target he set: a careless build loses early, a good one wins
+  wave 5 only just. Runs differ (physics): never tune a number on one run, and stop when a change
+  shows nothing. Change content in `tuning-run/game/content`, measure, then copy the files into
+  the repo and `git diff` them. If `setup.sh` says a hook did not apply, `Main.cs` or `Enemy.cs`
+  changed where its `sed` lines look.
 - **A mutation check** shows the tests can fail: break a rule on purpose (in a copy, or restore
   it with `git checkout -- <file>` once it is committed), see which tests turn red, put it back,
   see green again.

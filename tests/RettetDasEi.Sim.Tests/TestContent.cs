@@ -37,7 +37,41 @@ public static class TestContent
             "shape": "capsule", "width": 120, "height": 44, "mass": 1, "friction": 0.9, "hp": 50,
             "fill": "#6BAA3A", "accent": "#3F7A1E", "visual": "pickle",
             "attack": { "projectile": "straight", "visual": "slice", "damage": 10, "cooldown": 1,
-                        "range": 400, "speed": 900, "splash": 0, "recoil": 20 }
+                        "range": 400, "speed": 900, "splash": 0, "recoil": 20, "pierce": 3 }
+          },
+          {
+            "id": "lobber", "name": "Werfer", "description": "Pfütze.", "inShop": true, "cost": 40,
+            "shape": "box", "width": 48, "height": 124, "mass": 1, "friction": 0.9, "hp": 45,
+            "fill": "#F4C430", "accent": "#C0392B", "visual": "mustard",
+            "attack": { "projectile": "lob", "visual": "mustard", "damage": 8, "cooldown": 2,
+                        "range": 500, "speed": 0, "splash": 75, "recoil": 15, "pierce": 1,
+                        "puddle": { "radius": 70, "seconds": 4, "slow": 0.4 } }
+          },
+          {
+            "id": "pepper", "name": "Pfeffer", "description": "Niesen.", "inShop": true, "cost": 30,
+            "shape": "box", "width": 42, "height": 70, "mass": 0.6, "friction": 0.9, "hp": 30,
+            "fill": "#ECE7DC", "accent": "#4A4A4A", "visual": "pepper",
+            "attack": { "projectile": "straight", "visual": "pepper", "damage": 4, "cooldown": 0.35,
+                        "range": 360, "speed": 1100, "splash": 0, "recoil": 6, "pierce": 1,
+                        "itch": { "hits": 3, "pause": 1.5, "push": 30 } }
+          },
+          {
+            "id": "bomb", "name": "Bombe", "description": "Platzt.", "inShop": true, "cost": 15,
+            "shape": "circle", "width": 64, "height": 64, "mass": 0.9, "friction": 0.8, "hp": 35,
+            "fill": "#E74C3C", "accent": "#2E8B3A", "visual": "tomato",
+            "bomb": { "damage": 50, "radius": 100, "push": 400 }
+          },
+          {
+            "id": "sticky", "name": "Kleber", "description": "Klebt.", "inShop": true, "cost": 20,
+            "shape": "box", "width": 150, "height": 56, "mass": 4, "friction": 1, "hp": 140,
+            "fill": "#F2C94C", "accent": "#C99A1E", "visual": "cheese",
+            "glue": { "tearImpulse": 400, "restSpeed": 20, "regrabSeconds": 1 }
+          },
+          {
+            "id": "wall", "name": "Wand", "description": "Federt.", "inShop": true, "cost": 15,
+            "shape": "box", "width": 92, "height": 84, "mass": 1.5, "friction": 1, "hp": 70,
+            "fill": "#F3D39B", "accent": "#B9773A", "visual": "toast",
+            "shield": { "pushShare": 0.25, "throwBack": 90 }
           }
         ]
         """;

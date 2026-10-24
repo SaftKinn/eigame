@@ -18,7 +18,7 @@
   {
     "id": "cheese",
     "name": "Käseblock",
-    "description": "Breit und schwer. Das beste Fundament.",
+    "description": "Klebt fest, was auf ihm liegen bleibt.",
     "inShop": true,
     "cost": 20,
     "shape": "box",
@@ -29,12 +29,17 @@
     "hp": 140,
     "fill": "#F2C94C",
     "accent": "#C99A1E",
-    "visual": "cheese"
+    "visual": "cheese",
+    "glue": {
+      "tearImpulse": 400,
+      "restSpeed": 25,
+      "regrabSeconds": 1.0
+    }
   },
   {
     "id": "toast",
     "name": "Toastbrot",
-    "description": "Günstiger Baustein. Leicht, aber stabil.",
+    "description": "Schutzwall: Angreifer fliegen zurück.",
     "inShop": true,
     "cost": 15,
     "shape": "box",
@@ -45,12 +50,16 @@
     "hp": 70,
     "fill": "#F3D39B",
     "accent": "#B9773A",
-    "visual": "toast"
+    "visual": "toast",
+    "shield": {
+      "pushShare": 0.35,
+      "throwBack": 90
+    }
   },
   {
     "id": "pickle",
     "name": "Gurken-Kanone",
-    "description": "Schießt Gurkenscheiben geradeaus. Liegt flach und stabil.",
+    "description": "Scheiben fliegen durch drei Schädlinge.",
     "inShop": true,
     "cost": 35,
     "shape": "capsule",
@@ -70,13 +79,14 @@
       "range": 420,
       "speed": 900,
       "splash": 0,
-      "recoil": 25
+      "recoil": 25,
+      "pierce": 3
     }
   },
   {
     "id": "mustard",
     "name": "Senfflasche",
-    "description": "Spritzt Senf im Bogen und trifft mehrere. Hoch und wackelig.",
+    "description": "Senfpfütze bremst, wer hindurchläuft.",
     "inShop": true,
     "cost": 45,
     "shape": "box",
@@ -91,18 +101,24 @@
     "attack": {
       "projectile": "lob",
       "visual": "mustard",
-      "damage": 16,
+      "damage": 8,
       "cooldown": 2.2,
       "range": 520,
       "speed": 0,
       "splash": 75,
-      "recoil": 15
+      "recoil": 15,
+      "pierce": 1,
+      "puddle": {
+        "radius": 70,
+        "seconds": 4,
+        "slow": 0.4
+      }
     }
   },
   {
     "id": "pepper",
     "name": "Pfefferstreuer",
-    "description": "Schnelles Pfeffer-Sperrfeuer mit wenig Schaden. Sehr leicht.",
+    "description": "Kitzelt, bis der Schädling niest.",
     "inShop": true,
     "cost": 30,
     "shape": "box",
@@ -122,15 +138,21 @@
       "range": 360,
       "speed": 1100,
       "splash": 0,
-      "recoil": 6
+      "recoil": 6,
+      "pierce": 1,
+      "itch": {
+        "hits": 6,
+        "pause": 1.2,
+        "push": 30
+      }
     }
   },
   {
     "id": "tomato",
     "name": "Kirschtomate",
-    "description": "Billig und stark, aber rund. Rollt gern davon.",
+    "description": "Platzt bei Berührung wie eine Bombe.",
     "inShop": true,
-    "cost": 20,
+    "cost": 15,
     "shape": "circle",
     "width": 64,
     "height": 64,
@@ -140,15 +162,10 @@
     "fill": "#E74C3C",
     "accent": "#2E8B3A",
     "visual": "tomato",
-    "attack": {
-      "projectile": "straight",
-      "visual": "seed",
-      "damage": 9,
-      "cooldown": 0.9,
-      "range": 380,
-      "speed": 950,
-      "splash": 0,
-      "recoil": 18
+    "bomb": {
+      "damage": 60,
+      "radius": 100,
+      "push": 350
     }
   }
 ]

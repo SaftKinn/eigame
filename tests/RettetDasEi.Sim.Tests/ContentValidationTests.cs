@@ -12,7 +12,7 @@ public class ContentValidationTests
     {
         var db = TestContent.Load();
 
-        Assert.Equal(3, db.Units.Count);
+        Assert.Equal(8, db.Units.Count);
         Assert.Equal(2, db.Waves.Count);
         Assert.Equal("egg", db.Unit("egg").Id);
     }
@@ -34,6 +34,20 @@ public class ContentValidationTests
     [InlineData("units", "\"damage\": 10", "\"damage\": 0", "units.json 'shooter': attack damage")]
     [InlineData("units", "\"speed\": 900", "\"speed\": 0", "units.json 'shooter': a straight shot needs a speed")]
     [InlineData("units", "\"splash\": 0", "\"splash\": -1", "units.json 'shooter': splash and recoil")]
+    [InlineData("units", "\"pierce\": 3", "\"pierce\": 0", "units.json 'shooter': attack.pierce must be 1 or more")]
+    [InlineData("units", "\"recoil\": 15, \"pierce\": 1", "\"recoil\": 15, \"pierce\": 2", "units.json 'lobber': only a straight shot pierces")]
+    [InlineData("units", "\"radius\": 70, \"seconds\": 4", "\"radius\": 0, \"seconds\": 4", "units.json 'lobber': puddle radius and seconds")]
+    [InlineData("units", "\"slow\": 0.4", "\"slow\": 1.5", "units.json 'lobber': puddle slow")]
+    [InlineData("units", "\"slow\": 0.4", "\"slow\": 0", "units.json 'lobber': puddle slow")]
+    [InlineData("units", "\"hits\": 3", "\"hits\": 0", "units.json 'pepper': itch hits")]
+    [InlineData("units", "\"pause\": 1.5", "\"pause\": 0", "units.json 'pepper': itch pause")]
+    [InlineData("units", "\"push\": 30", "\"push\": -1", "units.json 'pepper': itch push")]
+    [InlineData("units", "\"damage\": 50", "\"damage\": 0", "units.json 'bomb': bomb damage and radius")]
+    [InlineData("units", "\"push\": 400", "\"push\": -5", "units.json 'bomb': bomb push")]
+    [InlineData("units", "\"tearImpulse\": 400", "\"tearImpulse\": 0", "units.json 'sticky': glue tearImpulse and restSpeed")]
+    [InlineData("units", "\"regrabSeconds\": 1", "\"regrabSeconds\": -1", "units.json 'sticky': glue regrabSeconds")]
+    [InlineData("units", "\"pushShare\": 0.25", "\"pushShare\": 1.2", "units.json 'wall': shield pushShare")]
+    [InlineData("units", "\"throwBack\": 90", "\"throwBack\": -1", "units.json 'wall': shield throwBack")]
     [InlineData("units", "\"id\": \"block\"", "\"id\": \"shooter\"", "units.json: two units share an id")]
     [InlineData("units", "\"inShop\": false", "\"inShop\": true", "units.json: the egg must not be in the shop")]
     [InlineData("enemies", "\"movement\": \"waddle\"", "\"movement\": \"swim\"", "enemies.json 'ant': movement")]
@@ -50,6 +64,26 @@ public class ContentValidationTests
 
         Assert.Contains("Content is broken", ex.Message);
         Assert.Contains(expected, ex.Message);
+    }
+
+    [Fact]
+    public void A_bomb_does_not_shoot()
+    {
+        string units = TestContent.Units.Replace(
+            "\"bomb\": { \"damage\": 50",
+            "\"attack\": { \"projectile\": \"straight\", \"visual\": \"seed\", \"damage\": 9, \"cooldown\": 1, \"range\": 300, \"speed\": 900, \"splash\": 0, \"recoil\": 0, \"pierce\": 1 },\n\"bomb\": { \"damage\": 50");
+
+        Assert.Contains("units.json 'bomb': a bomb does not shoot", Refused(() => TestContent.Load(units: units)).Message);
+    }
+
+    [Fact]
+    public void Only_a_lob_leaves_a_puddle()
+    {
+        string units = TestContent.Units.Replace(
+            "\"recoil\": 20, \"pierce\": 3 }",
+            "\"recoil\": 20, \"pierce\": 3, \"puddle\": { \"radius\": 70, \"seconds\": 4, \"slow\": 0.4 } }");
+
+        Assert.Contains("units.json 'shooter': only a lob leaves a puddle", Refused(() => TestContent.Load(units: units)).Message);
     }
 
     [Fact]

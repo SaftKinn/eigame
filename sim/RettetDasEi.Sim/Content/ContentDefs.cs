@@ -38,8 +38,43 @@ public sealed class UnitDef
     [JsonRequired] public string Accent { get; set; } = "";
     /// <summary>Art key: art/units/&lt;visual&gt;.png if it exists, else the drawing in DrawKit.</summary>
     [JsonRequired] public string Visual { get; set; } = "";
-    /// <summary>Absent for pure building blocks.</summary>
+    /// <summary>Absent for pure building blocks — and for a bomb, which does not shoot (ADR 003).</summary>
     public AttackDef? Attack { get; set; }
+    // The jobs of ADR 003: each is optional, a unit has the ones its entry names.
+    /// <summary>Bursts at a pest's touch (Tomate).</summary>
+    public BombDef? Bomb { get; set; }
+    /// <summary>What comes to rest on its top sticks to it (Käse).</summary>
+    public GlueDef? Glue { get; set; }
+    /// <summary>A pest striking it is thrown back, and it takes a share of the push (Toast).</summary>
+    public ShieldDef? Shield { get; set; }
+}
+
+/// <summary>Bursts once at any touch with a pest: damages pests, pushes own food — damages none.</summary>
+public sealed class BombDef
+{
+    [JsonRequired] public float Damage { get; set; }
+    /// <summary>Pixels from the bomb's centre to a pest's edge or a piece's bounding circle.</summary>
+    [JsonRequired] public float Radius { get; set; }
+    /// <summary>Impulse on own food at the centre, falling to 0 at the edge of the radius.</summary>
+    [JsonRequired] public float Push { get; set; }
+}
+
+public sealed class GlueDef
+{
+    /// <summary>A blow (a pest's push or a bomb's) at least this strong tears the glue of the piece it hits.</summary>
+    [JsonRequired] public float TearImpulse { get; set; }
+    /// <summary>Both pieces slower than this (pixels per second) count as come to rest.</summary>
+    [JsonRequired] public float RestSpeed { get; set; }
+    /// <summary>Seconds after a tear before the same two can stick again.</summary>
+    [JsonRequired] public float RegrabSeconds { get; set; }
+}
+
+public sealed class ShieldDef
+{
+    /// <summary>0..1, the share of a pest's push the shield takes.</summary>
+    [JsonRequired] public float PushShare { get; set; }
+    /// <summary>Pixels the striking pest is thrown back.</summary>
+    [JsonRequired] public float ThrowBack { get; set; }
 }
 
 public sealed class AttackDef
@@ -56,6 +91,32 @@ public sealed class AttackDef
     [JsonRequired] public float Splash { get; set; }
     /// <summary>Impulse that pushes the shooter back on every shot.</summary>
     [JsonRequired] public float Recoil { get; set; }
+    /// <summary>How many pests one straight shot hits on its way (1: the first only).</summary>
+    [JsonRequired] public int Pierce { get; set; }
+    /// <summary>A lob's blob leaves this on the ground (Senf).</summary>
+    public PuddleDef? Puddle { get; set; }
+    /// <summary>Every hit itches; enough of them make the pest sneeze (Pfeffer).</summary>
+    public ItchDef? Itch { get; set; }
+}
+
+/// <summary>Walkers in it move slower; flyers pass over it. Puddles do not stack — the strongest counts.</summary>
+public sealed class PuddleDef
+{
+    /// <summary>Half its width on the ground, in pixels.</summary>
+    [JsonRequired] public float Radius { get; set; }
+    [JsonRequired] public float Seconds { get; set; }
+    /// <summary>0..1, the speed a walker keeps in it (0.4 = 40 %).</summary>
+    [JsonRequired] public float Slow { get; set; }
+}
+
+public sealed class ItchDef
+{
+    /// <summary>Hits until a sneeze; then the itch starts again.</summary>
+    [JsonRequired] public int Hits { get; set; }
+    /// <summary>Seconds the sneezing pest stands still and does not attack.</summary>
+    [JsonRequired] public float Pause { get; set; }
+    /// <summary>Pixels the sneeze throws it back.</summary>
+    [JsonRequired] public float Push { get; set; }
 }
 
 /// <summary>A kitchen pest, game/content/enemies.json.</summary>

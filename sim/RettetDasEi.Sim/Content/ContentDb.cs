@@ -111,6 +111,36 @@ public sealed class ContentDb
                 Check(a.Damage > 0f && a.Cooldown > 0f && a.Range > 0f, $"{at}: attack damage, cooldown and range must be above 0");
                 Check(a.Projectile != "straight" || a.Speed > 0f, $"{at}: a straight shot needs a speed above 0");
                 Check(a.Splash >= 0f && a.Recoil >= 0f, $"{at}: splash and recoil must be 0 or more");
+                Check(a.Pierce >= 1, $"{at}: attack.pierce must be 1 or more");
+                Check(a.Projectile == "straight" || a.Pierce == 1, $"{at}: only a straight shot pierces (pierce 1 for a lob)");
+                if (a.Puddle is { } p)
+                {
+                    Check(a.Projectile == "lob", $"{at}: only a lob leaves a puddle");
+                    Check(p.Radius > 0f && p.Seconds > 0f, $"{at}: puddle radius and seconds must be above 0");
+                    Check(p.Slow > 0f && p.Slow <= 1f, $"{at}: puddle slow must be above 0 and at most 1");
+                }
+                if (a.Itch is { } itch)
+                {
+                    Check(itch.Hits >= 1, $"{at}: itch hits must be 1 or more");
+                    Check(itch.Pause > 0f, $"{at}: itch pause must be above 0");
+                    Check(itch.Push >= 0f, $"{at}: itch push must be 0 or more");
+                }
+            }
+            if (u.Bomb is { } b)
+            {
+                Check(u.Attack == null, $"{at}: a bomb does not shoot (no attack)");
+                Check(b.Damage > 0f && b.Radius > 0f, $"{at}: bomb damage and radius must be above 0");
+                Check(b.Push >= 0f, $"{at}: bomb push must be 0 or more");
+            }
+            if (u.Glue is { } g)
+            {
+                Check(g.TearImpulse > 0f && g.RestSpeed > 0f, $"{at}: glue tearImpulse and restSpeed must be above 0");
+                Check(g.RegrabSeconds >= 0f, $"{at}: glue regrabSeconds must be 0 or more");
+            }
+            if (u.Shield is { } s)
+            {
+                Check(s.PushShare >= 0f && s.PushShare <= 1f, $"{at}: shield pushShare must be between 0 and 1");
+                Check(s.ThrowBack >= 0f, $"{at}: shield throwBack must be 0 or more");
             }
         }
 

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# git pre-commit hook -- the same check as the Claude Stop hook, but on what is STAGED and
+# BLOCKING: a red check aborts the commit. Never bypass it to get a commit through; fix the cause.
+#
+# Installed via `git config core.hooksPath tools/hooks` (this tracked script IS the hook -- no copy
+# into .git/hooks that would drift). Run that once per clone (SETUP.md).
+#
+# Scope guard: runs only when staged changes touch game/scripts/, game/content/, sim/ or tests/ --
+# a docs-only commit passes straight through. The build runs against the WORKING TREE, not a
+# stashed staged snapshot -- keep the tree clean at commit time.
+set -uo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+if ! bash tools/hooks/check-on-change.sh --staged; then
+  echo "[pre-commit] check FAILED -- commit aborted." >&2
+  exit 1
+fi
+exit 0

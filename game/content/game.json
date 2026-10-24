@@ -5,5 +5,6 @@
   "unitLinearDamp": 0.05,
   "unitAngularDamp": 0.8,
   "sellRefund": 1.0,
-  "lobGravity": 980
+  "lobGravity": 980,
+  "flyPatience": 2.0
 }

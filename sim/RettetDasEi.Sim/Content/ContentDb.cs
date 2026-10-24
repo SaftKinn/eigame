@@ -91,6 +91,7 @@ public sealed class ContentDb
         Check(Game.StartGold >= 0, "game.json: startGold must be 0 or more");
         Check(Game.RangePerHeight >= 0f, "game.json: rangePerHeight must be 0 or more");
         Check(Game.LobGravity > 0f, "game.json: lobGravity must be above 0");
+        Check(Game.FlyPatience >= 0f, "game.json: flyPatience must be 0 or more");
         Check(Game.SellRefund >= 0f && Game.SellRefund <= 1f, "game.json: sellRefund must be between 0 and 1");
 
         Check(Units.Select(u => u.Id).Distinct().Count() == Units.Count, "units.json: two units share an id");

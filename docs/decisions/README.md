@@ -26,3 +26,4 @@ another?", it belongs here.
 | [001](001-physics-tower-no-frames.md) | A physics tower defense without frame animations | Accepted (prototype) |
 | [002](002-rules-core-physics-in-godot.md) | A rules core with tests; the physics stays in Godot | Accepted |
 | [003](003-every-food-a-job.md) | Every food a job (proposal A) | Accepted, built (M2, play-unverified) |
+| [004](004-pests-gang-up-flies-hunt-the-egg.md) | Pests gang up; flies hunt the egg | Accepted, built (play-unverified) |

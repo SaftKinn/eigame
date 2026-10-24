@@ -100,7 +100,7 @@ Extend the table with every new folder.
 
 ## Testing
 
-- `dotnet test tests/RettetDasEi.Sim.Tests` — no Godot needed, a few seconds (111 tests on
+- `dotnet test tests/RettetDasEi.Sim.Tests` — no Godot needed, a few seconds (116 tests on
   2026-10-24). Assert exact outcomes with explicit set-up; prefer a tiny scenario that isolates one
   behaviour. Tests don't use the shipped content for logic (`TestContent`, its own small content),
   so tuning never breaks a logic test; `ContentFilesTests` loads the shipped files to validate them.
@@ -118,9 +118,13 @@ Extend the table with every new folder.
   (`SmokeHarness.cs`, three hooks into `Main`: build the tower in `_Ready`, start every wave 2.5 s
   into a build phase, quit at won/lost) places a fixed tower by size — `-- --tower=small` (115
   gold), `mid` (250), `big` (390), `bigless` (345) — and prints the wave it was lost in and the
-  gold after each wave; each tower twice, ~25 s for six runs. The target he set: small loses early,
-  mid around wave 4, big wins wave 5 only just. Its towers are flat; his are taller and so
-  stronger. Change content in the copy, measure, then copy the files over and `git diff` them.
+  gold after each wave; each tower twice, ~25 s for six runs. Since ADR 004 also `w3` (180 gold,
+  the most one can have before wave 3), the largest crowd per wave and how many fly bites went to
+  the egg. The scratchpad keeps `setup-tune.sh` (a fresh copy with the harness hooked in) and
+  `run.sh <label> [towers]`. The target he set: small loses early, mid around wave 4, big wins
+  wave 5 only just. Its towers are flat; his are taller and so stronger — and runs differ from
+  each other (physics): don't tune a number on one run, and stop when a change shows nothing.
+  Change content in the copy, measure, then copy the files over and `git diff` them.
 - **A mutation check** shows the tests can fail: break a rule on purpose (in a copy, or restore
   it with `git checkout -- <file>` once it is committed), see which tests turn red, put it back,
   see green again.

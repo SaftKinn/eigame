@@ -16,6 +16,9 @@ public partial class Enemy : Node2D
     const float Recover = 0.34f;
     const float HopCycle = 1.1f;
     const float KnockSeconds = 0.32f;
+    /// <summary>How far a flyer turns from the straight way to find a way round food, nearest first.</summary>
+    static readonly float[] SteerAngles = { 30f, 60f, 90f, 120f, 150f };
+    static int _attacksBegun;
 
     public EnemyDef Def { get; private set; } = null!;
     /// <summary>The itch, the sneeze and the slow — the rules core's (ADR 002, 003).</summary>
@@ -25,6 +28,9 @@ public partial class Enemy : Node2D
     public float Hp { get; private set; }
     public bool IsDead { get; private set; }
     public bool IsFlyer => Def.Movement == "fly";
+    public bool IsAttacking => _attacking;
+    /// <summary>When it began its attack, counted over all pests — who lies under whom in a heap.</summary>
+    public int AttackOrder { get; private set; }
     /// <summary>How it moves right now; shooters aim ahead of it.</summary>
     public Vector2 Velocity { get; private set; }
 
@@ -36,6 +42,8 @@ public partial class Enemy : Node2D
     UnitBody? _target;
     float _t;
     float _hopT;
+    float _blockedT;
+    float _steer;
     float _knockT;
     float _knockTime;
     float _knockDistance;
@@ -164,24 +172,80 @@ public partial class Enemy : Node2D
         }
     }
 
+    /// <summary>
+    /// Flyers go for the egg and steer round the food in their way — upward first, the side once
+    /// chosen kept. With no way through for <c>flyPatience</c> seconds (the core's
+    /// <see cref="Flight.GivesUp"/>) they bite what blocks them (his word, 2026-10-24).
+    /// </summary>
     void FlyStep(float dt)
     {
-        var target = Main.I.HighestUnit();
+        var egg = Main.I.Egg;
+        var target = egg ?? Main.I.HighestUnit();
         Vector2 goal = target?.GlobalPosition ?? new Vector2(Main.ScreenWidth / 2f, 300f);
         Vector2 toGoal = goal - Position;
-        Vector2 velocity = toGoal.LengthSquared() > 1f ? toGoal.Normalized() * Def.Speed : Vector2.Zero;
-        Vector2 next = Position + velocity * dt;
-
-        var food = Main.I.UnitTouching(_probe, next);
-        if (food != null)
+        if (toGoal.LengthSquared() <= 1f)
         {
-            BeginAttack(food);
+            Velocity = Vector2.Zero;
+            Hover();
             return;
         }
-        Position = next;
-        Velocity = velocity;
-        if (Mathf.Abs(velocity.X) > 1f)
-            SetDir(velocity.X > 0f ? 1f : -1f);
+        Vector2 straight = toGoal.Normalized();
+        float step = Def.Speed * dt;
+
+        var touched = Main.I.UnitTouching(_probe, Position + straight * step, egg);
+        if (touched == null || touched == egg)
+        {
+            if (touched != null)
+            {
+                BeginAttack(touched);
+                return;
+            }
+            _blockedT = 0f;
+            _steer = 0f;
+            FlyMove(straight, dt);
+            return;
+        }
+
+        // Food in the way: look for a way round it while patience lasts.
+        _blockedT += dt;
+        if (Flight.GivesUp(GameContent.Db.Game, _blockedT))
+        {
+            BeginAttack(touched);
+            return;
+        }
+        if (_steer == 0f)
+            _steer = straight.X >= 0f ? -1f : 1f; // this turn points up first
+        foreach (float side in new[] { _steer, -_steer })
+        {
+            foreach (float degrees in SteerAngles)
+            {
+                var direction = straight.Rotated(side * Mathf.DegToRad(degrees));
+                var at = Position + direction * step;
+                if (at.Y > Main.CounterTop - Def.Radius)
+                    continue;
+                var hit = Main.I.UnitTouching(_probe, at, egg);
+                if (hit == egg && egg != null)
+                {
+                    BeginAttack(egg);
+                    return;
+                }
+                if (hit != null)
+                    continue;
+                _steer = side;
+                FlyMove(direction, dt);
+                return;
+            }
+        }
+        Velocity = Vector2.Zero;
+        Hover();
+    }
+
+    void FlyMove(Vector2 direction, float dt)
+    {
+        Velocity = direction * Def.Speed;
+        Position += Velocity * dt;
+        if (Mathf.Abs(Velocity.X) > 1f)
+            SetDir(Velocity.X > 0f ? 1f : -1f);
         Hover();
     }
 
@@ -208,6 +272,9 @@ public partial class Enemy : Node2D
     void BeginAttack(UnitBody food)
     {
         _attacking = true;
+        AttackOrder = ++_attacksBegun;
+        _blockedT = 0f;
+        _steer = 0f;
         _attackT = 0f;
         _struck = false;
         _target = food;
@@ -268,6 +335,8 @@ public partial class Enemy : Node2D
 
         float size = Mathf.Clamp(Def.Radius / 24f, 0.7f, 2f);
         _visual.Position = AttackDirection() * lunge * size;
+        if (!IsFlyer)
+            _visual.Position += new Vector2(0f, -Main.I.CrowdIndex(this) * Def.Radius * 0.7f); // the heap
         if (IsFlyer)
         {
             _visual.Flap = 0.25f + 0.75f * Mathf.Abs(Mathf.Sin(_t * 32f));
@@ -278,7 +347,7 @@ public partial class Enemy : Node2D
         {
             _attackT = 0f;
             _struck = false;
-            var still = Main.I.UnitTouching(_probe, Position + AttackDirection() * 4f);
+            var still = Main.I.UnitTouching(_probe, Position + AttackDirection() * 4f, IsFlyer ? Main.I.Egg : null);
             if (still == null)
                 StopAttack();
             else

@@ -31,6 +31,15 @@ public static class Shield
     public static float PushOn(ShieldDef? shield, float push) => shield == null ? push : push * shield.PushShare;
 }
 
+public static class Flight
+{
+    /// <summary>
+    /// A flyer heads for the egg and steers round the food; once it has found no way for
+    /// <c>flyPatience</c> seconds it gives up and bites what is in its way (his word, 2026-10-24).
+    /// </summary>
+    public static bool GivesUp(GameDef game, float blockedSeconds) => blockedSeconds >= game.FlyPatience;
+}
+
 public static class Pierce
 {
     /// <summary>Whether a shot that has hit <paramref name="hits"/> pests flies on.</summary>

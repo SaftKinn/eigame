@@ -49,6 +49,16 @@ public class JobsTests
         Assert.Equal(480f, Shield.PushOn(null, 480f));
     }
 
+    // ---------------------------------------------------------------- flight
+
+    [Theory]
+    [InlineData(0f, false)]
+    [InlineData(1.99f, false)]
+    [InlineData(2f, true)]   // TestContent: flyPatience 2
+    [InlineData(5f, true)]
+    public void A_flyer_bites_what_is_in_its_way_once_its_patience_is_up(float blocked, bool givesUp) =>
+        Assert.Equal(givesUp, Flight.GivesUp(Db.Game, blocked));
+
     // ---------------------------------------------------------------- pierce
 
     [Fact]

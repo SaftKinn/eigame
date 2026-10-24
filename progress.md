@@ -11,15 +11,14 @@ on-demand._
 - **Where we are:** M0 and **M1 closed 2026-10-24** (M1: the rules core, his round "hat
   gepasst"). **M2 built the same day, play-unverified:** every food a job (ADR 003 with its
   addendum) — Käse glues, Toast throws back, Gurke pierces, Senf puddles, Pfeffer sneezes, Tomate
-  bursts. Headless smoke runs fired every job; a fixed six-food tower wins all five waves —
-  maybe too easy now (his second round: won with a big glued tower). Fixed after his rounds: a
-  glued tower jumping by itself (the pair's collision off, measured calm); the cheese in red wax,
-  only its cut face sticks, while facing up; "klebt hier" while holding; a picked-up piece snaps
-  to the 15° step.
-- **Next:** Sezgin plays M2 (the script in `## Next concrete step`); his words → a tuning round
-  (`/playtest-triage`) or M2 closed. Then M3 (recipes, grill first).
-- **Open live gates — one:** M2, every food a job (his round).
-- **Tests:** 111, green (`dotnet test tests/RettetDasEi.Sim.Tests`).
+  bursts. Rounds with him since: a glued tower jumping by itself (fixed: the pair's collision
+  off); the cheese in red wax, only its cut face sticks; "klebt hier" while holding; a picked-up
+  piece snaps to the 15° step; "too easy" → harder waves and less gold, aimed at "wave 5 only
+  just"; **ADR 004:** pests gang up (a heap), flies hunt the egg round the food.
+- **Next:** Sezgin plays (the script in `## Next concrete step`) — wave 3 first; his words → a
+  tuning round (`/playtest-triage`) or M2 closed. Then M3 (recipes, grill first).
+- **Open live gates — one:** M2, every food a job, with the difficulty and ADR 004 (his round).
+- **Tests:** 116, green (`dotnet test tests/RettetDasEi.Sim.Tests`).
 - **Git:** local repo on `main`, no remote yet (GitHub when he wants one).
 
 ## Current focus
@@ -70,7 +69,11 @@ numbers are guesses — expect tuning (all in `units.json`).
    food shoved (a tomato beside the egg is a risk).
 6. **Overall:** does each food feel different now? Is one useless or a must? **Difficulty after
    the tuning:** waves 1–2 relaxed, from wave 3 the tower has to be good, wave 5 only just — and
-   sometimes lost? Less gold now (100 to start, little per kill).
+   sometimes lost? Less gold now (100 to start, little per kill). **Wave 3 above all** — the
+   harness lost it even with all the gold one can have by then.
+7. **Pests (ADR 004):** do walkers pile up at the tower and attack together (a heap)? Do flies fly
+   round the food to the egg — and bite their way in when it is built in? Is an egg on top now
+   too easy a target?
 His words → `/playtest-triage` (tuning in `units.json`) or M2 closed; then M3 (recipes, `/grill-me` first).
 
 ## Decision log
@@ -89,6 +92,8 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D8 | Language | Docs/code English; the player reads German; chat German; GPT prompts English | As in Chief Wants His Cut; GPT follows English prompts better |
 | D9 | Milestones | **M0 prototype → M1 rules core → M2 every food a job → M3 recipes → M4 look** | The core before the new rules, so they are built test-first; the look after the mechanics |
 | D13 | Building M2 | **A sneezing pest stands still; glue is two pins; the card shows the description** | What the grill left open, filled while building → ADR 003 addendum |
+| D14 | Pests together | **A crowd: walkers push in behind attackers and attack together, drawn as a heap** | His "nicht immer nur einer"; climbing was the costly alternative → ADR 004 |
+| D15 | Flies | **Hunt the egg round the food; after `flyPatience` (2 s) bite what blocks them** | His wish; a built-in egg is worth building → ADR 004 |
 | D10 | Tomate | **A bomb, no longer a shooter: bursts at any pest's touch; pushes own food, damages none** | Its rolling becomes the job; risk beside the egg → ADR 003 |
 | D11 | Käse, Toast | **Cheese glue that a hard blow tears; toast a shield wall (throw-back, a share of the push)** | Clearly felt jobs for the two blocks → ADR 003 |
 | D12 | Gurke, Senf, Pfeffer; teaching; order | **Pierce N; less splash + a puddle; an itch to N hits; the card's sentence; all six in one step** | His picks in the grill of 2026-10-24 → ADR 003 |
@@ -101,6 +106,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | The rules core, any rule (M1 on) | ADR 002 |
 | Content / new entries | ADR 001 (point 5), ADR 002 (validation moves to the core) |
 | M2 — every food a job | ADR 003, then 001 and 002 |
+| Pests' behaviour (crowd, flies) | ADR 004, then 001 |
 | M4 — look | ADR 001; the look's own ADR once decided |
 
 ## Milestones
@@ -127,6 +133,12 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 
 ## Playtest notes
 
+- **2026-10-24 — M2, fourth answer:** "Gegner sollen sich stacken und angreifen, nicht immer nur
+  einer. Außerdem sollen die Fliegen um Bauteile rumfliegen und direkt das Ei angreifen" → his
+  picks: a crowd (not climbing); flies bite what blocks them after ~2 s → ADR 004. Measured: crowds
+  of six ants; flies bite the egg whenever they get through; 115 gold loses wave 3, 250 wave 4,
+  345 wave 5, 390 wins. Wave 3 softened (6 flies, 14 ants). A 180-gold tower still lost wave 3 in
+  the harness — watch it. A lower ant push (80) was tried and changed nothing; kept at 110.
 - **2026-10-24 — M2, third answer:** "es war zu leicht, also ich gewinne eigentlich immer" → his
   picks: both levers (harder waves and less gold), "Welle 5 nur knapp". Tuning round (measured with
   fixed towers in a scratch copy, see `docs/conventions.md`): startGold 120 → 100; pests' hp

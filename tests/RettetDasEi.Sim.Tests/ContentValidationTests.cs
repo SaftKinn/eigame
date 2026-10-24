@@ -22,6 +22,7 @@ public class ContentValidationTests
     [InlineData("game", "\"rangePerHeight\": 0.5", "\"rangePerHeight\": -0.5", "game.json: rangePerHeight")]
     [InlineData("game", "\"lobGravity\": 980", "\"lobGravity\": 0", "game.json: lobGravity")]
     [InlineData("game", "\"sellRefund\": 0.5", "\"sellRefund\": 1.5", "game.json: sellRefund")]
+    [InlineData("game", "\"flyPatience\": 2", "\"flyPatience\": -1", "game.json: flyPatience")]
     [InlineData("game", "\"eggUnit\": \"egg\"", "\"eggUnit\": \"chick\"", "game.json: eggUnit 'chick'")]
     [InlineData("units", "\"shape\": \"box\"", "\"shape\": \"star\"", "units.json 'block': shape")]
     [InlineData("units", "\"width\": 100", "\"width\": 0", "units.json 'block': width and height")]

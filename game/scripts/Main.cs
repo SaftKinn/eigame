@@ -319,8 +319,14 @@ public partial class Main : Node2D
         return best;
     }
 
-    /// <summary>The piece of food a pest-sized circle at <paramref name="at"/> would touch, if any.</summary>
-    public UnitBody? UnitTouching(Shape2D shape, Vector2 at)
+    /// <summary>The egg while it is whole and not in the hand — what flyers go for.</summary>
+    public UnitBody? Egg => IsInstanceValid(_egg) && !_egg.IsBroken && !_egg.IsHeld ? _egg : null;
+
+    /// <summary>
+    /// The piece of food a pest-sized circle at <paramref name="at"/> would touch, if any — and if
+    /// it touches <paramref name="prefer"/> among others, that one.
+    /// </summary>
+    public UnitBody? UnitTouching(Shape2D shape, Vector2 at, UnitBody? prefer = null)
     {
         var query = new PhysicsShapeQueryParameters2D
         {
@@ -330,18 +336,41 @@ public partial class Main : Node2D
             CollideWithBodies = true,
             CollideWithAreas = false,
         };
-        foreach (var hit in GetWorld2D().DirectSpaceState.IntersectShape(query, 4))
-            if (hit["collider"].AsGodotObject() is UnitBody unit && !unit.IsBroken && !unit.IsHeld)
+        UnitBody? first = null;
+        foreach (var hit in GetWorld2D().DirectSpaceState.IntersectShape(query, 6))
+        {
+            if (hit["collider"].AsGodotObject() is not UnitBody unit || unit.IsBroken || unit.IsHeld)
+                continue;
+            if (unit == prefer)
                 return unit;
-        return null;
+            first ??= unit;
+        }
+        return first;
     }
 
-    /// <summary>Walkers queue up behind each other instead of melting into one.</summary>
+    /// <summary>
+    /// How many walkers attack here before this one — it is drawn that much higher, so a crowd at
+    /// the tower reads as a heap (his word, 2026-10-24: they gang up instead of one at a time).
+    /// </summary>
+    public int CrowdIndex(Enemy me)
+    {
+        int index = 0;
+        foreach (var other in _enemies)
+            if (other != me && !other.IsDead && !other.IsFlyer && other.IsAttacking
+                && other.AttackOrder < me.AttackOrder && Mathf.Abs(other.Position.X - me.Position.X) < me.Def.Radius * 1.2f)
+                index++;
+        return index;
+    }
+
+    /// <summary>
+    /// Walkers queue up behind each other while they walk — but never behind one that is
+    /// attacking: they push in and attack with it (his word, 2026-10-24).
+    /// </summary>
     public bool IsBlockedByEnemy(Enemy me, float nextX)
     {
         foreach (var other in _enemies)
         {
-            if (other == me || other.IsDead || other.IsFlyer || other.Dir != me.Dir)
+            if (other == me || other.IsDead || other.IsFlyer || other.IsAttacking || other.Dir != me.Dir)
                 continue;
             float ahead = (other.Position.X - nextX) * me.Dir;
             if (ahead > 0f && ahead < (me.Def.Radius + other.Def.Radius) * 0.6f)

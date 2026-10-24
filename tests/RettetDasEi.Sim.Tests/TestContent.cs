@@ -16,7 +16,8 @@ public static class TestContent
           "unitLinearDamp": 0.05,
           "unitAngularDamp": 0.8,
           "sellRefund": 0.5,
-          "lobGravity": 980
+          "lobGravity": 980,
+          "flyPatience": 2
         }
         """;
 

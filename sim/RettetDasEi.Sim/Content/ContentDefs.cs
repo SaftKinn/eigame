@@ -17,6 +17,8 @@ public sealed class GameDef
     /// <summary>Share of the price a placed unit returns when sold (scaled by its health).</summary>
     [JsonRequired] public float SellRefund { get; set; }
     [JsonRequired] public float LobGravity { get; set; }
+    /// <summary>Seconds a flyer looks for a way round the food to the egg before it bites what is in its way.</summary>
+    [JsonRequired] public float FlyPatience { get; set; }
 }
 
 /// <summary>A piece of food for the tower, game/content/units.json.</summary>

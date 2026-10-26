@@ -61,3 +61,6 @@ confirms or refutes them. Lessons learned in this project go under their own hea
 - [measure-difficulty-with-his-tower](measure-difficulty-with-his-tower.md) — Flat harness towers
   lost "only just" while his compact tall tower won with gold to spare; rebuild his tower from a
   screenshot and tune against it.
+- [the-boot-never-lets-go-of-a-piece](the-boot-never-lets-go-of-a-piece.md) — Build, tests and boot
+  never touch the hand; a drop crashed on his first try. Walk the hand's paths in the code; a
+  "hang" is first a stack trace in `logs\run.log`.

@@ -549,18 +549,20 @@ public partial class Main : Node2D
         WakeAll();
     }
 
+    // Both take the piece in the hand as an argument: Drop lets go of _held first (2026-10-26, a
+    // crash on letting go when these read _held).
+
     /// <summary>The piece in the hand and what is glued to it.</summary>
-    IEnumerable<UnitBody> HeldAll()
+    IEnumerable<UnitBody> HeldAll(UnitBody unit)
     {
-        yield return _held!;
+        yield return unit;
         foreach (var (member, _) in _heldGroup)
             yield return member;
     }
 
     /// <summary>Moves the piece in the hand, and its group along with it.</summary>
-    void PlaceHeld(Vector2 position, float rotation)
+    void PlaceHeld(UnitBody unit, Vector2 position, float rotation)
     {
-        var unit = _held!;
         unit.GlobalPosition = position;
         unit.GlobalRotation = rotation;
         foreach (var (member, relative) in _heldGroup)
@@ -575,12 +577,12 @@ public partial class Main : Node2D
         if (!overShop)
             target.Y = Mathf.Min(target.Y, CounterTop - 8f);
         target.X = Mathf.Clamp(target.X, 30f, ScreenWidth - 30f);
-        PlaceHeld(target, _heldRotation);
+        PlaceHeld(unit, target, _heldRotation);
 
         // A group is not sold: only a piece on its own goes back to the shop.
         bool sell = overShop && unit.Def.InShop && _heldGroup.Count == 0;
-        bool blocked = !overShop && HeldAll().Any(Overlaps);
-        foreach (var piece in HeldAll())
+        bool blocked = !overShop && HeldAll(unit).Any(Overlaps);
+        foreach (var piece in HeldAll(unit))
             piece.SetGhost(sell ? GhostMode.Sell : blocked ? GhostMode.Blocked : GhostMode.Ok);
         _hud.ShowSellHint(sell ? RefundFor(unit) : null);
 
@@ -652,10 +654,10 @@ public partial class Main : Node2D
         // Back above the counter (the egg cannot be sold), then up until it is free: a piece
         // let go inside the tower pops out on top of it and drops the last few pixels.
         position.Y = Mathf.Min(position.Y, CounterTop - 8f);
-        PlaceHeld(position, unit.GlobalRotation);
-        for (int i = 0; i < 250 && HeldAll().Any(Overlaps); i++)
-            PlaceHeld(unit.GlobalPosition + new Vector2(0f, -4f), unit.GlobalRotation);
-        foreach (var piece in HeldAll())
+        PlaceHeld(unit, position, unit.GlobalRotation);
+        for (int i = 0; i < 250 && HeldAll(unit).Any(Overlaps); i++)
+            PlaceHeld(unit, unit.GlobalPosition + new Vector2(0f, -4f), unit.GlobalRotation);
+        foreach (var piece in HeldAll(unit))
             piece.EndHold();
         _heldGroup.Clear();
         if (snap != null)

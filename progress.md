@@ -52,7 +52,9 @@ numbers are guesses — expect tuning (all in `units.json`).
   … praktisch für das ei" → `UnitBody.GlueOff` (D21; not a cheese). His win (screenshot) noted.
   Rebuilding (D22): lifting lifts the glued group (`GlueBonds.GroupOf`, `Main.PlaceHeld`), a
   right click in the hand unglues (`Main.Unglue`), glue off moved to G, the shelf under the
-  window (`Main.OnShelf`: sleeps); the help line in two lines.
+  window (`Main.OnShelf`: sleeps); the help line in two lines. "das spiel hat sich grad
+  aufgehängt": every drop threw (`PlaceHeld` read `_held`, which `Drop` clears first) — fixed,
+  lesson `the-boot-never-lets-go-of-a-piece`.
   Build green (0 warnings), 122 tests, headless boot clean; play-unverified.
 
 - **2026-10-25 (fresh checkout)** — The repo cloned anew into `Desktop\Projekte\EggGame` (the

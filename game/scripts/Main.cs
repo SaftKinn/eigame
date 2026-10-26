@@ -202,9 +202,15 @@ public partial class Main : Node2D
                 _heldRotation += RotateStep;
             else if (_held != null && mouse.ButtonIndex == MouseButton.Right)
             {
-                // Glue off and on for the piece in the hand — the egg built in loose, say (his word, 2026-10-26).
-                _held.GlueOff = !_held.GlueOff;
-                _hud.ShowMessage(_held.GlueOff ? "Kleben aus für dieses Teil" : "Kleben an für dieses Teil", 1.5f);
+                // Glue off and on for the piece in the hand — the egg built in loose, say; every
+                // piece but a cheese, which always glues (his word, 2026-10-26).
+                if (_held.Def.Glue != null)
+                    _hud.ShowMessage("Käse klebt immer.", 1.5f);
+                else
+                {
+                    _held.GlueOff = !_held.GlueOff;
+                    _hud.ShowMessage(_held.GlueOff ? "Kleben aus für dieses Teil" : "Kleben an für dieses Teil", 1.5f);
+                }
             }
         }
         else if (@event is InputEventKey { Pressed: true, Echo: false } key)

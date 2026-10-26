@@ -222,9 +222,12 @@ public partial class GlueBonds : Node2D
         if (held.GlueOff)
         {
             // Said over the piece in the hand while its glue is off (a right click switches it).
-            var over = held.GlobalPosition + new Vector2(-50f, -held.BoundRadius - 14f);
-            DrawStringOutline(font, over, "Kleben aus", HorizontalAlignment.Center, 100f, 20, 6, new Color(0.2f, 0.12f, 0.06f));
-            DrawString(font, over, "Kleben aus", HorizontalAlignment.Center, 100f, 20, new Color(0.85f, 0.85f, 0.85f));
+            // Centred by its own width: a fixed box of 100 px cut the last letter off (his screenshot).
+            const string Off = "Kleben aus";
+            float textWidth = font.GetStringSize(Off, HorizontalAlignment.Left, -1f, 20).X;
+            var over = held.GlobalPosition + new Vector2(-textWidth / 2f, -held.BoundRadius - 14f);
+            DrawStringOutline(font, over, Off, HorizontalAlignment.Left, -1f, 20, 6, new Color(0.2f, 0.12f, 0.06f));
+            DrawString(font, over, Off, HorizontalAlignment.Left, -1f, 20, new Color(0.85f, 0.85f, 0.85f));
             return;
         }
         var pairs = StickPairs(held);

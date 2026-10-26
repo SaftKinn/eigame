@@ -223,7 +223,8 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
   screenshot, 2026-10-26: a cheese laid across two); the snap moves to the nearest, and every
   pair then flush (within 4 px) sticks at once. **Glue off per piece:** a right click while
   holding a piece switches its `UnitBody.GlueOff` (his word, 2026-10-26: to build the egg in
-  loose) — it then sticks to nothing and nothing to it, until switched back; the piece in the
+  loose) — every piece but a cheese, which always glues ("Käse klebt immer.") — it then sticks
+  to nothing and nothing to it, until switched back; the piece in the
   hand says "Kleben aus", and the switch shows as a message. Which face, and how far: `GlueBonds.Face` measures on the real outlines
   (`UnitBody.Outline`: a block's four corners, the triangle's three, a circle or capsule as a
   16-point polygon) — the face is the cheese's edge across which the two lie furthest apart (by

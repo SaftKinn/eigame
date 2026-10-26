@@ -121,7 +121,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D18 | Käse's sides | **A magnet as a snap: let go beside a cheese's side, the held one moves flush and sticks at once** | His "sonst fällt … einfach runter"; a pull in the physics all the time would tug towers apart → ADR 003 (addendum) |
 | D19 | Käsedreieck | **The cheese block's other shape: an equilateral triangle, one shop card, a right click switches** | His wish ("linksklick" buys, so a right click); three 120° angles cannot be — asked → equilateral. `alternate` in units.json, `ContentDb.ShopUnits` → ADR 003 (addendum) |
 | D20 | Turning | **15° steps kept** (45° tried and taken back the same hour) | 45°: "die anderen winkel wären sonst überflüssig" — then "sonst das 3eck nicht mit jeder seite befestigen": 15° is the coarsest step with 45° and 60°/120° |
-| D21 | Glue off | **A right click while holding a piece switches its glue off and on; it stays with the piece** | His wish: to build the egg in loose |
+| D21 | Glue off | **A right click while holding a piece switches its glue off and on; it stays with the piece; not for a cheese** | His wish: to build the egg in loose; "alle bauteile außer den käse" |
 | D16 | Stability | **Food but cheese and egg grips at 0.5; recoil pepper 200, pickle 150, mustard 120** | Height was free and the cheese pointless; his idea: recoil tips a stack on a weak base → ADR 005 |
 | D10 | Tomate | **A bomb, no longer a shooter: bursts at any pest's touch; pushes own food, damages none** | Its rolling becomes the job; risk beside the egg → ADR 003 |
 | D11 | Käse, Toast | **Cheese glue that a hard blow tears; toast a shield wall (throw-back, a share of the push)** | Clearly felt jobs for the two blocks → ADR 003 |
@@ -167,7 +167,14 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
   den roten rand 'schale'" — asked (all round or whichever face is up): "Ringsum, auch
   seitlich" → D17, the wax gone. He had put side glue off twice on 2026-10-24; ADR 005 since.
   Then "seitlich muss es magnetisch angezogen werden sonst fällt der käse einfach runter oder
-  das bauteil das man drankleben will" → "Schnappen beim Loslassen" (D18). Then his screenshot
+  das bauteil das man drankleben will" → "Schnappen beim Loslassen" (D18).
+  **Won all five waves** (screenshot, 2026-10-26, with the glue on every face): on the board two
+  toasts outside, two upright cheeses, the egg loose between them; a pickle on each toast; a
+  cheese laid across the two upright ones as a roof, on it four peppers and two more pieces
+  (pepper-like, on their sides) at its ends. He said nothing about it being too easy — ask
+  next time; measure it in `tools/tuning` (tower `his`) before tuning waves.
+  "alle bauteile außer den käse mit rechtsklick unklebbar machen … bei dem ei stand Kleben au"
+  → the cheese always glues; the label centred by its own width (it was cut at 100 px). Then his screenshot
   (an upright cheese beside a flat one, not stuck): "so geht es noch nicht nur übereinander
   schnappt er … man soll präzise bauen können" → the face judged by the centres called it "on
   top", and the reach was a circle round the piece (huge for a long one); now edge to edge,

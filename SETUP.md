@@ -40,9 +40,8 @@ repository on this machine has it already (2026-10-24).
 - Red while dragging = it overlaps something; let go anyway and it pops up on top and drops.
 - **Space** (or the button) starts the wave. The food shoots by itself; higher food reaches further
   (the yellow band on the counter shows the reach while you hold a shooter).
-- **Every food has a job** (its shop card says it): **Käse** glues what rests on its yellow cut
-  face (the red wax never sticks; "klebt hier" shows while you hold a piece over it) — a hard
-  blow tears it off; a piece you pick up snaps straight, so Q/E can always turn it level again; **Toast** throws attackers back and is shoved less; **Gurke**'s slices go
+- **Every food has a job** (its shop card says it): **Käse** glues what touches it, on every side
+  ("klebt hier" shows while you hold a piece near it) — a hard blow tears it off; a piece you pick up snaps straight, so Q/E can always turn it level again; **Toast** throws attackers back and is shoved less; **Gurke**'s slices go
   through three pests; **Senf** leaves a puddle that slows walkers; **Pfeffer** makes pests sneeze
   and pause; **Tomate** shoots nothing — it bursts when a pest touches it and shoves your food
   (the red circle shows how far while you hold it).

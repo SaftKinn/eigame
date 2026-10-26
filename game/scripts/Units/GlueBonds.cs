@@ -5,19 +5,17 @@ using RettetDasEi.Sim;
 namespace RettetDasEi;
 
 /// <summary>
-/// The cheese's glue (ADR 003): what comes to rest on a gluing piece's top is pinned to it by two
+/// The cheese's glue (ADR 003): what comes to rest touching a gluing piece is pinned to it by two
 /// joints, so the two move as one. A hard blow on either tears it (the core's <see cref="Glue.Tears"/>),
 /// with cheese strings; after a short wait the two can stick again once they rest. Picking a piece
 /// up loosens all of its glue. Contacts and joints are Godot's physics; whether it tears is the core's.
-/// Only the cut face sticks — the cheese's own top, bare of wax — and only while it faces up
-/// (his word, 2026-10-24: no gluing at the sides). Sticking shows yellow crumbs; while a piece in
-/// the hand would stick, the cut face glows with "klebt hier". (A seam drawn while stuck was tried
-/// the same day and taken out at his word.)
+/// Every face sticks — top, bottom and sides, however the cheese lies (his word, 2026-10-26: the
+/// wax rind of 2026-10-24 is gone). Sticking shows yellow crumbs; while a piece in the hand would
+/// stick, the face it would stick to glows with "klebt hier". (A seam drawn while stuck was tried
+/// on 2026-10-24 and taken out at his word.)
 /// </summary>
 public partial class GlueBonds : Node2D
 {
-    /// <summary>The cut face counts as facing up while it is tilted less than this from straight up.</summary>
-    static readonly float MaxTilt = Mathf.DegToRad(45f);
     static readonly Color Rim = new(0.62f, 0.33f, 0.04f);
 
     sealed class Bond
@@ -56,7 +54,7 @@ public partial class GlueBonds : Node2D
             {
                 if (body is not UnitBody piece || piece == cheese || piece.IsHeld || piece.IsBroken)
                     continue;
-                if (piece.LinearVelocity.Length() > glue.RestSpeed || !RestsOnTop(cheese, piece))
+                if (piece.LinearVelocity.Length() > glue.RestSpeed)
                     continue;
                 if (IsBonded(cheese, piece) || IsCooling(cheese, piece))
                     continue;
@@ -66,29 +64,37 @@ public partial class GlueBonds : Node2D
     }
 
     /// <summary>
-    /// On its cut face: the cheese's own top faces up (within <see cref="MaxTilt"/>), and the piece
-    /// lies over that face — not beside the cheese, not under it. The waxed sides never stick.
+    /// The face of the cheese the piece lies at (in the cheese's own frame: top or bottom when the
+    /// piece is more above or below than beside it, else left or right), the point on that face
+    /// opposite the piece, the direction the face runs in, and the face's length.
     /// </summary>
-    static bool RestsOnTop(UnitBody cheese, UnitBody piece)
+    static (Vector2 At, Vector2 Along, float Length) Face(UnitBody cheese, UnitBody piece)
     {
-        var cutFaceNormal = -cheese.GlobalTransform.Y.Normalized();
-        if (cutFaceNormal.Dot(Vector2.Up) < Mathf.Cos(MaxTilt))
-            return false;
         var local = cheese.ToLocal(piece.GlobalPosition);
-        return local.Y < 0f && Mathf.Abs(local.X) <= cheese.Def.Width / 2f;
+        float halfWidth = cheese.Def.Width / 2f, halfHeight = cheese.Def.Height / 2f;
+        if (Mathf.Abs(local.Y) / halfHeight >= Mathf.Abs(local.X) / halfWidth)
+        {
+            var at = new Vector2(Mathf.Clamp(local.X, -halfWidth, halfWidth), Mathf.Sign(local.Y) * halfHeight);
+            return (cheese.ToGlobal(at), cheese.GlobalTransform.X.Normalized(), cheese.Def.Width);
+        }
+        var side = new Vector2(Mathf.Sign(local.X) * halfWidth, Mathf.Clamp(local.Y, -halfHeight, halfHeight));
+        return (cheese.ToGlobal(side), cheese.GlobalTransform.Y.Normalized(), cheese.Def.Height);
     }
 
     void Stick(UnitBody cheese, UnitBody piece)
     {
-        // Two pins side by side, so the piece cannot turn about one point.
-        float half = Mathf.Min(piece.Def.Width, cheese.Def.Width) * 0.3f;
-        var at = new Vector2(piece.GlobalPosition.X, (piece.GlobalPosition.Y + cheese.GlobalPosition.Y) / 2f);
+        // Two pins along the face they touch at, so the piece cannot turn about one point.
+        var (at, along, length) = Face(cheese, piece);
+        var x = piece.GlobalTransform.X.Normalized();
+        var y = piece.GlobalTransform.Y.Normalized();
+        float pieceAlong = Mathf.Abs(along.Dot(x)) * piece.Def.Width + Mathf.Abs(along.Dot(y)) * piece.Def.Height;
+        float half = Mathf.Min(pieceAlong, length) * 0.3f;
         var bond = new Bond
         {
             Cheese = cheese,
             Piece = piece,
-            A = Pin(cheese, piece, at + new Vector2(-half, 0f)),
-            B = Pin(cheese, piece, at + new Vector2(half, 0f)),
+            A = Pin(cheese, piece, at - along * half),
+            B = Pin(cheese, piece, at + along * half),
         };
         _bonds.Add(bond);
         Fx.Crumbs(Main.I.FxRoot, at, new Color(0.98f, 0.82f, 0.25f), 5, 90f);
@@ -151,7 +157,7 @@ public partial class GlueBonds : Node2D
 
     public override void _Draw()
     {
-        // While a piece is in the hand: where it would stick, the cut face glows.
+        // While a piece is in the hand: where it would stick, the face glows.
         var held = Main.I.HeldUnit;
         if (held == null)
             return;
@@ -159,8 +165,8 @@ public partial class GlueBonds : Node2D
         if (target == null)
             return;
         float time = Time.GetTicksMsec() / 1000f;
-        var (spot, direction) = CutFacePoint(target, held);
-        float width = Mathf.Min(held.Def.Width, target.Def.Width) * 0.8f;
+        var (spot, direction, length) = Face(target, held);
+        float width = Mathf.Min(held.Def.Width, length) * 0.8f;
         float pulse = 0.7f + 0.3f * Mathf.Sin(time * 8f);
         var span = direction * width * 0.5f;
         DrawLine(spot - span, spot + span, new Color(1f, 0.85f, 0.2f, 0.45f * pulse), 26f, true);
@@ -175,43 +181,43 @@ public partial class GlueBonds : Node2D
     }
 
     /// <summary>
-    /// The gluing piece a held piece would stick to if let go here: one it would rest on (the same
-    /// rule as <see cref="RestsOnTop"/>) with its bottom near that piece's top.
+    /// The gluing piece a held piece would stick to if let go here: the nearest one whose box comes
+    /// within reach of the held piece's edge, on any side.
     /// </summary>
     static UnitBody? StickTarget(UnitBody held)
     {
+        UnitBody? nearest = null;
+        float nearestGap = float.MaxValue;
         foreach (var unit in Main.I.Units)
         {
-            if (unit == held || unit.Def.Glue == null || unit.IsHeld || unit.IsBroken || !RestsOnTop(unit, held))
+            if (unit == held || unit.Def.Glue == null || unit.IsHeld || unit.IsBroken)
                 continue;
-            float gap = (unit.GlobalPosition.Y - unit.Def.Height / 2f) - (held.GlobalPosition.Y + held.BoundRadius);
-            if (gap > -30f && gap < 60f)
-                return unit;
+            var local = unit.ToLocal(held.GlobalPosition);
+            float outX = Mathf.Max(Mathf.Abs(local.X) - unit.Def.Width / 2f, 0f);
+            float outY = Mathf.Max(Mathf.Abs(local.Y) - unit.Def.Height / 2f, 0f);
+            float gap = Mathf.Sqrt(outX * outX + outY * outY) - held.BoundRadius;
+            if (gap > -30f && gap < 60f && gap < nearestGap)
+            {
+                nearest = unit;
+                nearestGap = gap;
+            }
         }
-        return null;
+        return nearest;
     }
 
-    /// <summary>The point of the cheese's cut face under the piece, and the direction the face runs in.</summary>
-    static (Vector2 At, Vector2 Along) CutFacePoint(UnitBody cheese, UnitBody piece)
-    {
-        var local = cheese.ToLocal(piece.GlobalPosition);
-        float halfWidth = cheese.Def.Width / 2f;
-        var at = new Vector2(Mathf.Clamp(local.X, -halfWidth, halfWidth), -cheese.Def.Height / 2f);
-        return (cheese.ToGlobal(at), cheese.GlobalTransform.X.Normalized());
-    }
-
-    bool IsBonded(UnitBody cheese, UnitBody piece)
+    // Both ways round: two cheeses side by side each find the other, and are one bond.
+    bool IsBonded(UnitBody a, UnitBody b)
     {
         foreach (var bond in _bonds)
-            if (bond.Cheese == cheese && bond.Piece == piece)
+            if ((bond.Cheese == a && bond.Piece == b) || (bond.Cheese == b && bond.Piece == a))
                 return true;
         return false;
     }
 
-    bool IsCooling(UnitBody cheese, UnitBody piece)
+    bool IsCooling(UnitBody a, UnitBody b)
     {
         foreach (var cooldown in _cooldowns)
-            if (cooldown.Cheese == cheese && cooldown.Piece == piece)
+            if ((cooldown.Cheese == a && cooldown.Piece == b) || (cooldown.Cheese == b && cooldown.Piece == a))
                 return true;
         return false;
     }

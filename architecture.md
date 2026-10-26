@@ -208,15 +208,16 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
   from the centre (tilted 0.4 upward) through `UnitBody.Shove` — no damage, the egg too —, red
   crumbs, "Platsch!", a shake, the tomato breaks. A held tomato shows its radius (`RangeOverlay`).
 - **Käse** (`glue`): `Units/GlueBonds` (a node of `Main`, `Main.Glue`) looks every physics step at
-  what touches a gluing piece. **Only the cut face sticks** — the cheese's own top, drawn bare
-  while the rest is in red wax (`DrawKit`) — and only while it faces up (tilted less than 45°): a
-  piece over that face, both slower than `restSpeed`, is pinned by two `PinJoint2D` (softness 0)
-  30 % of the narrower width apart, **with the pair's own collision off** (`DisableCollision`;
-  pins and contact fighting made a resting stack jump — 836 px/s measured, 0 without). An upright
-  or upside-down cheese glues nothing. Sticking shows yellow crumbs; while a piece is in the hand
-  over a cut face it would rest on, that face glows with "klebt hier" (`GlueBonds._Draw`,
-  `StickTarget` — the same `RestsOnTop` rule as sticking). A seam drawn while stuck was tried and
-  taken out at his word. Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
+  what touches a gluing piece. **Every face sticks** — top, bottom and sides, however the cheese
+  lies (his word, 2026-10-26; the red wax rind with only a cut face sticking, 2026-10-24, is
+  gone): a piece touching it, both slower than `restSpeed`, is pinned by two `PinJoint2D`
+  (softness 0) on the face they touch at (`GlueBonds.Face`: top/bottom or left/right in the
+  cheese's own frame), 30 % of the shorter of the two lengths along that face apart, **with the
+  pair's own collision off** (`DisableCollision`; pins and contact fighting made a resting stack
+  jump — 836 px/s measured, 0 without). Two cheeses touching make one bond, not two. Sticking
+  shows yellow crumbs; while a piece is in the hand within reach of a cheese's box, the nearest
+  face glows with "klebt hier" (`GlueBonds._Draw`, `StickTarget`, the same `Face` as sticking). A
+  seam drawn while stuck was tried and taken out at his word. Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
   (`GlueBonds.Blow`); `Glue.Tears` decides; a torn pair waits `regrabSeconds`. `BeginHold`
   (picking up) and `Break` loosen all of a piece's glue. A tear and a pick-up show
   `Fx/CheeseStrings`; sticking shows a few yellow crumbs.

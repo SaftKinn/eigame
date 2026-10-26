@@ -116,3 +116,10 @@ noch leichter machen".
 sides; he wants no side gluing and the seam "wie vorher" (gone). Now the cheese wears a red wax
 rind and **only its cut face sticks, while it faces up** (within 45°) — point 4's "top" is the
 cheese's own top, not the world's. The "klebt hier" preview stays.
+
+**After the start of his third round (2026-10-26):** "es soll doch jede seite des käßes kleben
+entferne den roten rand" — asked whether he means all round, sides included, or whichever face
+is up: **all round**. The wax rind is gone; every face sticks — top, bottom and sides — and a
+cheese beside a cheese glues to it. What changed since he put side glue off twice: ADR 005 made
+every food but the cheese slippery, so the cheese is now the one thing that holds a tower; side
+glue makes it worth more, and the game easier — the next round shows by how much.

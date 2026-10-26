@@ -45,21 +45,13 @@ public static class DrawKit
                 eyeY = -h * 0.05f;
                 break;
             case "cheese":
-            {
-                // In its red wax rind all round but the cut face on top: only that face sticks
-                // (ADR 003, his word 2026-10-24) — the rind says so without a word.
-                var wax = new Color(0.78f, 0.13f, 0.11f);
-                Box(ci, body, wax, wax.Darkened(0.4f), 8, 4);
-                float rind = Mathf.Clamp(h * 0.16f, 5f, 9f);
-                var cut = new Rect2(-w / 2f + rind, -h / 2f, w - 2f * rind, h - rind);
-                Box(ci, cut, fill, accent, 5, 0);
-                ci.DrawLine(new Vector2(-w / 2f + rind + 3f, -h / 2f + 2.5f), new Vector2(w / 2f - rind - 3f, -h / 2f + 2.5f), fill.Lightened(0.45f), 3f, true);
-                ci.DrawCircle(new Vector2(-w * 0.3f, h * 0.12f), h * 0.12f, accent);
-                ci.DrawCircle(new Vector2(w * 0.3f, -h * 0.16f), h * 0.09f, accent);
-                ci.DrawCircle(new Vector2(w * 0.15f, h * 0.2f), h * 0.08f, accent);
-                ci.DrawCircle(new Vector2(-w * 0.12f, h * 0.24f), h * 0.06f, accent);
+                // Bare all round: every face sticks (his word, 2026-10-26 — the wax rind is gone).
+                Box(ci, body, fill, accent, 8, 4);
+                ci.DrawCircle(new Vector2(-w * 0.33f, h * 0.18f), h * 0.13f, accent);
+                ci.DrawCircle(new Vector2(w * 0.34f, -h * 0.16f), h * 0.1f, accent);
+                ci.DrawCircle(new Vector2(w * 0.16f, h * 0.24f), h * 0.09f, accent);
+                ci.DrawCircle(new Vector2(-w * 0.12f, h * 0.3f), h * 0.06f, accent);
                 break;
-            }
             case "toast":
                 Box(ci, body, fill, accent, 18, 8);
                 break;

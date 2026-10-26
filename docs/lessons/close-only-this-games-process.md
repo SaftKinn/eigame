@@ -15,8 +15,9 @@ one afternoon two of them were a headless export of another project. They had no
 
 - Pick the process by its command line. Chief Wants His Cut also starts with `--path game`, so a
   relative `game` says nothing about which project. **Claude starts this game with the absolute
-  path** (`--path "C:\Users\kings\Desktop\Projekte\EggGame\game"` — the checkout since 2026-10-25;
-  it was `Desktop\Claude\rettet-das-ei` before) and closes what matches it;
+  path** of the checkout it is in and closes what matches that folder's name — the folder moves
+  between sessions (`Desktop\Projekte\EggGame` on 2026-10-25, `Desktop\Claude\rettet-das-ei`
+  on 2026-10-26), so put the folder you are in where the snippet says `EggGame`;
   a game started by "Spiel starten.bat" (relative `--path game`) is two processes: the
   `…_console.exe`, whose parent is the `cmd.exe` running that `.bat`, and the window
   `…_mono_win64.exe`, whose parent is that console exe — so look at the parent **and the

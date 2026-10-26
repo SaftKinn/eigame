@@ -17,6 +17,8 @@ namespace RettetDasEi;
 public partial class GlueBonds : Node2D
 {
     static readonly Color Rim = new(0.62f, 0.33f, 0.04f);
+    /// <summary>How far a piece snapped to a cheese's side sits from it.</summary>
+    const float SnapGap = 1f;
 
     sealed class Bond
     {
@@ -65,30 +67,65 @@ public partial class GlueBonds : Node2D
 
     /// <summary>
     /// The face of the cheese the piece lies at (in the cheese's own frame: top or bottom when the
-    /// piece is more above or below than beside it, else left or right), the point on that face
-    /// opposite the piece, the direction the face runs in, and the face's length.
+    /// piece is more above or below than beside it, else left or right — <c>Side</c>), the point on
+    /// that face opposite the piece, the direction the face runs in, and the face's length.
     /// </summary>
-    static (Vector2 At, Vector2 Along, float Length) Face(UnitBody cheese, UnitBody piece)
+    static (Vector2 At, Vector2 Along, float Length, bool Side) Face(UnitBody cheese, UnitBody piece)
     {
         var local = cheese.ToLocal(piece.GlobalPosition);
         float halfWidth = cheese.Def.Width / 2f, halfHeight = cheese.Def.Height / 2f;
         if (Mathf.Abs(local.Y) / halfHeight >= Mathf.Abs(local.X) / halfWidth)
         {
             var at = new Vector2(Mathf.Clamp(local.X, -halfWidth, halfWidth), Mathf.Sign(local.Y) * halfHeight);
-            return (cheese.ToGlobal(at), cheese.GlobalTransform.X.Normalized(), cheese.Def.Width);
+            return (cheese.ToGlobal(at), cheese.GlobalTransform.X.Normalized(), cheese.Def.Width, false);
         }
-        var side = new Vector2(Mathf.Sign(local.X) * halfWidth, Mathf.Clamp(local.Y, -halfHeight, halfHeight));
-        return (cheese.ToGlobal(side), cheese.GlobalTransform.Y.Normalized(), cheese.Def.Height);
+        var beside = new Vector2(Mathf.Sign(local.X) * halfWidth, Mathf.Clamp(local.Y, -halfHeight, halfHeight));
+        return (cheese.ToGlobal(beside), cheese.GlobalTransform.Y.Normalized(), cheese.Def.Height, true);
+    }
+
+    /// <summary>Half the extent of a body's box along a direction, however the body is turned.</summary>
+    static float HalfExtent(UnitBody body, Vector2 direction) =>
+        Mathf.Abs(direction.Dot(body.GlobalTransform.X.Normalized())) * body.Def.Width / 2f
+        + Mathf.Abs(direction.Dot(body.GlobalTransform.Y.Normalized())) * body.Def.Height / 2f;
+
+    /// <summary>
+    /// A piece at one of the cheese's sides: the gap between the piece's near edge and that face
+    /// (negative when they overlap), and the direction out of the face. Null above or below it.
+    /// </summary>
+    static (float Gap, Vector2 Out)? Beside(UnitBody cheese, UnitBody piece)
+    {
+        if (!Face(cheese, piece).Side)
+            return null;
+        var local = cheese.ToLocal(piece.GlobalPosition);
+        var outward = cheese.GlobalTransform.X.Normalized() * Mathf.Sign(local.X);
+        return (Mathf.Abs(local.X) - cheese.Def.Width / 2f - HalfExtent(piece, outward), outward);
+    }
+
+    /// <summary>
+    /// The side glue's magnet (his word, 2026-10-26: beside a cheese a piece just fell down): let
+    /// go beside a cheese's side, the held one — the piece or the cheese — moves flush against it.
+    /// The pair and the move, or null when the held one would not stick at a side.
+    /// </summary>
+    public (UnitBody Cheese, UnitBody Piece, Vector2 Move)? SideSnap(UnitBody held)
+    {
+        if (StickPair(held) is not { } pair || Beside(pair.Cheese, pair.Piece) is not { } beside)
+            return null;
+        var move = beside.Out * (SnapGap - beside.Gap);
+        return (pair.Cheese, pair.Piece, held == pair.Piece ? move : -move);
+    }
+
+    /// <summary>After a snap: the pair sticks at once, without waiting to rest, if still flush.</summary>
+    public void StickBeside(UnitBody cheese, UnitBody piece)
+    {
+        if (Beside(cheese, piece) is { } beside && Mathf.Abs(beside.Gap - SnapGap) < 4f && !IsBonded(cheese, piece))
+            Stick(cheese, piece);
     }
 
     void Stick(UnitBody cheese, UnitBody piece)
     {
         // Two pins along the face they touch at, so the piece cannot turn about one point.
-        var (at, along, length) = Face(cheese, piece);
-        var x = piece.GlobalTransform.X.Normalized();
-        var y = piece.GlobalTransform.Y.Normalized();
-        float pieceAlong = Mathf.Abs(along.Dot(x)) * piece.Def.Width + Mathf.Abs(along.Dot(y)) * piece.Def.Height;
-        float half = Mathf.Min(pieceAlong, length) * 0.3f;
+        var (at, along, length, _) = Face(cheese, piece);
+        float half = Mathf.Min(2f * HalfExtent(piece, along), length) * 0.3f;
         var bond = new Bond
         {
             Cheese = cheese,
@@ -161,12 +198,11 @@ public partial class GlueBonds : Node2D
         var held = Main.I.HeldUnit;
         if (held == null)
             return;
-        var target = StickTarget(held);
-        if (target == null)
+        if (StickPair(held) is not { } pair)
             return;
         float time = Time.GetTicksMsec() / 1000f;
-        var (spot, direction, length) = Face(target, held);
-        float width = Mathf.Min(held.Def.Width, length) * 0.8f;
+        var (spot, direction, length, _) = Face(pair.Cheese, pair.Piece);
+        float width = Mathf.Min(2f * HalfExtent(pair.Piece, direction), length) * 0.8f;
         float pulse = 0.7f + 0.3f * Mathf.Sin(time * 8f);
         var span = direction * width * 0.5f;
         DrawLine(spot - span, spot + span, new Color(1f, 0.85f, 0.2f, 0.45f * pulse), 26f, true);
@@ -181,24 +217,28 @@ public partial class GlueBonds : Node2D
     }
 
     /// <summary>
-    /// The gluing piece a held piece would stick to if let go here: the nearest one whose box comes
-    /// within reach of the held piece's edge, on any side.
+    /// What would stick if the held one were let go here: the nearest pair of a cheese and a piece,
+    /// either of them the held one (a held piece near a cheese, or a held cheese near anything),
+    /// the piece's edge within reach of the cheese's box, on any side.
     /// </summary>
-    static UnitBody? StickTarget(UnitBody held)
+    static (UnitBody Cheese, UnitBody Piece)? StickPair(UnitBody held)
     {
-        UnitBody? nearest = null;
+        (UnitBody Cheese, UnitBody Piece)? nearest = null;
         float nearestGap = float.MaxValue;
         foreach (var unit in Main.I.Units)
         {
-            if (unit == held || unit.Def.Glue == null || unit.IsHeld || unit.IsBroken)
+            if (unit == held || unit.IsHeld || unit.IsBroken)
                 continue;
-            var local = unit.ToLocal(held.GlobalPosition);
-            float outX = Mathf.Max(Mathf.Abs(local.X) - unit.Def.Width / 2f, 0f);
-            float outY = Mathf.Max(Mathf.Abs(local.Y) - unit.Def.Height / 2f, 0f);
-            float gap = Mathf.Sqrt(outX * outX + outY * outY) - held.BoundRadius;
+            var (cheese, piece) = unit.Def.Glue != null ? (unit, held) : (held, unit);
+            if (cheese.Def.Glue == null)
+                continue;
+            var local = cheese.ToLocal(piece.GlobalPosition);
+            float outX = Mathf.Max(Mathf.Abs(local.X) - cheese.Def.Width / 2f, 0f);
+            float outY = Mathf.Max(Mathf.Abs(local.Y) - cheese.Def.Height / 2f, 0f);
+            float gap = Mathf.Sqrt(outX * outX + outY * outY) - piece.BoundRadius;
             if (gap > -30f && gap < 60f && gap < nearestGap)
             {
-                nearest = unit;
+                nearest = (cheese, piece);
                 nearestGap = gap;
             }
         }

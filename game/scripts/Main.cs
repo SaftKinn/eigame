@@ -554,6 +554,11 @@ public partial class Main : Node2D
             return;
         }
 
+        // Let go beside a cheese's side, it snaps flush against it (the side glue's magnet).
+        var snap = Glue.SideSnap(unit);
+        if (snap != null)
+            unit.GlobalPosition += snap.Value.Move;
+
         // Back above the counter (the egg cannot be sold), then up until it is free: a piece
         // let go inside the tower pops out on top of it and drops the last few pixels.
         var position = unit.GlobalPosition;
@@ -562,6 +567,8 @@ public partial class Main : Node2D
         for (int i = 0; i < 250 && Overlaps(unit); i++)
             unit.GlobalPosition += new Vector2(0f, -4f);
         unit.EndHold();
+        if (snap != null)
+            Glue.StickBeside(snap.Value.Cheese, snap.Value.Piece);
         WakeAll();
     }
 

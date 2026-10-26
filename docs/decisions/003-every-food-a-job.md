@@ -122,4 +122,7 @@ entferne den roten rand" — asked whether he means all round, sides included, o
 is up: **all round**. The wax rind is gone; every face sticks — top, bottom and sides — and a
 cheese beside a cheese glues to it. What changed since he put side glue off twice: ADR 005 made
 every food but the cheese slippery, so the cheese is now the one thing that holds a tower; side
-glue makes it worth more, and the game easier — the next round shows by how much.
+glue makes it worth more, and the game easier — the next round shows by how much. Then: "seitlich
+muss es magnetisch angezogen werden sonst fällt der käse einfach runter oder das bauteil" — of a
+snap when let go or a pull in the physics all the time, his pick: **the snap**. Let go beside a
+cheese's side, the held piece or cheese moves flush against it and sticks at once.

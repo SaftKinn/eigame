@@ -214,9 +214,12 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
   (softness 0) on the face they touch at (`GlueBonds.Face`: top/bottom or left/right in the
   cheese's own frame), 30 % of the shorter of the two lengths along that face apart, **with the
   pair's own collision off** (`DisableCollision`; pins and contact fighting made a resting stack
-  jump — 836 px/s measured, 0 without). Two cheeses touching make one bond, not two. Sticking
-  shows yellow crumbs; while a piece is in the hand within reach of a cheese's box, the nearest
-  face glows with "klebt hier" (`GlueBonds._Draw`, `StickTarget`, the same `Face` as sticking). A
+  jump — 836 px/s measured, 0 without). Two cheeses touching make one bond, not two. **The side
+  magnet:** beside a side nothing comes to rest — it falls past — so a piece (or a cheese) let go
+  at a cheese's side snaps flush against it (`Main.Drop` → `GlueBonds.SideSnap`, 1 px off) and
+  sticks at once, without resting (`StickBeside`); top and bottom still stick by resting. Sticking
+  shows yellow crumbs; while a piece or a cheese is in the hand within reach, the nearest face
+  glows with "klebt hier" (`GlueBonds._Draw`, `StickPair`, the same `Face` as sticking). A
   seam drawn while stuck was tried and taken out at his word. Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
   (`GlueBonds.Blow`); `Glue.Tears` decides; a torn pair waits `regrabSeconds`. `BeginHold`
   (picking up) and `Break` loosen all of a piece's glue. A tear and a pick-up show

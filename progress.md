@@ -40,7 +40,9 @@ numbers are guesses — expect tuning (all in `units.json`).
   "es soll doch jede seite des käßes kleben entferne den roten rand" → asked: all round, sides
   too. `GlueBonds`: any touching piece sticks, the pins on the face they touch at (`Face`),
   two cheeses one bond; "klebt hier" on the nearest face; `DrawKit` cheese bare as before the
-  wax (D17, ADR 003 addendum). Build green (0 warnings), 116 tests, headless boot clean;
+  wax (D17, ADR 003 addendum). Then "seitlich muss es magnetisch angezogen werden" → asked
+  (snap on letting go / a pull in the physics): the snap — `GlueBonds.SideSnap` from
+  `Main.Drop`, sticks at once (D18). Build green (0 warnings), 116 tests, headless boot clean;
   play-unverified.
 
 - **2026-10-25 (fresh checkout)** — The repo cloned anew into `Desktop\Projekte\EggGame` (the
@@ -65,7 +67,7 @@ numbers are guesses — expect tuning (all in `units.json`).
 1. **Laden:** each card says its job in a sentence — readable, and does it say enough?
 2. **Käse:** no wax any more — every side sticks (D17). Hold a piece near it — the face it would
    stick to glows, "klebt hier"; let go, yellow crumbs: it sticks — on top, below, beside, and a
-   cheese beside a cheese. Does a glued tower stay still in the build phase, sides glued too? Is
+   cheese beside a cheese. Beside a side it snaps flush when let go (D18), a held cheese too. Does a glued tower stay still in the build phase, sides glued too? Is
    it now too easy? Pick the cheese up:
    cheese strings, what lay on it falls. In wave 2 a meatball's blow should tear a piece off.
    **Turning:** pick up a crooked piece — Q/E brings it back to exactly level or upright.
@@ -107,6 +109,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D14 | Pests together | **A crowd: walkers push in behind attackers and attack together, drawn as a heap** | His "nicht immer nur einer"; climbing was the costly alternative → ADR 004 |
 | D15 | Flies | **Hunt the egg round the food; after `flyPatience` (2 s) bite what blocks them** | His wish; a built-in egg is worth building → ADR 004 |
 | D17 | Käse | **Every face sticks (top, bottom, sides); the red wax rind gone** | His word at the start of his round, 2026-10-26: "jede seite"; asked → all round, sides too. Since ADR 005 the cheese is the one thing that holds a tower → ADR 003 (addendum) |
+| D18 | Käse's sides | **A magnet as a snap: let go beside a cheese's side, the held one moves flush and sticks at once** | His "sonst fällt … einfach runter"; a pull in the physics all the time would tug towers apart → ADR 003 (addendum) |
 | D16 | Stability | **Food but cheese and egg grips at 0.5; recoil pepper 200, pickle 150, mustard 120** | Height was free and the cheese pointless; his idea: recoil tips a stack on a weak base → ADR 005 |
 | D10 | Tomate | **A bomb, no longer a shooter: bursts at any pest's touch; pushes own food, damages none** | Its rolling becomes the job; risk beside the egg → ADR 003 |
 | D11 | Käse, Toast | **Cheese glue that a hard blow tears; toast a shield wall (throw-back, a share of the push)** | Clearly felt jobs for the two blocks → ADR 003 |
@@ -151,6 +154,8 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 - **2026-10-26 — M2, third round (start):** "es soll doch jede seite des käßes kleben entferne
   den roten rand 'schale'" — asked (all round or whichever face is up): "Ringsum, auch
   seitlich" → D17, the wax gone. He had put side glue off twice on 2026-10-24; ADR 005 since.
+  Then "seitlich muss es magnetisch angezogen werden sonst fällt der käse einfach runter oder
+  das bauteil das man drankleben will" → "Schnappen beim Loslassen" (D18).
 
 - **2026-10-24 — M2, sixth answer:** won again with a compact tower (cheese base, the egg upright
   between four peppers, a cheese roof, two pickles on top, a toast beside; screenshot) without

@@ -28,6 +28,20 @@ public partial class KitchenBackdrop : Node2D
         DrawLine(new Vector2(210f, 230f), new Vector2(630f, 230f), Colors.White, 10f);
         DrawCircle(new Vector2(320f, 160f), 34f, new Color(1f, 0.93f, 0.6f));
 
+        // The parking shelf under the window (a real one: a static plank in Main, his word 2026-10-26).
+        var wood = Color.FromHtml("#B07A45");
+        var woodDark = Color.FromHtml("#8A5530");
+        for (int i = 0; i < 2; i++)
+        {
+            float x = i == 0 ? Main.ShelfLeft + 40f : Main.ShelfRight - 52f;
+            DrawColoredPolygon(new[]
+            {
+                new Vector2(x, Main.ShelfTop + Main.ShelfThickness), new Vector2(x + 12f, Main.ShelfTop + Main.ShelfThickness),
+                new Vector2(x + 12f, Main.ShelfTop + Main.ShelfThickness + 50f),
+            }, woodDark);
+        }
+        DrawKit.Box(this, new Rect2(Main.ShelfLeft, Main.ShelfTop, Main.ShelfRight - Main.ShelfLeft, Main.ShelfThickness), wood, woodDark, 4, 3);
+
         // Clock.
         var clock = new Vector2(960f, 170f);
         DrawCircle(clock, 62f, Colors.White);

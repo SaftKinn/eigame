@@ -212,37 +212,45 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
   what touches a gluing piece. **Every face sticks** — top, bottom and sides, however the cheese
   lies (his word, 2026-10-26; the red wax rind with only a cut face sticking, 2026-10-24, is
   gone): a piece touching it, both slower than `restSpeed`, is pinned by two `PinJoint2D`
-  (softness 0) on the face they touch at (`GlueBonds.Face`: top/bottom or left/right in the
-  cheese's own frame), 30 % of the shorter of the two lengths along that face apart, **with the
-  pair's own collision off** (`DisableCollision`; pins and contact fighting made a resting stack
-  jump — 836 px/s measured, 0 without). Two cheeses touching make one bond, not two. **The side
-  magnet:** beside a side nothing comes to rest — it falls past — so a piece (or a cheese) let go
-  at a cheese's side snaps flush against it (`Main.Drop` → `GlueBonds.SideSnap`, 1 px off) and
-  sticks at once, without resting (`StickSnapped`); the snap works on every face, so what glows
-  is what happens. Every pair in reach glows, not only the nearest (`StickPairs`; his
-  screenshot, 2026-10-26: a cheese laid across two); the snap moves to the nearest, and every
-  pair then flush (within 4 px) sticks at once. **Glue off per piece:** a right click while
-  holding a piece switches its `UnitBody.GlueOff` (his word, 2026-10-26: to build the egg in
-  loose) — every piece but a cheese, which always glues ("Käse klebt immer.") — it then sticks
-  to nothing and nothing to it, until switched back; the piece in the
-  hand says "Kleben aus", and the switch shows as a message. Which face, and how far: `GlueBonds.Face` measures on the real outlines
-  (`UnitBody.Outline`: a block's four corners, the triangle's three, a circle or capsule as a
-  16-point polygon) — the face is the cheese's edge across which the two lie furthest apart (by
-  the centres, an upright cheese beside a flat one counted as "on top", his screenshot
-  2026-10-26). Precise building (his word): "klebt hier" and the snap only within `Reach`
-  (12 px) edge to edge and against at least `MinContact` (8 px) of a face.
+  (softness 0) on the face they touch at, 30 % of the stretch they share along it apart, **with
+  the pair's own collision off** (`DisableCollision`; pins and contact fighting made a resting
+  stack jump — 836 px/s measured, 0 without). Two cheeses touching make one bond, not two.
+  - *Which face, how far:* `GlueBonds.Face` measures on the real outlines (`UnitBody.Outline`: a
+    block's four corners, the triangle's three, a circle or capsule as a 16-point polygon) — the
+    face is the cheese's edge across which the two lie furthest apart (by the centres, an upright
+    cheese beside a flat one counted as "on top", his screenshot 2026-10-26).
+  - *The magnet:* beside a side nothing comes to rest — it falls past — so a piece (or a cheese)
+    let go within `Reach` (12 px, edge to edge; "präzise bauen", his word) of a face, against at
+    least `MinContact` (8 px) of it, snaps flush (`Main.Drop` → `GlueBonds.Snap`, 1 px off) and
+    sticks at once, without resting (`StickSnapped`) — on every face, so what glows is what
+    happens. Every pair in reach glows with "klebt hier" (`GlueBonds._Draw`, `StickPairs`, the
+    same `Face`), not only the nearest (his screenshot: a cheese laid across two); the snap goes
+    to the nearest, and every pair then flush (within 4 px) sticks at once. Sticking shows
+    yellow crumbs. A seam drawn while stuck was tried and taken out at his word.
+  - *Lifting:* picking a piece up lifts everything glued to it (`GlueBonds.GroupOf`; Main keeps
+    each member's transform relative to the piece in the hand, turns and drops them together, and
+    pops the whole group up if any of it overlaps; a group is not sold). A right click in the hand
+    unglues the piece from its group (`Main.Unglue`, cheese strings), which is let go where it is
+    (his word, 2026-10-26: rebuilding piece by piece was a chore). `Break` loosens all of a
+    piece's glue.
+  - *Glue off per piece:* G in the hand switches `UnitBody.GlueOff` (his word, 2026-10-26: to
+    build the egg in loose; first on the right click) — every piece but a cheese, which always
+    glues ("Käse klebt immer.") — it then sticks to nothing and nothing to it, until switched
+    back; the piece in the hand says "Kleben aus", and the switch shows as a message.
+  - *Tearing:* every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
+    (`GlueBonds.Blow`); `Glue.Tears` decides; a torn pair waits `regrabSeconds`. A tear and an
+    unglue show `Fx/CheeseStrings`.
 - **Käsedreieck** (`cheese_triangle`, shape `triangle`): an equilateral triangle point up, round
   its centroid (`UnitBody.TrianglePoints` — its collision polygon, its drawing and its outline),
   the cheese block's other shape: both name each other as `alternate`, share one shop card
   (`ContentDb.ShopUnits`), and a right click on the card switches it (`ShopCard`; the other shape
   small in the corner, the tooltip names it). Same glue; first numbers 110 × 95, mass 2.5, hp
-  100, 15 gold (guesses). Sticking shows yellow crumbs; while a piece or a cheese is in the hand, the nearest
-  face in reach glows with "klebt hier" (`GlueBonds._Draw`, `StickPair`, the same `Face` as
-  sticking). A
-  seam drawn while stuck was tried and taken out at his word. Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
-  (`GlueBonds.Blow`); `Glue.Tears` decides; a torn pair waits `regrabSeconds`. `BeginHold`
-  (picking up) and `Break` loosen all of a piece's glue. A tear and a pick-up show
-  `Fx/CheeseStrings`; sticking shows a few yellow crumbs.
+  100, 15 gold (guesses).
+- **The shelf** (`Main.ShelfLeft…ShelfTop`, a static plank on the wall under the window, drawn by
+  `KitchenBackdrop`): a place to park pieces and groups while rebuilding (his word, 2026-10-26).
+  What stands on it sleeps (`Main.OnShelf`: over the plank, anywhere above it): it shoots and
+  bursts not (`UnitBody`), pests pass it by (`UnitTouching`, `HighestUnit`, `Egg`), a tomato's
+  push skips it. The egg on the shelf counts as off the tower: no wave starts.
 - **Toast** (`shield`): `Enemy.DoStrike` pushes with `Shield.PushOn` (the share), the toast
   `SpringBack`s (squash, elastic), and the pest is thrown back `throwBack` px (`Enemy.KnockBack`:
   0.32 s, a hop on the ground or a glide for a flyer) and has to come on again.

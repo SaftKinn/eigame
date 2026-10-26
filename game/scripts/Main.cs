@@ -25,6 +25,12 @@ public partial class Main : Node2D
     public const float BoardLeft = 740f;
     public const float BoardRight = 1180f;
     const float BoardRamp = 24f;
+    // The shelf on the wall, under the window: a place to park pieces while rebuilding (his word,
+    // 2026-10-26). What stands on it sleeps — it does not shoot and is not attacked.
+    public const float ShelfLeft = 170f;
+    public const float ShelfRight = 670f;
+    public const float ShelfTop = 560f;
+    public const float ShelfThickness = 16f;
     // 15°: the coarsest step with both 45° (the blocks' diagonals) and 60°/120° (the triangle laid
     // on any of its faces) — 45° was tried and left the triangle on one face (his word, 2026-10-26).
     const float RotateStep = Mathf.Pi / 12f;
@@ -55,6 +61,8 @@ public partial class Main : Node2D
     bool _fast;
 
     UnitBody? _held;
+    /// <summary>What is glued to the piece in the hand, each with its place relative to it.</summary>
+    readonly List<(UnitBody Unit, Transform2D Relative)> _heldGroup = new();
     bool _heldIsNew;
     Vector2 _grabOffset;
     float _heldRotation;
@@ -70,6 +78,7 @@ public partial class Main : Node2D
         AddChild(new KitchenBackdrop { ZIndex = -10 });
         _counter = AddStatic(new Vector2(ScreenWidth / 2f, CounterTop + 150f), new Vector2(ScreenWidth + 400f, 300f));
         AddStatic(new Vector2((BoardLeft + BoardRight) / 2f, (BoardTop + CounterTop) / 2f), new Vector2(BoardRight - BoardLeft, CounterTop - BoardTop));
+        AddStatic(new Vector2((ShelfLeft + ShelfRight) / 2f, ShelfTop + ShelfThickness / 2f), new Vector2(ShelfRight - ShelfLeft, ShelfThickness));
         AddStatic(new Vector2(-20f, 0f), new Vector2(40f, 4000f));
         AddStatic(new Vector2(ScreenWidth + 20f, 0f), new Vector2(40f, 4000f));
 
@@ -200,18 +209,8 @@ public partial class Main : Node2D
                 _heldRotation -= RotateStep;
             else if (_held != null && mouse.ButtonIndex == MouseButton.WheelDown)
                 _heldRotation += RotateStep;
-            else if (_held != null && mouse.ButtonIndex == MouseButton.Right)
-            {
-                // Glue off and on for the piece in the hand — the egg built in loose, say; every
-                // piece but a cheese, which always glues (his word, 2026-10-26).
-                if (_held.Def.Glue != null)
-                    _hud.ShowMessage("Käse klebt immer.", 1.5f);
-                else
-                {
-                    _held.GlueOff = !_held.GlueOff;
-                    _hud.ShowMessage(_held.GlueOff ? "Kleben aus für dieses Teil" : "Kleben an für dieses Teil", 1.5f);
-                }
-            }
+            else if (_held != null && mouse.ButtonIndex == MouseButton.Right && _heldGroup.Count > 0)
+                Unglue();
         }
         else if (@event is InputEventKey { Pressed: true, Echo: false } key)
         {
@@ -235,26 +234,37 @@ public partial class Main : Node2D
                     if (_held != null)
                         _heldRotation += RotateStep;
                     break;
+                case Key.G:
+                    if (_held != null)
+                        ToggleGlue(_held);
+                    break;
             }
         }
     }
 
     // ------------------------------------------------------------- waves
 
-    bool CanStartWave() => _held == null && _game.CanStartWave(EggOnCounter());
+    // The egg on the shelf would sleep through the wave, so it counts as off the tower, as on the counter.
+    bool CanStartWave() => _held == null && _game.CanStartWave(EggOffTower());
 
     bool EggOnCounter() => IsInstanceValid(_egg) && !_egg.IsBroken && !_egg.IsHeld && _egg.IsTouching(_counter);
+
+    bool EggOffTower() => EggOnCounter() || (IsInstanceValid(_egg) && !_egg.IsBroken && !_egg.IsHeld && OnShelf(_egg));
+
+    /// <summary>Whether a piece stands on the shelf (over it, anywhere above its plank): it sleeps.</summary>
+    public static bool OnShelf(UnitBody unit) =>
+        unit.GlobalPosition.X >= ShelfLeft && unit.GlobalPosition.X <= ShelfRight && unit.GlobalPosition.Y < ShelfTop;
 
     void TryStartWave()
     {
         if (!CanStartWave())
         {
-            if (Phase == Phase.Build && EggOnCounter())
+            if (Phase == Phase.Build && EggOffTower())
                 _hud.ShowMessage("Das Ei muss aufs Brett oder auf den Turm!", 2.5f);
             return;
         }
 
-        _game.TryStartWave(EggOnCounter());
+        _game.TryStartWave(EggOffTower());
         ReadEvents();
     }
 
@@ -325,7 +335,7 @@ public partial class Main : Node2D
         UnitBody? best = null;
         foreach (var unit in _units)
         {
-            if (unit.IsHeld || unit.IsBroken)
+            if (unit.IsHeld || unit.IsBroken || OnShelf(unit))
                 continue;
             if (best == null || unit.GlobalPosition.Y < best.GlobalPosition.Y)
                 best = unit;
@@ -334,7 +344,7 @@ public partial class Main : Node2D
     }
 
     /// <summary>The egg while it is whole and not in the hand — what flyers go for.</summary>
-    public UnitBody? Egg => IsInstanceValid(_egg) && !_egg.IsBroken && !_egg.IsHeld ? _egg : null;
+    public UnitBody? Egg => IsInstanceValid(_egg) && !_egg.IsBroken && !_egg.IsHeld && !OnShelf(_egg) ? _egg : null;
 
     /// <summary>
     /// The piece of food a pest-sized circle at <paramref name="at"/> would touch, if any — and if
@@ -353,7 +363,8 @@ public partial class Main : Node2D
         UnitBody? first = null;
         foreach (var hit in GetWorld2D().DirectSpaceState.IntersectShape(query, 6))
         {
-            if (hit["collider"].AsGodotObject() is not UnitBody unit || unit.IsBroken || unit.IsHeld)
+            // What stands on the shelf sleeps: pests pass it by.
+            if (hit["collider"].AsGodotObject() is not UnitBody unit || unit.IsBroken || unit.IsHeld || OnShelf(unit))
                 continue;
             if (unit == prefer)
                 return unit;
@@ -430,7 +441,7 @@ public partial class Main : Node2D
 
         foreach (var unit in _units)
         {
-            if (unit == bomb || unit.IsHeld || unit.IsBroken)
+            if (unit == bomb || unit.IsHeld || unit.IsBroken || OnShelf(unit))
                 continue;
             var away = unit.GlobalPosition - center;
             float push = Bomb.PushAt(def, away.Length(), unit.BoundRadius);
@@ -522,11 +533,38 @@ public partial class Main : Node2D
         _held = unit;
         _heldIsNew = isNew;
         _grabOffset = isNew ? Vector2.Zero : unit.GlobalPosition - mouse;
+        // What is glued to it comes along, each keeping its place to the piece in the hand (his
+        // word, 2026-10-26); a right click in the hand unglues the piece from them (Unglue).
+        _heldGroup.Clear();
+        var inverse = unit.GlobalTransform.AffineInverse();
+        foreach (var member in Glue.GroupOf(unit))
+        {
+            _heldGroup.Add((member, inverse * member.GlobalTransform));
+            member.BeginHold();
+        }
         // Snapped to the rotate step: a piece picked up crooked can be turned back to exactly
         // level or upright with Q/E or the wheel (his word, 2026-10-24).
         _heldRotation = Mathf.Snapped(unit.GlobalRotation, RotateStep);
         unit.BeginHold();
         WakeAll();
+    }
+
+    /// <summary>The piece in the hand and what is glued to it.</summary>
+    IEnumerable<UnitBody> HeldAll()
+    {
+        yield return _held!;
+        foreach (var (member, _) in _heldGroup)
+            yield return member;
+    }
+
+    /// <summary>Moves the piece in the hand, and its group along with it.</summary>
+    void PlaceHeld(Vector2 position, float rotation)
+    {
+        var unit = _held!;
+        unit.GlobalPosition = position;
+        unit.GlobalRotation = rotation;
+        foreach (var (member, relative) in _heldGroup)
+            member.GlobalTransform = unit.GlobalTransform * relative;
     }
 
     void UpdateHeld()
@@ -537,16 +575,52 @@ public partial class Main : Node2D
         if (!overShop)
             target.Y = Mathf.Min(target.Y, CounterTop - 8f);
         target.X = Mathf.Clamp(target.X, 30f, ScreenWidth - 30f);
-        unit.GlobalPosition = target;
-        unit.GlobalRotation = _heldRotation;
+        PlaceHeld(target, _heldRotation);
 
-        bool sell = overShop && unit.Def.InShop;
-        bool blocked = !overShop && Overlaps(unit);
-        unit.SetGhost(sell ? GhostMode.Sell : blocked ? GhostMode.Blocked : GhostMode.Ok);
+        // A group is not sold: only a piece on its own goes back to the shop.
+        bool sell = overShop && unit.Def.InShop && _heldGroup.Count == 0;
+        bool blocked = !overShop && HeldAll().Any(Overlaps);
+        foreach (var piece in HeldAll())
+            piece.SetGhost(sell ? GhostMode.Sell : blocked ? GhostMode.Blocked : GhostMode.Ok);
         _hud.ShowSellHint(sell ? RefundFor(unit) : null);
 
         if (!Input.IsMouseButtonPressed(MouseButton.Left))
             Drop(sell);
+    }
+
+    /// <summary>
+    /// G in the hand: glue off and on for that piece — the egg built in loose, say; every piece but
+    /// a cheese, which always glues (his word, 2026-10-26; first on the right click, which now
+    /// unglues from a group).
+    /// </summary>
+    void ToggleGlue(UnitBody unit)
+    {
+        if (unit.Def.Glue != null)
+        {
+            _hud.ShowMessage("Käse klebt immer.", 1.5f);
+            return;
+        }
+        unit.GlueOff = !unit.GlueOff;
+        _hud.ShowMessage(unit.GlueOff ? "Kleben aus für dieses Teil" : "Kleben an für dieses Teil", 1.5f);
+    }
+
+    /// <summary>
+    /// A right click in the hand: the piece comes off its group, which is let go where it is (and
+    /// moved up until free, as a dropped piece is); the piece stays in the hand on its own.
+    /// </summary>
+    void Unglue()
+    {
+        var unit = _held!;
+        Glue.Loosen(unit, strings: true);
+        var released = _heldGroup.Select(g => g.Unit).ToList();
+        _heldGroup.Clear();
+        for (int i = 0; i < 250 && released.Any(Overlaps); i++)
+            foreach (var piece in released)
+                piece.GlobalPosition += new Vector2(0f, -4f);
+        foreach (var piece in released)
+            piece.EndHold();
+        _hud.ShowMessage("Abgekoppelt – du hältst nur dieses Teil.", 1.5f);
+        WakeAll();
     }
 
     int RefundFor(UnitBody unit) => _game.RefundFor(unit.Def, _heldIsNew, unit.Hp, unit.MaxHp);
@@ -568,19 +642,22 @@ public partial class Main : Node2D
             return;
         }
 
-        // Let go within reach of a cheese's face, it snaps flush against it (the glue's magnet).
+        // Let go within reach of a cheese's face, it snaps flush against it (the glue's magnet);
+        // a group moves with the piece in the hand.
+        var position = unit.GlobalPosition;
         var snap = Glue.Snap(unit);
         if (snap != null)
-            unit.GlobalPosition += snap.Value;
+            position += snap.Value;
 
         // Back above the counter (the egg cannot be sold), then up until it is free: a piece
         // let go inside the tower pops out on top of it and drops the last few pixels.
-        var position = unit.GlobalPosition;
         position.Y = Mathf.Min(position.Y, CounterTop - 8f);
-        unit.GlobalPosition = position;
-        for (int i = 0; i < 250 && Overlaps(unit); i++)
-            unit.GlobalPosition += new Vector2(0f, -4f);
-        unit.EndHold();
+        PlaceHeld(position, unit.GlobalRotation);
+        for (int i = 0; i < 250 && HeldAll().Any(Overlaps); i++)
+            PlaceHeld(unit.GlobalPosition + new Vector2(0f, -4f), unit.GlobalRotation);
+        foreach (var piece in HeldAll())
+            piece.EndHold();
+        _heldGroup.Clear();
         if (snap != null)
             Glue.StickSnapped(unit);
         WakeAll();

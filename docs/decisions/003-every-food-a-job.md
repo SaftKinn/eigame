@@ -136,4 +136,7 @@ the **Käsedreieck**, the block's other shape, gluing on all three faces. Pieces
 das 3eck nicht mit jeder seite befestigen": 15° is the coarsest step with both 45° and 60°/120°.
 And "mit halten und rechtsklick kann man kleben deaktivieren und aktivieren für das bauteil das
 man in der hand hält praktisch für das ei": a piece's glue can be switched off — it sticks to
-nothing and nothing to it — and on again.
+nothing and nothing to it — and on again; not a cheese's. Then "es ist auch nervig … alles
+abreisen zu müssen … um seinen turm neu zu gestalten" → **point 6 is replaced**: picking a piece
+up lifts everything glued to it; a right click in the hand unglues that piece from the group
+(glue off moved to G); and a shelf on the wall to park pieces — what stands there sleeps.

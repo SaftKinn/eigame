@@ -42,8 +42,11 @@ repository on this machine has it already (2026-10-24).
   (the yellow band on the counter shows the reach while you hold a shooter).
 - **Every food has a job** (its shop card says it): **Käse** glues what touches it, on every side
   ("klebt hier" shows while you hold a piece close to it; let go, it snaps flush) — a hard blow
-  tears it off; a right click on its shop card switches it to the **Käsedreieck**; a right
-  click while holding a piece switches its glue off (and on again) — to build the egg in loose; pieces turn in
+  tears it off; a right click on its shop card switches it to the **Käsedreieck**; picking a
+  piece up lifts everything glued to it — a right click while holding unglues just that piece;
+  **G** while holding switches a piece's glue off (and on again) — to build the egg in loose (a
+  cheese always glues); the **shelf** on the left wall is a parking place: what stands there
+  neither shoots nor is attacked; pieces turn in
   15° steps and a piece you pick up snaps straight, so Q/E can always turn it level again; **Toast** throws attackers back and is shoved less; **Gurke**'s slices go
   through three pests; **Senf** leaves a puddle that slows walkers; **Pfeffer** makes pests sneeze
   and pause; **Tomate** shoots nothing — it bursts when a pest touches it and shoves your food

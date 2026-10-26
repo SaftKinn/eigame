@@ -19,7 +19,7 @@ public partial class UnitBody : RigidBody2D
     public bool IsEgg { get; private set; }
     public bool IsHeld { get; private set; }
     public bool IsBroken { get; private set; }
-    /// <summary>Switched by a right click while held: this piece sticks to nothing and nothing to it.</summary>
+    /// <summary>Switched by G while held: this piece sticks to nothing and nothing to it.</summary>
     public bool GlueOff { get; set; }
     public CollisionShape2D ShapeNode { get; private set; } = null!;
     public Shape2D ShapeResource { get; private set; } = null!;
@@ -145,6 +145,9 @@ public partial class UnitBody : RigidBody2D
 
     public override void _PhysicsProcess(double delta)
     {
+        // On the shelf it sleeps: no shot, no burst (his word, 2026-10-26).
+        if (Main.OnShelf(this))
+            return;
         // A bomb shoots nothing; it bursts as soon as a pest touches it (ADR 003).
         if (Def.Bomb != null && !IsBroken && !IsHeld && Main.I.Phase == Phase.Wave && Main.I.PestTouches(this))
         {
@@ -279,8 +282,7 @@ public partial class UnitBody : RigidBody2D
 
     public void BeginHold()
     {
-        // Picking up always loosens the glue; what lay on it falls (ADR 003).
-        Main.I.Glue.Loosen(this, strings: true);
+        // The glue stays: what is glued to it is lifted with it (Main.StartHold, his word 2026-10-26).
         IsHeld = true;
         _shot?.Kill();
         _visual.Scale = Vector2.One;

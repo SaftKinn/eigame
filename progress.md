@@ -49,7 +49,10 @@ numbers are guesses — expect tuning (all in `units.json`).
   "sonst das 3eck nicht mit jeder seite befestigen". His screenshot of a cheese
   held across two upright ones, one strip glowing → every pair in reach glows and sticks
   (`StickPairs`). Turning back to 15°. "mit halten und rechtsklick kann man kleben deaktivieren
-  … praktisch für das ei" → `UnitBody.GlueOff`, switched by a right click while holding (D21).
+  … praktisch für das ei" → `UnitBody.GlueOff` (D21; not a cheese). His win (screenshot) noted.
+  Rebuilding (D22): lifting lifts the glued group (`GlueBonds.GroupOf`, `Main.PlaceHeld`), a
+  right click in the hand unglues (`Main.Unglue`), glue off moved to G, the shelf under the
+  window (`Main.OnShelf`: sleeps); the help line in two lines.
   Build green (0 warnings), 122 tests, headless boot clean; play-unverified.
 
 - **2026-10-25 (fresh checkout)** — The repo cloned anew into `Desktop\Projekte\EggGame` (the
@@ -121,6 +124,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D18 | Käse's sides | **A magnet as a snap: let go beside a cheese's side, the held one moves flush and sticks at once** | His "sonst fällt … einfach runter"; a pull in the physics all the time would tug towers apart → ADR 003 (addendum) |
 | D19 | Käsedreieck | **The cheese block's other shape: an equilateral triangle, one shop card, a right click switches** | His wish ("linksklick" buys, so a right click); three 120° angles cannot be — asked → equilateral. `alternate` in units.json, `ContentDb.ShopUnits` → ADR 003 (addendum) |
 | D20 | Turning | **15° steps kept** (45° tried and taken back the same hour) | 45°: "die anderen winkel wären sonst überflüssig" — then "sonst das 3eck nicht mit jeder seite befestigen": 15° is the coarsest step with 45° and 60°/120° |
+| D22 | Rebuilding | **Lifting a piece lifts its glued group; a right click in the hand unglues it; glue off on G; a shelf under the window where pieces sleep** | "nervig … alles abreisen … um seinen turm neu zu gestalten"; his picks: shelf + group, unglue while holding, shelf pieces sleep (no free shots from up there) → ADR 003 (addendum, replaces point 6) |
 | D21 | Glue off | **A right click while holding a piece switches its glue off and on; it stays with the piece; not for a cheese** | His wish: to build the egg in loose; "alle bauteile außer den käse" |
 | D16 | Stability | **Food but cheese and egg grips at 0.5; recoil pepper 200, pickle 150, mustard 120** | Height was free and the cheese pointless; his idea: recoil tips a stack on a weak base → ADR 005 |
 | D10 | Tomate | **A bomb, no longer a shooter: bursts at any pest's touch; pushes own food, damages none** | Its rolling becomes the job; risk beside the egg → ADR 003 |
@@ -174,7 +178,10 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
   (pepper-like, on their sides) at its ends. He said nothing about it being too easy — ask
   next time; measure it in `tools/tuning` (tower `his`) before tuning waves.
   "alle bauteile außer den käse mit rechtsklick unklebbar machen … bei dem ei stand Kleben au"
-  → the cheese always glues; the label centred by its own width (it was cut at 100 px). Then his screenshot
+  → the cheese always glues; the label centred by its own width (it was cut at 100 px).
+  "es ist auch nervig wenn man höher bauen will alles abreisen zu müssen und verteilen zu müssen
+  außerhalb der plattform" → his picks: a shelf, lifting lifts the glued group, a right click in
+  the hand unglues the piece, shelf pieces sleep (D22). Then his screenshot
   (an upright cheese beside a flat one, not stuck): "so geht es noch nicht nur übereinander
   schnappt er … man soll präzise bauen können" → the face judged by the centres called it "on
   top", and the reach was a circle round the piece (huge for a long one); now edge to edge,

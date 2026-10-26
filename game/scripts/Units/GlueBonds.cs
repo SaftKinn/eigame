@@ -8,7 +8,8 @@ namespace RettetDasEi;
 /// The cheese's glue (ADR 003): what comes to rest touching a gluing piece is pinned to it by two
 /// joints, so the two move as one. A hard blow on either tears it (the core's <see cref="Glue.Tears"/>),
 /// with cheese strings; after a short wait the two can stick again once they rest. Picking a piece
-/// up loosens all of its glue. Contacts and joints are Godot's physics; whether it tears is the core's.
+/// up lifts everything glued to it (<see cref="GroupOf"/>); a right click in the hand unglues the
+/// piece from that group. Contacts and joints are Godot's physics; whether it tears is the core's.
 /// Every face sticks — top, bottom and sides, however the cheese lies (his word, 2026-10-26: the
 /// wax rind of 2026-10-24 is gone). Sticking shows yellow crumbs; while a piece in the hand would
 /// stick, the face it would stick to glows with "klebt hier". (A seam drawn while stuck was tried
@@ -188,7 +189,25 @@ public partial class GlueBonds : Node2D
         }
     }
 
-    /// <summary>Every bond of <paramref name="unit"/> goes — it is picked up or breaks.</summary>
+    /// <summary>
+    /// Everything glued to <paramref name="unit"/>, through any number of bonds — what is lifted with
+    /// it (his word, 2026-10-26: rebuilding a tower piece by piece was a chore). Without the unit.
+    /// </summary>
+    public List<UnitBody> GroupOf(UnitBody unit)
+    {
+        var group = new List<UnitBody> { unit };
+        for (int i = 0; i < group.Count; i++)
+            foreach (var bond in _bonds)
+            {
+                var other = bond.Cheese == group[i] ? bond.Piece : bond.Piece == group[i] ? bond.Cheese : null;
+                if (other != null && !group.Contains(other))
+                    group.Add(other);
+            }
+        group.RemoveAt(0);
+        return group;
+    }
+
+    /// <summary>Every bond of <paramref name="unit"/> goes — it is unglued from its group in the hand, or breaks.</summary>
     public void Loosen(UnitBody unit, bool strings)
     {
         for (int i = _bonds.Count - 1; i >= 0; i--)
@@ -221,7 +240,7 @@ public partial class GlueBonds : Node2D
         var font = ThemeDB.FallbackFont;
         if (held.GlueOff)
         {
-            // Said over the piece in the hand while its glue is off (a right click switches it).
+            // Said over the piece in the hand while its glue is off (G switches it).
             // Centred by its own width: a fixed box of 100 px cut the last letter off (his screenshot).
             const string Off = "Kleben aus";
             float textWidth = font.GetStringSize(Off, HorizontalAlignment.Left, -1f, 20).X;

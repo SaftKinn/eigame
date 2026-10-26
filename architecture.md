@@ -61,7 +61,7 @@ Runs, unlocks and saves wait for the prototype rule in `CLAUDE.md` (Part 2 of `r
 ## 3. Solution layout
 
 ```
-eigame/                             the repo (checked out as Desktop\Projekte\EggGame)
+eigame/                             the repo (its folder differs by machine: Desktop\Claude\rettet-das-ei, Desktop\Projekte\EggGame)
 ├── game/                           Godot project (open THIS folder in the editor)
 │   ├── project.godot               1920×1080, stretch canvas_items, aspect keep; physics 120 Hz, 24 iterations
 │   ├── RettetDasEi.csproj          Godot.NET.Sdk 4.6.2 — physics, hand, view; references the core (ADR 002)
@@ -72,13 +72,13 @@ eigame/                             the repo (checked out as Desktop\Projekte\Eg
 │   └── scripts/
 │       ├── Main.cs                 the scene: reports to the core, shows its events; the shop's hand, queries for others
 │       ├── Content/                GameContent — reads res://content/ through the core's loader
-│       ├── Units/                  UnitBody (RigidBody2D: health, shooting, bomb, drag state), UnitVisual, HpBar, GlueBonds (the cheese's joints)
+│       ├── Units/                  UnitBody (RigidBody2D: health, shooting, bomb, drag state, outline), UnitVisual, HpBar, GlueBonds (the cheese's joints, faces, magnet, groups)
 │       ├── Enemies/                Enemy (moves, attacks with impulses, thrown back, sneezes), EnemyVisual
 │       ├── Combat/                 Projectile (straight with lead and pierce, lob with splash), Puddle
 │       ├── Ui/                     Hud (gold, wave, messages, shop, end page; Hud.Anchor), ShopCard, RangeOverlay
 │       ├── Fx/                     Fx (crumbs, numbers), FloatingText, CheeseStrings
 │       ├── View/                   DrawKit — the stand-in drawings, magenta for unknown keys
-│       └── World/                  KitchenBackdrop
+│       └── World/                  KitchenBackdrop (the wall, the board, the shelf's look; its plank is Main's)
 ├── sim/RettetDasEi.Sim/            the rules core, NO Godot reference (ADR 002; M1)
 │   ├── Content/                    ContentDefs (the JSON's shapes), ContentDb (load + validate), HexColor
 │   └── Rules/                      GameState (gold, shop, waves, phases), GameEvent, WaveSchedule, Shop, Reach;

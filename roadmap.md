@@ -65,7 +65,9 @@ fun, without any frame animation?
   *The tests' gate is met; the live gate is open.*
 - **His rounds the same day** turned it further (`progress.md`, Playtest notes): the glue held
   still and in wax, harder waves and less gold, pests that gang up and flies that hunt the egg
-  (ADR 004), slippery food and real recoil (ADR 005). The live gate now covers all of it.
+  (ADR 004), slippery food and real recoil (ADR 005). His round of 2026-10-26 reworked the
+  building hand (glue on every face, a magnet, lifting glued groups, a shelf, the Käsedreieck;
+  no push back per hit — D17–D24). The live gate now covers all of it.
 - **Verification (tests):** each rule of the core with its edge cases — how effects stack, end,
   and meet each other.
 - **Verification (live):** Sezgin can say what each food is for; buying is a choice between jobs;

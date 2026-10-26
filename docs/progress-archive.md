@@ -5,6 +5,21 @@ Older `## Last session` entries and resolved open questions, rotated out of `pro
 
 ## Last session (Verlauf)
 
+- **2026-10-24 (M2's rounds with him)** — Six answers of his turned into rounds, each measured,
+  committed and the game started for him (details in `## Playtest notes`): the glue's jumping
+  (pins vs contact, measured from his recording, lesson `a-joint-and-a-contact-on-one-pair-fight`);
+  the cheese in wax, only its cut face sticks; a held piece snaps to 15°; harder waves and less
+  gold; ADR 004 (a crowd, no blocking at all, flies hunt the egg); ADR 005 (slippery food, real
+  recoil). A tuning harness (`tools/tuning`) plays fixed towers through the waves
+  (`docs/conventions.md`); his own winning tower rebuilt in it showed the flat towers
+  underestimate a good builder (lesson `measure-difficulty-with-his-tower`). Remote added and
+  pushed.
+
+## Resolved (rotated)
+
+- **Parked idea "cheese that glues at its sides too"** (2026-10-24, put off by him then) — done
+  at his word on 2026-10-26 (D17).
+
 - **2026-10-24 (M2)** — The six jobs built in one step (his pick). `5daa544`: content fields
   (`bomb`, `glue`, `shield` on units; `pierce` required, `puddle`, `itch` on attacks), their
   validation, the core's `PestEffects` and `Jobs` — 111 tests, a mutation check of three rules

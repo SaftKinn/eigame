@@ -105,8 +105,8 @@ Extend the table with every new folder.
 
 ## Testing
 
-- `dotnet test tests/RettetDasEi.Sim.Tests` — no Godot needed, a few seconds (116 tests on
-  2026-10-24). Assert exact outcomes with explicit set-up; prefer a tiny scenario that isolates one
+- `dotnet test tests/RettetDasEi.Sim.Tests` — no Godot needed, a few seconds (122 tests on
+  2026-10-26). Assert exact outcomes with explicit set-up; prefer a tiny scenario that isolates one
   behaviour. Tests don't use the shipped content for logic (`TestContent`, its own small content),
   so tuning never breaks a logic test; `ContentFilesTests` loads the shipped files to validate them.
 - The Godot side: `dotnet build game/RettetDasEi.csproj` and a headless boot —
@@ -132,7 +132,15 @@ Extend the table with every new folder.
   wave 5 only just. Runs differ (physics): never tune a number on one run, and stop when a change
   shows nothing. Change content in `tuning-run/game/content`, measure, then copy the files into
   the repo and `git diff` them. If `setup.sh` says a hook did not apply, `Main.cs` or `Enemy.cs`
-  changed where its `sed` lines look.
+  changed where its `sed` lines look. The harness's towers get a `GlueWindow` (since D24 only
+  what the hand lets go sticks by resting — a tower placed by code would never glue). Its towers
+  date from 2026-10-24; his tower of 2026-10-26 (screenshot in `progress.md`) is not in it yet.
+- **A probe of the hand** (2026-10-26): build, boot and the harness never pick up or let go of a
+  piece (lesson `the-boot-never-lets-go-of-a-piece`). To measure a drop, a scratch copy with a
+  partial `Main` that builds the tower, calls `StartHold`, moves it with `PlaceHeld` each physics
+  step (a `sed` line makes `UpdateHeld` call the probe instead of reading the mouse), then
+  `Drop`, and prints the fastest body every 0.25 s — that is how the flung group (5676 px/s) was
+  found and its fix measured.
 - **A mutation check** shows the tests can fail: break a rule on purpose (in a copy, or restore
   it with `git checkout -- <file>` once it is committed), see which tests turn red, put it back,
   see green again.

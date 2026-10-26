@@ -456,8 +456,8 @@ public partial class Enemy : Node2D
         _visual.Flash();
         Fx.Number(Main.I.FxRoot, GlobalPosition + new Vector2((float)GD.RandRange(-12.0, 12.0), -Def.Radius - 14f),
             Mathf.RoundToInt(damage).ToString(), Fx.DamageColor, 26);
-        if (!IsFlyer && !_attacking)
-            Position += new Vector2(-Dir * 5f, 0f);
+        // No shove back per hit: 5 px a hit from four peppers held any pest off the tower for good
+        // (his word, 2026-10-26). Only a sneeze and a toast throw back.
         QueueRedraw();
         if (Hp <= 0f)
             Die();

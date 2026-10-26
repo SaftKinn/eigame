@@ -168,7 +168,9 @@ launched by the stack.
 - **Attacking:** on touching food it attacks in a cycle of `attackCooldown` (at least wind-up
   0.28 s + strike 0.08 s + recover 0.34 s): lean back, lunge, and at the lunge the food gets
   `damage` and an impulse of `push` — walkers forward and a little upward (that is what tips a
-  tower), flyers towards the piece. A hit pest is knocked back 5 px; at 0 health it is flung
+  tower), flyers towards the piece. A hit pest flashes and shows the damage, but is not
+  moved (5 px back per hit until 2026-10-26: four peppers held any pest off the tower for good,
+  his word — only a sneeze and a toast throw back); at 0 health it is flung
   away spinning and fades; its `gold` is added **→ core (M1)**.
 
 ### 5.4 Projectiles (`Projectile`)

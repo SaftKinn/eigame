@@ -54,11 +54,11 @@ public partial class GlueBonds : Node2D
         foreach (var cheese in Main.I.Units)
         {
             var glue = cheese.Def.Glue;
-            if (glue == null || cheese.IsHeld || cheese.IsBroken || cheese.LinearVelocity.Length() > glue.RestSpeed)
+            if (glue == null || cheese.IsHeld || cheese.IsBroken || cheese.GlueOff || cheese.LinearVelocity.Length() > glue.RestSpeed)
                 continue;
             foreach (var body in cheese.GetCollidingBodies())
             {
-                if (body is not UnitBody piece || piece == cheese || piece.IsHeld || piece.IsBroken)
+                if (body is not UnitBody piece || piece == cheese || piece.IsHeld || piece.IsBroken || piece.GlueOff)
                     continue;
                 if (piece.LinearVelocity.Length() > glue.RestSpeed)
                     continue;
@@ -218,6 +218,15 @@ public partial class GlueBonds : Node2D
         var held = Main.I.HeldUnit;
         if (held == null)
             return;
+        var font = ThemeDB.FallbackFont;
+        if (held.GlueOff)
+        {
+            // Said over the piece in the hand while its glue is off (a right click switches it).
+            var over = held.GlobalPosition + new Vector2(-50f, -held.BoundRadius - 14f);
+            DrawStringOutline(font, over, "Kleben aus", HorizontalAlignment.Center, 100f, 20, 6, new Color(0.2f, 0.12f, 0.06f));
+            DrawString(font, over, "Kleben aus", HorizontalAlignment.Center, 100f, 20, new Color(0.85f, 0.85f, 0.85f));
+            return;
+        }
         var pairs = StickPairs(held);
         if (pairs.Count == 0)
             return;
@@ -237,7 +246,6 @@ public partial class GlueBonds : Node2D
                 label = end;
         }
         label += new Vector2(14f, 7f);
-        var font = ThemeDB.FallbackFont;
         DrawStringOutline(font, label, "klebt hier", HorizontalAlignment.Left, -1f, 22, 7, new Color(0.35f, 0.2f, 0.05f));
         DrawString(font, label, "klebt hier", HorizontalAlignment.Left, -1f, 22, new Color(1f, 0.9f, 0.45f));
     }
@@ -252,9 +260,11 @@ public partial class GlueBonds : Node2D
     static List<(UnitBody Cheese, UnitBody Piece)> StickPairs(UnitBody held)
     {
         var pairs = new List<(UnitBody Cheese, UnitBody Piece, float Gap)>();
+        if (held.GlueOff)
+            return new List<(UnitBody Cheese, UnitBody Piece)>();
         foreach (var unit in Main.I.Units)
         {
-            if (unit == held || unit.IsHeld || unit.IsBroken)
+            if (unit == held || unit.IsHeld || unit.IsBroken || unit.GlueOff)
                 continue;
             var (cheese, piece) = unit.Def.Glue != null ? (unit, held) : (held, unit);
             if (cheese.Def.Glue == null)

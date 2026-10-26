@@ -48,7 +48,9 @@ numbers are guesses — expect tuning (all in `units.json`).
   6 new tests, a right click on the card) and 45° turning (D20) — back to 15° the same hour:
   "sonst das 3eck nicht mit jeder seite befestigen". His screenshot of a cheese
   held across two upright ones, one strip glowing → every pair in reach glows and sticks
-  (`StickPairs`). Build green (0 warnings), 122 tests, headless boot clean; play-unverified.
+  (`StickPairs`). Turning back to 15°. "mit halten und rechtsklick kann man kleben deaktivieren
+  … praktisch für das ei" → `UnitBody.GlueOff`, switched by a right click while holding (D21).
+  Build green (0 warnings), 122 tests, headless boot clean; play-unverified.
 
 - **2026-10-25 (fresh checkout)** — The repo cloned anew into `Desktop\Projekte\EggGame` (the
   old folder `Desktop\Claude\rettet-das-ei` is gone); the lesson `close-only-this-games-process`
@@ -119,6 +121,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D18 | Käse's sides | **A magnet as a snap: let go beside a cheese's side, the held one moves flush and sticks at once** | His "sonst fällt … einfach runter"; a pull in the physics all the time would tug towers apart → ADR 003 (addendum) |
 | D19 | Käsedreieck | **The cheese block's other shape: an equilateral triangle, one shop card, a right click switches** | His wish ("linksklick" buys, so a right click); three 120° angles cannot be — asked → equilateral. `alternate` in units.json, `ContentDb.ShopUnits` → ADR 003 (addendum) |
 | D20 | Turning | **15° steps kept** (45° tried and taken back the same hour) | 45°: "die anderen winkel wären sonst überflüssig" — then "sonst das 3eck nicht mit jeder seite befestigen": 15° is the coarsest step with 45° and 60°/120° |
+| D21 | Glue off | **A right click while holding a piece switches its glue off and on; it stays with the piece** | His wish: to build the egg in loose |
 | D16 | Stability | **Food but cheese and egg grips at 0.5; recoil pepper 200, pickle 150, mustard 120** | Height was free and the cheese pointless; his idea: recoil tips a stack on a weak base → ADR 005 |
 | D10 | Tomate | **A bomb, no longer a shooter: bursts at any pest's touch; pushes own food, damages none** | Its rolling becomes the job; risk beside the egg → ADR 003 |
 | D11 | Käse, Toast | **Cheese glue that a hard blow tears; toast a shield wall (throw-back, a share of the push)** | Clearly felt jobs for the two blocks → ADR 003 |

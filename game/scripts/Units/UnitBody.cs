@@ -19,6 +19,8 @@ public partial class UnitBody : RigidBody2D
     public bool IsEgg { get; private set; }
     public bool IsHeld { get; private set; }
     public bool IsBroken { get; private set; }
+    /// <summary>Switched by a right click while held: this piece sticks to nothing and nothing to it.</summary>
+    public bool GlueOff { get; set; }
     public CollisionShape2D ShapeNode { get; private set; } = null!;
     public Shape2D ShapeResource { get; private set; } = null!;
 

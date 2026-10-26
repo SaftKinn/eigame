@@ -134,3 +134,6 @@ equilateral triangle; switched by a right click on the shop card, since the left
 the **Käsedreieck**, the block's other shape, gluing on all three faces. Pieces were turned in
 45° steps ("die anderen winkel wären sonst überflüssig") and back to 15° the same hour — "sonst
 das 3eck nicht mit jeder seite befestigen": 15° is the coarsest step with both 45° and 60°/120°.
+And "mit halten und rechtsklick kann man kleben deaktivieren und aktivieren für das bauteil das
+man in der hand hält praktisch für das ei": a piece's glue can be switched off — it sticks to
+nothing and nothing to it — and on again.

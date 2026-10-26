@@ -25,8 +25,9 @@ public partial class Main : Node2D
     public const float BoardLeft = 740f;
     public const float BoardRight = 1180f;
     const float BoardRamp = 24f;
-    // 45°: level, upright and the diagonals — finer steps were never needed (his word, 2026-10-26).
-    const float RotateStep = Mathf.Pi / 4f;
+    // 15°: the coarsest step with both 45° (the blocks' diagonals) and 60°/120° (the triangle laid
+    // on any of its faces) — 45° was tried and left the triangle on one face (his word, 2026-10-26).
+    const float RotateStep = Mathf.Pi / 12f;
 
     public Phase Phase => _game.Phase;
     public IReadOnlyList<Enemy> Enemies => _enemies;

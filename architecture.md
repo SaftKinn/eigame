@@ -183,8 +183,8 @@ radius. Life 3 s, gone off screen.
 - **Buy:** press a shop card in the build phase with enough gold → the gold is paid and the piece
   is in the hand **→ core (M1: the payment)**. The physics state of a held piece is frozen and
   collides with nothing; it follows the mouse (kept above the counter), rotated by the wheel or
-  Q/E in steps of 45° (15° until 2026-10-26 — "die anderen winkel wären sonst überflüssig"). A
-  piece picked up crooked is snapped to the nearest step at once, so it can
+  Q/E in steps of 15° — the coarsest with 45° and the triangle's 60°/120° (45° steps were tried
+  on 2026-10-26 and left the triangle on one face). A piece picked up crooked is snapped to the nearest step at once, so it can
   always be turned back to exactly level or upright (his word, 2026-10-24).
 - **Overlap:** a held piece that overlaps something is tinted red; let go anyway, it is moved up
   until it is free and drops the last few pixels.

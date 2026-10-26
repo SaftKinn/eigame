@@ -43,7 +43,7 @@ repository on this machine has it already (2026-10-24).
 - **Every food has a job** (its shop card says it): **Käse** glues what touches it, on every side
   ("klebt hier" shows while you hold a piece close to it; let go, it snaps flush) — a hard blow
   tears it off; a right click on its shop card switches it to the **Käsedreieck**; pieces turn in
-  45° steps and a piece you pick up snaps straight, so Q/E can always turn it level again; **Toast** throws attackers back and is shoved less; **Gurke**'s slices go
+  15° steps and a piece you pick up snaps straight, so Q/E can always turn it level again; **Toast** throws attackers back and is shoved less; **Gurke**'s slices go
   through three pests; **Senf** leaves a puddle that slows walkers; **Pfeffer** makes pests sneeze
   and pause; **Tomate** shoots nothing — it bursts when a pest touches it and shoves your food
   (the red circle shows how far while you hold it).

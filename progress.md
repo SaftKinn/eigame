@@ -45,7 +45,8 @@ numbers are guesses — expect tuning (all in `units.json`).
   `Main.Drop`, sticks at once (D18). His screenshot: no snap beside an upright cheese, the
   reach too far → faces and gaps on the real outlines (`UnitBody.Outline`), 12 px, the snap on
   every face. The Käsedreieck (D19: `cheese_triangle`, `alternate`, `ContentDb.ShopUnits` with
-  6 new tests, a right click on the card) and 45° turning (D20). His screenshot of a cheese
+  6 new tests, a right click on the card) and 45° turning (D20) — back to 15° the same hour:
+  "sonst das 3eck nicht mit jeder seite befestigen". His screenshot of a cheese
   held across two upright ones, one strip glowing → every pair in reach glows and sticks
   (`StickPairs`). Build green (0 warnings), 122 tests, headless boot clean; play-unverified.
 
@@ -73,7 +74,7 @@ numbers are guesses — expect tuning (all in `units.json`).
    stick to glows, "klebt hier"; let go, yellow crumbs: it sticks — on top, below, beside, and a
    cheese beside a cheese. Within 12 px of a face it snaps flush when let go (D18), a held
    cheese too. **Käsedreieck:** right click on the cheese card → the triangle (D19); it glues on
-   all three faces; point up and point down fit. Turning is in 45° steps now (D20). Does a glued tower stay still in the build phase, sides glued too? Is
+   all three faces; point up and point down fit. Turning in 15° steps: the triangle on each of its faces (Q/E 8 times = 120°). Does a glued tower stay still in the build phase, sides glued too? Is
    it now too easy? Pick the cheese up:
    cheese strings, what lay on it falls. In wave 2 a meatball's blow should tear a piece off.
    **Turning:** pick up a crooked piece — Q/E brings it back to exactly level or upright.
@@ -117,7 +118,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D17 | Käse | **Every face sticks (top, bottom, sides); the red wax rind gone** | His word at the start of his round, 2026-10-26: "jede seite"; asked → all round, sides too. Since ADR 005 the cheese is the one thing that holds a tower → ADR 003 (addendum) |
 | D18 | Käse's sides | **A magnet as a snap: let go beside a cheese's side, the held one moves flush and sticks at once** | His "sonst fällt … einfach runter"; a pull in the physics all the time would tug towers apart → ADR 003 (addendum) |
 | D19 | Käsedreieck | **The cheese block's other shape: an equilateral triangle, one shop card, a right click switches** | His wish ("linksklick" buys, so a right click); three 120° angles cannot be — asked → equilateral. `alternate` in units.json, `ContentDb.ShopUnits` → ADR 003 (addendum) |
-| D20 | Turning | **45° steps (was 15°)** | "die anderen winkel wären sonst überflüssig"; the triangle lies flat point up or down |
+| D20 | Turning | **15° steps kept** (45° tried and taken back the same hour) | 45°: "die anderen winkel wären sonst überflüssig" — then "sonst das 3eck nicht mit jeder seite befestigen": 15° is the coarsest step with 45° and 60°/120° |
 | D16 | Stability | **Food but cheese and egg grips at 0.5; recoil pepper 200, pickle 150, mustard 120** | Height was free and the cheese pointless; his idea: recoil tips a stack on a weak base → ADR 005 |
 | D10 | Tomate | **A bomb, no longer a shooter: bursts at any pest's touch; pushes own food, damages none** | Its rolling becomes the job; risk beside the egg → ADR 003 |
 | D11 | Käse, Toast | **Cheese glue that a hard blow tears; toast a shield wall (throw-back, a share of the push)** | Clearly felt jobs for the two blocks → ADR 003 |

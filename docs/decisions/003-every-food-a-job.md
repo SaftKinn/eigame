@@ -131,6 +131,6 @@ präzise bauen können": faces and gaps are now measured on the real outlines, e
 12 px reach, and the snap works on every face. And: "wenn man linksklick auf den käseblock macht
 soll man auf ein käsedreieck umschalten können" (three 120° angles cannot be — asked: an
 equilateral triangle; switched by a right click on the shop card, since the left click buys) →
-the **Käsedreieck**, the block's other shape, gluing on all three faces. Pieces now turn in 45°
-steps ("die anderen winkel wären sonst überflüssig"); the triangle lies flat point up or point
-down, which fit into each other.
+the **Käsedreieck**, the block's other shape, gluing on all three faces. Pieces were turned in
+45° steps ("die anderen winkel wären sonst überflüssig") and back to 15° the same hour — "sonst
+das 3eck nicht mit jeder seite befestigen": 15° is the coarsest step with both 45° and 60°/120°.

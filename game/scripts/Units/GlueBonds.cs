@@ -117,23 +117,28 @@ public partial class GlueBonds : Node2D
     /// <summary>
     /// The glue's magnet (his word, 2026-10-26: beside a cheese a piece just fell down): let go
     /// within reach of a cheese's face, the held one — the piece or the cheese — moves flush
-    /// against it. The pair and the move, or null when nothing is in reach.
+    /// against the nearest. The move, or null when nothing is in reach.
     /// </summary>
-    public (UnitBody Cheese, UnitBody Piece, Vector2 Move)? Snap(UnitBody held)
+    public Vector2? Snap(UnitBody held)
     {
-        if (StickPair(held) is not { } pair)
+        var pairs = StickPairs(held);
+        if (pairs.Count == 0)
             return null;
-        var face = Face(pair.Cheese, pair.Piece);
+        var (cheese, piece) = pairs[0];
+        var face = Face(cheese, piece);
         var move = face.Out * (SnapGap - face.Gap);
-        return (pair.Cheese, pair.Piece, held == pair.Piece ? move : -move);
+        return held == piece ? move : -move;
     }
 
-    /// <summary>After a snap: the pair sticks at once, without waiting to rest, if still flush.</summary>
-    public void StickSnapped(UnitBody cheese, UnitBody piece)
+    /// <summary>
+    /// After a snap: every pair the let-go one is now flush in sticks at once, without waiting to
+    /// rest — a piece laid across two cheeses sticks to both (his screenshot, 2026-10-26).
+    /// </summary>
+    public void StickSnapped(UnitBody held)
     {
-        var face = Face(cheese, piece);
-        if (Mathf.Abs(face.Gap - SnapGap) < 4f && face.Length >= MinContact && !IsBonded(cheese, piece))
-            Stick(cheese, piece);
+        foreach (var (cheese, piece) in StickPairs(held))
+            if (Mathf.Abs(Face(cheese, piece).Gap - SnapGap) < 4f && !IsBonded(cheese, piece))
+                Stick(cheese, piece);
     }
 
     void Stick(UnitBody cheese, UnitBody piece)
@@ -209,38 +214,44 @@ public partial class GlueBonds : Node2D
 
     public override void _Draw()
     {
-        // While a piece is in the hand: where it would stick, the face glows.
+        // While a piece is in the hand: every face it would stick to glows; the words go by the nearest.
         var held = Main.I.HeldUnit;
         if (held == null)
             return;
-        if (StickPair(held) is not { } pair)
+        var pairs = StickPairs(held);
+        if (pairs.Count == 0)
             return;
         float time = Time.GetTicksMsec() / 1000f;
-        var (spot, direction, length, _, _) = Face(pair.Cheese, pair.Piece);
-        float width = length * 0.8f;
         float pulse = 0.7f + 0.3f * Mathf.Sin(time * 8f);
-        var span = direction * width * 0.5f;
-        DrawLine(spot - span, spot + span, new Color(1f, 0.85f, 0.2f, 0.45f * pulse), 26f, true);
-        DrawLine(spot - span, spot + span, Rim, 11f, true);
-        DrawLine(spot - span, spot + span, new Color(1f, 0.96f, 0.6f, pulse), 7f, true);
-        // The words beside the strip's right end, off the cheese's face.
-        var end = span.X >= 0f ? spot + span : spot - span;
-        var label = end + new Vector2(14f, 7f);
+        Vector2 label = default;
+        for (int i = 0; i < pairs.Count; i++)
+        {
+            var (spot, direction, length, _, _) = Face(pairs[i].Cheese, pairs[i].Piece);
+            var span = direction * length * 0.4f;
+            DrawLine(spot - span, spot + span, new Color(1f, 0.85f, 0.2f, 0.45f * pulse), 26f, true);
+            DrawLine(spot - span, spot + span, Rim, 11f, true);
+            DrawLine(spot - span, spot + span, new Color(1f, 0.96f, 0.6f, pulse), 7f, true);
+            // The words beside the right end of the rightmost strip, off the cheese's face.
+            var end = span.X >= 0f ? spot + span : spot - span;
+            if (i == 0 || end.X > label.X)
+                label = end;
+        }
+        label += new Vector2(14f, 7f);
         var font = ThemeDB.FallbackFont;
         DrawStringOutline(font, label, "klebt hier", HorizontalAlignment.Left, -1f, 22, 7, new Color(0.35f, 0.2f, 0.05f));
         DrawString(font, label, "klebt hier", HorizontalAlignment.Left, -1f, 22, new Color(1f, 0.9f, 0.45f));
     }
 
     /// <summary>
-    /// What would stick if the held one were let go here: the nearest pair of a cheese and a piece,
-    /// either of them the held one (a held piece near a cheese, or a held cheese near anything),
-    /// edge to edge within <see cref="Reach"/> (his word, 2026-10-26: precise, brought really close
-    /// together) and lying against at least <see cref="MinContact"/> of a face.
+    /// What would stick if the held one were let go here: every pair of a cheese and a piece, one
+    /// of them the held one (a held piece near cheeses, or a held cheese near anything), edge to
+    /// edge within <see cref="Reach"/> (his word, 2026-10-26: precise, brought really close
+    /// together) and lying against at least <see cref="MinContact"/> of a face — the nearest
+    /// first, one pair per other piece.
     /// </summary>
-    static (UnitBody Cheese, UnitBody Piece)? StickPair(UnitBody held)
+    static List<(UnitBody Cheese, UnitBody Piece)> StickPairs(UnitBody held)
     {
-        (UnitBody Cheese, UnitBody Piece)? nearest = null;
-        float nearestGap = float.MaxValue;
+        var pairs = new List<(UnitBody Cheese, UnitBody Piece, float Gap)>();
         foreach (var unit in Main.I.Units)
         {
             if (unit == held || unit.IsHeld || unit.IsBroken)
@@ -249,14 +260,14 @@ public partial class GlueBonds : Node2D
             if (cheese.Def.Glue == null)
                 continue;
             var face = Face(cheese, piece);
-            float gap = face.Gap;
-            if (gap > -Reach && gap < Reach && face.Length >= MinContact && Mathf.Abs(gap) < nearestGap)
-            {
-                nearest = (cheese, piece);
-                nearestGap = Mathf.Abs(gap);
-            }
+            if (face.Gap > -Reach && face.Gap < Reach && face.Length >= MinContact)
+                pairs.Add((cheese, piece, Mathf.Abs(face.Gap)));
         }
-        return nearest;
+        pairs.Sort((a, b) => a.Gap.CompareTo(b.Gap));
+        var result = new List<(UnitBody Cheese, UnitBody Piece)>(pairs.Count);
+        foreach (var (cheese, piece, _) in pairs)
+            result.Add((cheese, piece));
+        return result;
     }
 
     // Both ways round: two cheeses side by side each find the other, and are one bond.

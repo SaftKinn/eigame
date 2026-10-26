@@ -219,7 +219,9 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
   magnet:** beside a side nothing comes to rest — it falls past — so a piece (or a cheese) let go
   at a cheese's side snaps flush against it (`Main.Drop` → `GlueBonds.SideSnap`, 1 px off) and
   sticks at once, without resting (`StickSnapped`); the snap works on every face, so what glows
-  is what happens. Which face, and how far: `GlueBonds.Face` measures on the real outlines
+  is what happens. Every pair in reach glows, not only the nearest (`StickPairs`; his
+  screenshot, 2026-10-26: a cheese laid across two); the snap moves to the nearest, and every
+  pair then flush (within 4 px) sticks at once. Which face, and how far: `GlueBonds.Face` measures on the real outlines
   (`UnitBody.Outline`: a block's four corners, the triangle's three, a circle or capsule as a
   16-point polygon) — the face is the cheese's edge across which the two lie furthest apart (by
   the centres, an upright cheese beside a flat one counted as "on top", his screenshot

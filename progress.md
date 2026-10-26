@@ -45,8 +45,9 @@ numbers are guesses — expect tuning (all in `units.json`).
   `Main.Drop`, sticks at once (D18). His screenshot: no snap beside an upright cheese, the
   reach too far → faces and gaps on the real outlines (`UnitBody.Outline`), 12 px, the snap on
   every face. The Käsedreieck (D19: `cheese_triangle`, `alternate`, `ContentDb.ShopUnits` with
-  6 new tests, a right click on the card) and 45° turning (D20). Build green (0 warnings),
-  122 tests, headless boot clean; play-unverified.
+  6 new tests, a right click on the card) and 45° turning (D20). His screenshot of a cheese
+  held across two upright ones, one strip glowing → every pair in reach glows and sticks
+  (`StickPairs`). Build green (0 warnings), 122 tests, headless boot clean; play-unverified.
 
 - **2026-10-25 (fresh checkout)** — The repo cloned anew into `Desktop\Projekte\EggGame` (the
   old folder `Desktop\Claude\rettet-das-ei` is gone); the lesson `close-only-this-games-process`

@@ -558,7 +558,7 @@ public partial class Main : Node2D
         // Let go within reach of a cheese's face, it snaps flush against it (the glue's magnet).
         var snap = Glue.Snap(unit);
         if (snap != null)
-            unit.GlobalPosition += snap.Value.Move;
+            unit.GlobalPosition += snap.Value;
 
         // Back above the counter (the egg cannot be sold), then up until it is free: a piece
         // let go inside the tower pops out on top of it and drops the last few pixels.
@@ -569,7 +569,7 @@ public partial class Main : Node2D
             unit.GlobalPosition += new Vector2(0f, -4f);
         unit.EndHold();
         if (snap != null)
-            Glue.StickSnapped(snap.Value.Cheese, snap.Value.Piece);
+            Glue.StickSnapped(unit);
         WakeAll();
     }
 

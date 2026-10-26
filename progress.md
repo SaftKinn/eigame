@@ -155,7 +155,11 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
   den roten rand 'schale'" — asked (all round or whichever face is up): "Ringsum, auch
   seitlich" → D17, the wax gone. He had put side glue off twice on 2026-10-24; ADR 005 since.
   Then "seitlich muss es magnetisch angezogen werden sonst fällt der käse einfach runter oder
-  das bauteil das man drankleben will" → "Schnappen beim Loslassen" (D18).
+  das bauteil das man drankleben will" → "Schnappen beim Loslassen" (D18). Then his screenshot
+  (an upright cheese beside a flat one, not stuck): "so geht es noch nicht nur übereinander
+  schnappt er … man soll präzise bauen können" → the face judged by the centres called it "on
+  top", and the reach was a circle round the piece (huge for a long one); now edge to edge,
+  12 px reach.
 
 - **2026-10-24 — M2, sixth answer:** won again with a compact tower (cheese base, the egg upright
   between four peppers, a cheese roof, two pickles on top, a toast beside; screenshot) without

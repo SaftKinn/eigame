@@ -19,6 +19,10 @@ public partial class GlueBonds : Node2D
     static readonly Color Rim = new(0.62f, 0.33f, 0.04f);
     /// <summary>How far a piece snapped to a cheese's side sits from it.</summary>
     const float SnapGap = 1f;
+    /// <summary>How close, edge to edge, a held piece must come for "klebt hier" and the snap.</summary>
+    const float Reach = 12f;
+    /// <summary>How much of a face a piece must lie against to stick there (not corner to corner).</summary>
+    const float MinContact = 8f;
 
     sealed class Bond
     {
@@ -66,21 +70,31 @@ public partial class GlueBonds : Node2D
     }
 
     /// <summary>
-    /// The face of the cheese the piece lies at (in the cheese's own frame: top or bottom when the
-    /// piece is more above or below than beside it, else left or right — <c>Side</c>), the point on
-    /// that face opposite the piece, the direction the face runs in, and the face's length.
+    /// Where a piece meets the cheese, edge to edge (his screenshot, 2026-10-26: an upright cheese
+    /// beside a flat one counted as "on top" when judged by the centres). In the cheese's own frame
+    /// the face is the one across the wider gap between the two boxes — a side (<c>Side</c>) or the
+    /// top or bottom. <c>Gap</c>: between the piece's near edge and that face, negative when they
+    /// overlap. <c>At</c> and <c>Length</c>: the middle and length of the stretch of the face the
+    /// piece lies against; <c>Along</c>: the direction the face runs in; <c>Out</c>: out of it.
     /// </summary>
-    static (Vector2 At, Vector2 Along, float Length, bool Side) Face(UnitBody cheese, UnitBody piece)
+    static (Vector2 At, Vector2 Along, float Length, bool Side, float Gap, Vector2 Out) Face(UnitBody cheese, UnitBody piece)
     {
         var local = cheese.ToLocal(piece.GlobalPosition);
+        var axisX = cheese.GlobalTransform.X.Normalized();
+        var axisY = cheese.GlobalTransform.Y.Normalized();
         float halfWidth = cheese.Def.Width / 2f, halfHeight = cheese.Def.Height / 2f;
-        if (Mathf.Abs(local.Y) / halfHeight >= Mathf.Abs(local.X) / halfWidth)
+        float extentX = HalfExtent(piece, axisX), extentY = HalfExtent(piece, axisY);
+        float gapX = Mathf.Abs(local.X) - halfWidth - extentX;
+        float gapY = Mathf.Abs(local.Y) - halfHeight - extentY;
+        if (gapX > gapY)
         {
-            var at = new Vector2(Mathf.Clamp(local.X, -halfWidth, halfWidth), Mathf.Sign(local.Y) * halfHeight);
-            return (cheese.ToGlobal(at), cheese.GlobalTransform.X.Normalized(), cheese.Def.Width, false);
+            float low = Mathf.Max(-halfHeight, local.Y - extentY), high = Mathf.Min(halfHeight, local.Y + extentY);
+            var at = new Vector2(Mathf.Sign(local.X) * halfWidth, (low + high) / 2f);
+            return (cheese.ToGlobal(at), axisY, Mathf.Max(high - low, 0f), true, gapX, axisX * Mathf.Sign(local.X));
         }
-        var beside = new Vector2(Mathf.Sign(local.X) * halfWidth, Mathf.Clamp(local.Y, -halfHeight, halfHeight));
-        return (cheese.ToGlobal(beside), cheese.GlobalTransform.Y.Normalized(), cheese.Def.Height, true);
+        float left = Mathf.Max(-halfWidth, local.X - extentX), right = Mathf.Min(halfWidth, local.X + extentX);
+        var onFace = new Vector2((left + right) / 2f, Mathf.Sign(local.Y) * halfHeight);
+        return (cheese.ToGlobal(onFace), axisX, Mathf.Max(right - left, 0f), false, gapY, axisY * Mathf.Sign(local.Y));
     }
 
     /// <summary>Half the extent of a body's box along a direction, however the body is turned.</summary>
@@ -88,17 +102,11 @@ public partial class GlueBonds : Node2D
         Mathf.Abs(direction.Dot(body.GlobalTransform.X.Normalized())) * body.Def.Width / 2f
         + Mathf.Abs(direction.Dot(body.GlobalTransform.Y.Normalized())) * body.Def.Height / 2f;
 
-    /// <summary>
-    /// A piece at one of the cheese's sides: the gap between the piece's near edge and that face
-    /// (negative when they overlap), and the direction out of the face. Null above or below it.
-    /// </summary>
+    /// <summary>A piece at one of the cheese's sides: <see cref="Face"/>'s gap and outward direction. Null above or below it.</summary>
     static (float Gap, Vector2 Out)? Beside(UnitBody cheese, UnitBody piece)
     {
-        if (!Face(cheese, piece).Side)
-            return null;
-        var local = cheese.ToLocal(piece.GlobalPosition);
-        var outward = cheese.GlobalTransform.X.Normalized() * Mathf.Sign(local.X);
-        return (Mathf.Abs(local.X) - cheese.Def.Width / 2f - HalfExtent(piece, outward), outward);
+        var face = Face(cheese, piece);
+        return face.Side ? (face.Gap, face.Out) : null;
     }
 
     /// <summary>
@@ -124,8 +132,8 @@ public partial class GlueBonds : Node2D
     void Stick(UnitBody cheese, UnitBody piece)
     {
         // Two pins along the face they touch at, so the piece cannot turn about one point.
-        var (at, along, length, _) = Face(cheese, piece);
-        float half = Mathf.Min(2f * HalfExtent(piece, along), length) * 0.3f;
+        var (at, along, length, _, _, _) = Face(cheese, piece);
+        float half = Mathf.Max(length * 0.3f, 2f);
         var bond = new Bond
         {
             Cheese = cheese,
@@ -201,8 +209,8 @@ public partial class GlueBonds : Node2D
         if (StickPair(held) is not { } pair)
             return;
         float time = Time.GetTicksMsec() / 1000f;
-        var (spot, direction, length, _) = Face(pair.Cheese, pair.Piece);
-        float width = Mathf.Min(2f * HalfExtent(pair.Piece, direction), length) * 0.8f;
+        var (spot, direction, length, _, _, _) = Face(pair.Cheese, pair.Piece);
+        float width = length * 0.8f;
         float pulse = 0.7f + 0.3f * Mathf.Sin(time * 8f);
         var span = direction * width * 0.5f;
         DrawLine(spot - span, spot + span, new Color(1f, 0.85f, 0.2f, 0.45f * pulse), 26f, true);
@@ -219,7 +227,8 @@ public partial class GlueBonds : Node2D
     /// <summary>
     /// What would stick if the held one were let go here: the nearest pair of a cheese and a piece,
     /// either of them the held one (a held piece near a cheese, or a held cheese near anything),
-    /// the piece's edge within reach of the cheese's box, on any side.
+    /// edge to edge within <see cref="Reach"/> (his word, 2026-10-26: precise, brought really close
+    /// together) and lying against at least <see cref="MinContact"/> of a face.
     /// </summary>
     static (UnitBody Cheese, UnitBody Piece)? StickPair(UnitBody held)
     {
@@ -232,14 +241,12 @@ public partial class GlueBonds : Node2D
             var (cheese, piece) = unit.Def.Glue != null ? (unit, held) : (held, unit);
             if (cheese.Def.Glue == null)
                 continue;
-            var local = cheese.ToLocal(piece.GlobalPosition);
-            float outX = Mathf.Max(Mathf.Abs(local.X) - cheese.Def.Width / 2f, 0f);
-            float outY = Mathf.Max(Mathf.Abs(local.Y) - cheese.Def.Height / 2f, 0f);
-            float gap = Mathf.Sqrt(outX * outX + outY * outY) - piece.BoundRadius;
-            if (gap > -30f && gap < 60f && gap < nearestGap)
+            var face = Face(cheese, piece);
+            float gap = face.Gap;
+            if (gap > -Reach && gap < Reach && face.Length >= MinContact && Mathf.Abs(gap) < nearestGap)
             {
                 nearest = (cheese, piece);
-                nearestGap = gap;
+                nearestGap = Mathf.Abs(gap);
             }
         }
         return nearest;

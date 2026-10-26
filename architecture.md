@@ -217,9 +217,14 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
   jump — 836 px/s measured, 0 without). Two cheeses touching make one bond, not two. **The side
   magnet:** beside a side nothing comes to rest — it falls past — so a piece (or a cheese) let go
   at a cheese's side snaps flush against it (`Main.Drop` → `GlueBonds.SideSnap`, 1 px off) and
-  sticks at once, without resting (`StickBeside`); top and bottom still stick by resting. Sticking
-  shows yellow crumbs; while a piece or a cheese is in the hand within reach, the nearest face
-  glows with "klebt hier" (`GlueBonds._Draw`, `StickPair`, the same `Face` as sticking). A
+  sticks at once, without resting (`StickBeside`); top and bottom still stick by resting. Which
+  face, and how far: `GlueBonds.Face` measures edge to edge in the cheese's frame — the face is
+  the one across the wider of the two box gaps (by the centres, an upright cheese beside a flat
+  one counted as "on top", his screenshot 2026-10-26). Precise building (his word): "klebt hier"
+  and the snap only within `Reach` (12 px) edge to edge and against at least `MinContact` (8 px)
+  of a face. Sticking shows yellow crumbs; while a piece or a cheese is in the hand, the nearest
+  face in reach glows with "klebt hier" (`GlueBonds._Draw`, `StickPair`, the same `Face` as
+  sticking). A
   seam drawn while stuck was tried and taken out at his word. Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse
   (`GlueBonds.Blow`); `Glue.Tears` decides; a torn pair waits `regrabSeconds`. `BeginHold`
   (picking up) and `Break` loosen all of a piece's glue. A tear and a pick-up show

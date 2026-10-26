@@ -29,8 +29,13 @@ public sealed class UnitDef
     [JsonRequired] public string Description { get; set; } = "";
     [JsonRequired] public bool InShop { get; set; }
     [JsonRequired] public int Cost { get; set; }
-    /// <summary>"box", "circle", "capsule" or "egg".</summary>
+    /// <summary>"box", "circle", "capsule", "egg" or "triangle" (point up, centred on its centroid).</summary>
     [JsonRequired] public string Shape { get; set; } = "";
+    /// <summary>
+    /// The other shape of the same food, sharing its shop card: a right click on the card switches
+    /// between the two (the cheese block and the cheese triangle). Each names the other.
+    /// </summary>
+    public string? Alternate { get; set; }
     [JsonRequired] public float Width { get; set; }
     [JsonRequired] public float Height { get; set; }
     [JsonRequired] public float Mass { get; set; }

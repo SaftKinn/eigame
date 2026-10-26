@@ -52,6 +52,18 @@ public static class DrawKit
                 ci.DrawCircle(new Vector2(w * 0.16f, h * 0.24f), h * 0.09f, accent);
                 ci.DrawCircle(new Vector2(-w * 0.12f, h * 0.3f), h * 0.06f, accent);
                 break;
+            case "cheese_triangle":
+            {
+                // The cheese block's other shape (his word, 2026-10-26): every side sticks too.
+                var points = UnitBody.TrianglePoints(w, h);
+                ci.DrawColoredPolygon(points, fill);
+                ci.DrawPolyline(Closed(points), accent, 4f, true);
+                ci.DrawCircle(new Vector2(-w * 0.24f, h * 0.18f), h * 0.07f, accent);
+                ci.DrawCircle(new Vector2(w * 0.22f, h * 0.2f), h * 0.06f, accent);
+                ci.DrawCircle(new Vector2(0f, -h * 0.36f), h * 0.05f, accent);
+                eyeY = h * 0.02f;
+                break;
+            }
             case "toast":
                 Box(ci, body, fill, accent, 18, 8);
                 break;
@@ -97,7 +109,11 @@ public static class DrawKit
         ci.DrawArc(new Vector2(0f, eyeY + eyeR * 1.4f), eyeR * 0.7f, 0.35f, Mathf.Pi - 0.35f, 10, Ink, 2.5f, true);
 
         if (def.Visual != "egg" && hpRatio < 0.5f)
-            ci.DrawPolyline(new[] { new Vector2(w * 0.3f, -h * 0.45f), new Vector2(w * 0.18f, -h * 0.15f), new Vector2(w * 0.3f, h * 0.05f), new Vector2(w * 0.2f, h * 0.3f) }, Ink, 3f, true);
+        {
+            // Nearer the middle on a triangle, whose top is narrow.
+            float cx = def.Shape == "triangle" ? w * 0.35f : w;
+            ci.DrawPolyline(new[] { new Vector2(cx * 0.3f, -h * 0.45f), new Vector2(cx * 0.18f, -h * 0.15f), new Vector2(cx * 0.3f, h * 0.05f), new Vector2(cx * 0.2f, h * 0.3f) }, Ink, 3f, true);
+        }
 
         ci.DrawSetTransform(Vector2.Zero, 0f, Vector2.One);
     }

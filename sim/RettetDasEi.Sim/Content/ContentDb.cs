@@ -31,7 +31,7 @@ public sealed class ContentDb
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
     };
 
-    static readonly string[] Shapes = { "box", "circle", "capsule", "egg" };
+    static readonly string[] Shapes = { "box", "circle", "capsule", "egg", "triangle" };
     static readonly string[] Projectiles = { "straight", "lob" };
     static readonly string[] Movements = { "waddle", "roll", "hop", "fly" };
     static readonly string[] Sides = { "left", "right", "both" };
@@ -57,6 +57,22 @@ public sealed class ContentDb
             Read<List<WaveDef>>(readFile, WavesFile));
         db.Validate();
         return db;
+    }
+
+    /// <summary>
+    /// One card per food in the shop: every unit in the shop, but of a pair of alternates only the
+    /// first in units.json — the card switches to the other (<see cref="UnitDef.Alternate"/>).
+    /// </summary>
+    public IReadOnlyList<UnitDef> ShopUnits
+    {
+        get
+        {
+            var cards = new List<UnitDef>();
+            foreach (var u in Units)
+                if (u.InShop && !cards.Any(c => c.Alternate == u.Id))
+                    cards.Add(u);
+            return cards;
+        }
     }
 
     public UnitDef Unit(string id) =>
@@ -142,6 +158,13 @@ public sealed class ContentDb
             {
                 Check(s.PushShare >= 0f && s.PushShare <= 1f, $"{at}: shield pushShare must be between 0 and 1");
                 Check(s.ThrowBack >= 0f, $"{at}: shield throwBack must be 0 or more");
+            }
+            if (u.Alternate is { } alt)
+            {
+                Check(u.InShop, $"{at}: an alternate must be in the shop");
+                var other = Units.FirstOrDefault(o => o.Id == alt);
+                Check(other != null, $"{at}: alternate '{alt}' is not in units.json");
+                Check(other == null || other.Alternate == u.Id, $"{at}: its alternate '{alt}' must name '{u.Id}' back");
             }
         }
 

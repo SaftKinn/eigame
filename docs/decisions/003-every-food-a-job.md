@@ -125,4 +125,12 @@ every food but the cheese slippery, so the cheese is now the one thing that hold
 glue makes it worth more, and the game easier — the next round shows by how much. Then: "seitlich
 muss es magnetisch angezogen werden sonst fällt der käse einfach runter oder das bauteil" — of a
 snap when let go or a pull in the physics all the time, his pick: **the snap**. Let go beside a
-cheese's side, the held piece or cheese moves flush against it and sticks at once.
+cheese's side, the held piece or cheese moves flush against it and sticks at once. His screenshot
+then showed it not working beside an upright cheese, and "klebt hier" too far off — "man soll
+präzise bauen können": faces and gaps are now measured on the real outlines, edge to edge, with a
+12 px reach, and the snap works on every face. And: "wenn man linksklick auf den käseblock macht
+soll man auf ein käsedreieck umschalten können" (three 120° angles cannot be — asked: an
+equilateral triangle; switched by a right click on the shop card, since the left click buys) →
+the **Käsedreieck**, the block's other shape, gluing on all three faces. Pieces now turn in 45°
+steps ("die anderen winkel wären sonst überflüssig"); the triangle lies flat point up or point
+down, which fit into each other.

@@ -4,7 +4,11 @@ using RettetDasEi.Sim;
 
 namespace RettetDasEi;
 
-/// <summary>One piece of food for sale. Pressing on it puts a new one in the hand.</summary>
+/// <summary>
+/// One piece of food for sale. Pressing on it puts a new one in the hand; a right click switches a
+/// food with two shapes to its other one (<see cref="UnitDef.Alternate"/> — the cheese block and
+/// the cheese triangle), shown small in the card's corner.
+/// </summary>
 public partial class ShopCard : Control
 {
     public UnitDef Def { get; private set; } = null!;
@@ -15,12 +19,11 @@ public partial class ShopCard : Control
 
     public void Setup(UnitDef def)
     {
-        Def = def;
         CustomMinimumSize = new Vector2(164f, 146f);
         MouseFilter = MouseFilterEnum.Stop;
         FocusMode = FocusModeEnum.None;
         MouseDefaultCursorShape = CursorShape.PointingHand;
-        TooltipText = $"{def.Name} – {def.Cost} Gold\n{def.Description}";
+        Show(def);
         MouseEntered += () =>
         {
             _hover = true;
@@ -31,6 +34,14 @@ public partial class ShopCard : Control
             _hover = false;
             QueueRedraw();
         };
+    }
+
+    void Show(UnitDef def)
+    {
+        Def = def;
+        TooltipText = $"{def.Name} – {def.Cost} Gold\n{def.Description}"
+            + (def.Alternate is { } other ? $"\nRechtsklick: {GameContent.Db.Unit(other).Name}" : "");
+        QueueRedraw();
     }
 
     public void SetAvailable(bool available)
@@ -46,6 +57,11 @@ public partial class ShopCard : Control
         if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
         {
             OnPick?.Invoke(Def);
+            AcceptEvent();
+        }
+        else if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } && Def.Alternate is { } other)
+        {
+            Show(GameContent.Db.Unit(other));
             AcceptEvent();
         }
     }
@@ -65,6 +81,14 @@ public partial class ShopCard : Control
         DrawMultilineString(font, new Vector2(6f, 102f), Def.Description, HorizontalAlignment.Center, Size.X - 12f, 13, 2,
             new Color(0.38f, 0.25f, 0.14f));
         DrawString(font, new Vector2(0f, 139f), $"{Def.Cost} Gold", HorizontalAlignment.Center, Size.X, 17, new Color(0.62f, 0.42f, 0.04f));
+
+        // The other shape, small in the corner: a right click switches to it (the tooltip says so).
+        if (Def.Alternate is { } other)
+        {
+            var otherDef = GameContent.Db.Unit(other);
+            float small = Mathf.Min(26f / otherDef.Width, 22f / otherDef.Height);
+            DrawKit.DrawUnit(this, otherDef, new Vector2(Size.X - 20f, 18f), small, 1f, 1f);
+        }
 
         if (!_available)
             DrawKit.Box(this, rect, new Color(0.3f, 0.25f, 0.2f, 0.5f), new Color(0f, 0f, 0f, 0f), 14, 0);

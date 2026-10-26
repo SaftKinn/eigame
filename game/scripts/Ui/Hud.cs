@@ -57,7 +57,7 @@ public partial class Hud : CanvasLayer
         // Above the shop: how to play, and the hint while selling.
         var help = MakeLabel(20, new Color(1f, 0.96f, 0.88f));
         help.HorizontalAlignment = HorizontalAlignment.Center;
-        help.Text = "Karte ins Spielfeld ziehen · Essen anklicken und verschieben · Drehen: Mausrad oder Q/E · "
+        help.Text = "Karte ins Spielfeld ziehen (Rechtsklick: andere Form) · Essen anklicken und verschieben · Drehen: Mausrad oder Q/E · "
             + "Verkaufen: zurück in den Laden ziehen · Leertaste: Welle · F: schneller · R: neu starten";
         root.AddChild(help);
         Anchor(help, Control.LayoutPreset.BottomWide, -ShopHeight - 38f, -ShopHeight - 6f);

@@ -23,7 +23,7 @@ on-demand._
   grill first).
 - **Open live gates — one:** M2, every food a job, with the difficulty, ADR 004 and ADR 005
   (his round). When a playtest is due, start the game for him (CLAUDE.md).
-- **Tests:** 116, green (`dotnet test tests/RettetDasEi.Sim.Tests`).
+- **Tests:** 122, green (`dotnet test tests/RettetDasEi.Sim.Tests`).
 - **Git:** `main`, remote `origin` = github.com/SaftKinn/eigame (since 2026-10-24). The checkout's
   folder differs from session to session (2026-10-25 `Desktop\Projekte\EggGame`, 2026-10-26
   `Desktop\Claude\rettet-das-ei`): take the folder you are in, never the one written here.
@@ -42,8 +42,11 @@ numbers are guesses — expect tuning (all in `units.json`).
   two cheeses one bond; "klebt hier" on the nearest face; `DrawKit` cheese bare as before the
   wax (D17, ADR 003 addendum). Then "seitlich muss es magnetisch angezogen werden" → asked
   (snap on letting go / a pull in the physics): the snap — `GlueBonds.SideSnap` from
-  `Main.Drop`, sticks at once (D18). Build green (0 warnings), 116 tests, headless boot clean;
-  play-unverified.
+  `Main.Drop`, sticks at once (D18). His screenshot: no snap beside an upright cheese, the
+  reach too far → faces and gaps on the real outlines (`UnitBody.Outline`), 12 px, the snap on
+  every face. The Käsedreieck (D19: `cheese_triangle`, `alternate`, `ContentDb.ShopUnits` with
+  6 new tests, a right click on the card) and 45° turning (D20). Build green (0 warnings),
+  122 tests, headless boot clean; play-unverified.
 
 - **2026-10-25 (fresh checkout)** — The repo cloned anew into `Desktop\Projekte\EggGame` (the
   old folder `Desktop\Claude\rettet-das-ei` is gone); the lesson `close-only-this-games-process`
@@ -67,7 +70,9 @@ numbers are guesses — expect tuning (all in `units.json`).
 1. **Laden:** each card says its job in a sentence — readable, and does it say enough?
 2. **Käse:** no wax any more — every side sticks (D17). Hold a piece near it — the face it would
    stick to glows, "klebt hier"; let go, yellow crumbs: it sticks — on top, below, beside, and a
-   cheese beside a cheese. Beside a side it snaps flush when let go (D18), a held cheese too. Does a glued tower stay still in the build phase, sides glued too? Is
+   cheese beside a cheese. Within 12 px of a face it snaps flush when let go (D18), a held
+   cheese too. **Käsedreieck:** right click on the cheese card → the triangle (D19); it glues on
+   all three faces; point up and point down fit. Turning is in 45° steps now (D20). Does a glued tower stay still in the build phase, sides glued too? Is
    it now too easy? Pick the cheese up:
    cheese strings, what lay on it falls. In wave 2 a meatball's blow should tear a piece off.
    **Turning:** pick up a crooked piece — Q/E brings it back to exactly level or upright.
@@ -110,6 +115,8 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D15 | Flies | **Hunt the egg round the food; after `flyPatience` (2 s) bite what blocks them** | His wish; a built-in egg is worth building → ADR 004 |
 | D17 | Käse | **Every face sticks (top, bottom, sides); the red wax rind gone** | His word at the start of his round, 2026-10-26: "jede seite"; asked → all round, sides too. Since ADR 005 the cheese is the one thing that holds a tower → ADR 003 (addendum) |
 | D18 | Käse's sides | **A magnet as a snap: let go beside a cheese's side, the held one moves flush and sticks at once** | His "sonst fällt … einfach runter"; a pull in the physics all the time would tug towers apart → ADR 003 (addendum) |
+| D19 | Käsedreieck | **The cheese block's other shape: an equilateral triangle, one shop card, a right click switches** | His wish ("linksklick" buys, so a right click); three 120° angles cannot be — asked → equilateral. `alternate` in units.json, `ContentDb.ShopUnits` → ADR 003 (addendum) |
+| D20 | Turning | **45° steps (was 15°)** | "die anderen winkel wären sonst überflüssig"; the triangle lies flat point up or down |
 | D16 | Stability | **Food but cheese and egg grips at 0.5; recoil pepper 200, pickle 150, mustard 120** | Height was free and the cheese pointless; his idea: recoil tips a stack on a weak base → ADR 005 |
 | D10 | Tomate | **A bomb, no longer a shooter: bursts at any pest's touch; pushes own food, damages none** | Its rolling becomes the job; risk beside the egg → ADR 003 |
 | D11 | Käse, Toast | **Cheese glue that a hard blow tears; toast a shield wall (throw-back, a share of the push)** | Clearly felt jobs for the two blocks → ADR 003 |
@@ -159,7 +166,9 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
   (an upright cheese beside a flat one, not stuck): "so geht es noch nicht nur übereinander
   schnappt er … man soll präzise bauen können" → the face judged by the centres called it "on
   top", and the reach was a circle round the piece (huge for a long one); now edge to edge,
-  12 px reach.
+  12 px reach. Then "auf ein käsedreieck umschalten … 120 grad pro winkel" → asked: an
+  equilateral triangle, a right click on the shop card (D19). Then "alle bauteile auch nur um
+  45 grad rotieren" (D20).
 
 - **2026-10-24 — M2, sixth answer:** won again with a compact tower (cheese base, the egg upright
   between four peppers, a cheese roof, two pickles on top, a toast beside; screenshot) without

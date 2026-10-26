@@ -25,7 +25,8 @@ public partial class Main : Node2D
     public const float BoardLeft = 740f;
     public const float BoardRight = 1180f;
     const float BoardRamp = 24f;
-    const float RotateStep = Mathf.Pi / 12f;
+    // 45°: level, upright and the diagonals — finer steps were never needed (his word, 2026-10-26).
+    const float RotateStep = Mathf.Pi / 4f;
 
     public Phase Phase => _game.Phase;
     public IReadOnlyList<Enemy> Enemies => _enemies;
@@ -86,7 +87,7 @@ public partial class Main : Node2D
 
         _hud = new Hud();
         AddChild(_hud);
-        _hud.Build(GameContent.Db.Units.Where(u => u.InShop), BuyFromShop, TryStartWave, Restart);
+        _hud.Build(GameContent.Db.ShopUnits, BuyFromShop, TryStartWave, Restart);
 
         var eggDef = GameContent.Db.Unit(GameContent.Db.Game.EggUnit);
         _egg = CreateUnit(eggDef, new Vector2((BoardLeft + BoardRight) / 2f, BoardTop - eggDef.Height / 2f - 1f), 0f);
@@ -554,8 +555,8 @@ public partial class Main : Node2D
             return;
         }
 
-        // Let go beside a cheese's side, it snaps flush against it (the side glue's magnet).
-        var snap = Glue.SideSnap(unit);
+        // Let go within reach of a cheese's face, it snaps flush against it (the glue's magnet).
+        var snap = Glue.Snap(unit);
         if (snap != null)
             unit.GlobalPosition += snap.Value.Move;
 
@@ -568,7 +569,7 @@ public partial class Main : Node2D
             unit.GlobalPosition += new Vector2(0f, -4f);
         unit.EndHold();
         if (snap != null)
-            Glue.StickBeside(snap.Value.Cheese, snap.Value.Piece);
+            Glue.StickSnapped(snap.Value.Cheese, snap.Value.Piece);
         WakeAll();
     }
 

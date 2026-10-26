@@ -53,6 +53,7 @@ public partial class UnitBody : RigidBody2D
         CollisionMask = Main.WorldLayer | Main.UnitsLayer;
 
         ShapeResource = BuildShape(def, out float shapeRotation);
+        Outline = BuildOutline(def);
         ShapeNode = new CollisionShape2D { Shape = ShapeResource, Rotation = shapeRotation };
         AddChild(ShapeNode);
 
@@ -66,11 +67,55 @@ public partial class UnitBody : RigidBody2D
         _cooldown = def.Attack != null ? def.Attack.Cooldown * 0.5f : 0f;
     }
 
+    /// <summary>
+    /// A triangle pointing up, <paramref name="w"/> wide at the base and <paramref name="h"/> high,
+    /// round its centroid (the body's centre of mass): the one outline its shape, drawing and glue use.
+    /// </summary>
+    public static Vector2[] TrianglePoints(float w, float h) =>
+        new[] { new Vector2(0f, -h * 2f / 3f), new Vector2(w / 2f, h / 3f), new Vector2(-w / 2f, h / 3f) };
+
+    /// <summary>
+    /// The body's outline in its own frame, as a convex polygon (a circle or capsule approximated):
+    /// what the glue measures faces and gaps with (<see cref="GlueBonds"/>).
+    /// </summary>
+    public Vector2[] Outline { get; private set; } = null!;
+
+    static Vector2[] BuildOutline(UnitDef def)
+    {
+        float w = def.Width, h = def.Height;
+        switch (def.Shape)
+        {
+            case "triangle":
+                return TrianglePoints(w, h);
+            case "circle":
+            case "capsule":
+            case "egg":
+            {
+                // Two half circles joined (a circle when the two coincide), 8 points each.
+                float r = Mathf.Min(w, h) / 2f;
+                var axis = w >= h ? new Vector2(w / 2f - r, 0f) : new Vector2(0f, h / 2f - r);
+                var start = w >= h ? -Mathf.Pi / 2f : 0f;
+                var points = new Vector2[16];
+                for (int i = 0; i < 8; i++)
+                {
+                    float a = start + i * Mathf.Pi / 7f;
+                    points[i] = axis + Vector2.FromAngle(a) * r;
+                    points[i + 8] = -axis - Vector2.FromAngle(a) * r;
+                }
+                return points;
+            }
+            default:
+                return new[] { new Vector2(-w / 2f, -h / 2f), new Vector2(w / 2f, -h / 2f), new Vector2(w / 2f, h / 2f), new Vector2(-w / 2f, h / 2f) };
+        }
+    }
+
     static Shape2D BuildShape(UnitDef def, out float rotation)
     {
         rotation = 0f;
         switch (def.Shape)
         {
+            case "triangle":
+                return new ConvexPolygonShape2D { Points = TrianglePoints(def.Width, def.Height) };
             case "circle":
                 return new CircleShape2D { Radius = def.Width / 2f };
             case "capsule":

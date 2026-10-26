@@ -18,7 +18,7 @@
   {
     "id": "cheese",
     "name": "Käseblock",
-    "description": "Klebt fest, was auf ihm liegen bleibt.",
+    "description": "Klebt fest, was ihn berührt – an jeder Seite.",
     "inShop": true,
     "cost": 20,
     "shape": "box",
@@ -30,6 +30,29 @@
     "fill": "#F2C94C",
     "accent": "#C99A1E",
     "visual": "cheese",
+    "alternate": "cheese_triangle",
+    "glue": {
+      "tearImpulse": 400,
+      "restSpeed": 25,
+      "regrabSeconds": 1.0
+    }
+  },
+  {
+    "id": "cheese_triangle",
+    "name": "Käsedreieck",
+    "description": "Klebt fest, was es berührt – an allen drei Seiten.",
+    "inShop": true,
+    "cost": 15,
+    "shape": "triangle",
+    "width": 110,
+    "height": 95,
+    "mass": 2.5,
+    "friction": 1.0,
+    "hp": 100,
+    "fill": "#F2C94C",
+    "accent": "#C99A1E",
+    "visual": "cheese_triangle",
+    "alternate": "cheese",
     "glue": {
       "tearImpulse": 400,
       "restSpeed": 25,

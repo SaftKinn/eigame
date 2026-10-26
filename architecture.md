@@ -183,7 +183,8 @@ radius. Life 3 s, gone off screen.
 - **Buy:** press a shop card in the build phase with enough gold → the gold is paid and the piece
   is in the hand **→ core (M1: the payment)**. The physics state of a held piece is frozen and
   collides with nothing; it follows the mouse (kept above the counter), rotated by the wheel or
-  Q/E in steps of 15°. A piece picked up crooked is snapped to the nearest step at once, so it can
+  Q/E in steps of 45° (15° until 2026-10-26 — "die anderen winkel wären sonst überflüssig"). A
+  piece picked up crooked is snapped to the nearest step at once, so it can
   always be turned back to exactly level or upright (his word, 2026-10-24).
 - **Overlap:** a held piece that overlaps something is tinted red; let go anyway, it is moved up
   until it is free and drops the last few pixels.
@@ -217,12 +218,19 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
   jump — 836 px/s measured, 0 without). Two cheeses touching make one bond, not two. **The side
   magnet:** beside a side nothing comes to rest — it falls past — so a piece (or a cheese) let go
   at a cheese's side snaps flush against it (`Main.Drop` → `GlueBonds.SideSnap`, 1 px off) and
-  sticks at once, without resting (`StickBeside`); top and bottom still stick by resting. Which
-  face, and how far: `GlueBonds.Face` measures edge to edge in the cheese's frame — the face is
-  the one across the wider of the two box gaps (by the centres, an upright cheese beside a flat
-  one counted as "on top", his screenshot 2026-10-26). Precise building (his word): "klebt hier"
-  and the snap only within `Reach` (12 px) edge to edge and against at least `MinContact` (8 px)
-  of a face. Sticking shows yellow crumbs; while a piece or a cheese is in the hand, the nearest
+  sticks at once, without resting (`StickSnapped`); the snap works on every face, so what glows
+  is what happens. Which face, and how far: `GlueBonds.Face` measures on the real outlines
+  (`UnitBody.Outline`: a block's four corners, the triangle's three, a circle or capsule as a
+  16-point polygon) — the face is the cheese's edge across which the two lie furthest apart (by
+  the centres, an upright cheese beside a flat one counted as "on top", his screenshot
+  2026-10-26). Precise building (his word): "klebt hier" and the snap only within `Reach`
+  (12 px) edge to edge and against at least `MinContact` (8 px) of a face.
+- **Käsedreieck** (`cheese_triangle`, shape `triangle`): an equilateral triangle point up, round
+  its centroid (`UnitBody.TrianglePoints` — its collision polygon, its drawing and its outline),
+  the cheese block's other shape: both name each other as `alternate`, share one shop card
+  (`ContentDb.ShopUnits`), and a right click on the card switches it (`ShopCard`; the other shape
+  small in the corner, the tooltip names it). Same glue; first numbers 110 × 95, mass 2.5, hp
+  100, 15 gold (guesses). Sticking shows yellow crumbs; while a piece or a cheese is in the hand, the nearest
   face in reach glows with "klebt hier" (`GlueBonds._Draw`, `StickPair`, the same `Face` as
   sticking). A
   seam drawn while stuck was tried and taken out at his word. Every blow — `UnitBody.TakeHit` (a pest's push) and `Shove` — reports its impulse

@@ -24,6 +24,8 @@ public partial class GlueBonds : Node2D
     const float Reach = 12f;
     /// <summary>How much of a face a piece must lie against to stick there (not corner to corner).</summary>
     const float MinContact = 8f;
+    /// <summary>Seconds a piece let go by the hand may stick by coming to rest (<see cref="UnitBody.GlueWindow"/>).</summary>
+    public const float PlacedWindow = 2f;
 
     sealed class Bond
     {
@@ -51,6 +53,9 @@ public partial class GlueBonds : Node2D
             if (_cooldowns[i].Left <= 0f)
                 _cooldowns.RemoveAt(i);
         }
+        foreach (var unit in Main.I.Units)
+            if (!unit.IsHeld && unit.GlueWindow > 0f)
+                unit.GlueWindow -= (float)delta;
 
         foreach (var cheese in Main.I.Units)
         {
@@ -62,6 +67,9 @@ public partial class GlueBonds : Node2D
                 if (body is not UnitBody piece || piece == cheese || piece.IsHeld || piece.IsBroken || piece.GlueOff)
                     continue;
                 if (piece.LinearVelocity.Length() > glue.RestSpeed)
+                    continue;
+                // Only what the hand just let go, or a blow just tore off, sticks by coming to rest.
+                if (cheese.GlueWindow <= 0f && piece.GlueWindow <= 0f)
                     continue;
                 if (IsBonded(cheese, piece) || IsCooling(cheese, piece))
                     continue;
@@ -142,7 +150,7 @@ public partial class GlueBonds : Node2D
                 Stick(cheese, piece);
     }
 
-    void Stick(UnitBody cheese, UnitBody piece)
+    void Stick(UnitBody cheese, UnitBody piece, bool crumbs = true)
     {
         // Two pins along the face they touch at, so the piece cannot turn about one point.
         var (at, along, length, _, _) = Face(cheese, piece);
@@ -155,7 +163,8 @@ public partial class GlueBonds : Node2D
             B = Pin(cheese, piece, at + along * half),
         };
         _bonds.Add(bond);
-        Fx.Crumbs(Main.I.FxRoot, at, new Color(0.98f, 0.82f, 0.25f), 5, 90f);
+        if (crumbs)
+            Fx.Crumbs(Main.I.FxRoot, at, new Color(0.98f, 0.82f, 0.25f), 5, 90f);
     }
 
     PinJoint2D Pin(UnitBody cheese, UnitBody piece, Vector2 at)
@@ -185,7 +194,11 @@ public partial class GlueBonds : Node2D
             if (!Glue.Tears(bond.Cheese.Def.Glue!, impulse))
                 continue;
             Remove(i, strings: true);
-            _cooldowns.Add(new Cooldown { Cheese = bond.Cheese, Piece = bond.Piece, Left = bond.Cheese.Def.Glue!.RegrabSeconds });
+            float regrab = bond.Cheese.Def.Glue!.RegrabSeconds;
+            _cooldowns.Add(new Cooldown { Cheese = bond.Cheese, Piece = bond.Piece, Left = regrab });
+            // Torn off, both may grab hold again by coming to rest, once the wait is over.
+            bond.Cheese.GlueWindow = Mathf.Max(bond.Cheese.GlueWindow, regrab + PlacedWindow);
+            bond.Piece.GlueWindow = Mathf.Max(bond.Piece.GlueWindow, regrab + PlacedWindow);
         }
     }
 
@@ -207,7 +220,56 @@ public partial class GlueBonds : Node2D
         return group;
     }
 
-    /// <summary>Every bond of <paramref name="unit"/> goes — it is unglued from its group in the hand, or breaks.</summary>
+    /// <summary>
+    /// A group goes into the hand: its bonds' pins go while it is held, and the pairs are handed
+    /// back to be pinned again where it is let go (<see cref="Land"/>). Pins left on bodies moved by
+    /// hand flung the group apart on letting go — a pepper at 5676 px/s, measured 2026-10-26 from his
+    /// recording.
+    /// </summary>
+    public List<(UnitBody Cheese, UnitBody Piece)> Lift(UnitBody unit, List<UnitBody> group)
+    {
+        var pairs = new List<(UnitBody Cheese, UnitBody Piece)>();
+        for (int i = _bonds.Count - 1; i >= 0; i--)
+        {
+            var bond = _bonds[i];
+            bool cheeseIn = bond.Cheese == unit || group.Contains(bond.Cheese);
+            bool pieceIn = bond.Piece == unit || group.Contains(bond.Piece);
+            if (!cheeseIn || !pieceIn)
+                continue;
+            pairs.Add((bond.Cheese, bond.Piece));
+            _bonds.RemoveAt(i);
+            bond.A.QueueFree();
+            bond.B.QueueFree();
+        }
+        return pairs;
+    }
+
+    /// <summary>
+    /// Ungluing in the hand: the lifted pairs of <paramref name="unit"/> part with cheese strings;
+    /// the others are handed back, to land with the rest of the group.
+    /// </summary>
+    public List<(UnitBody Cheese, UnitBody Piece)> Part(UnitBody unit, List<(UnitBody Cheese, UnitBody Piece)> pairs)
+    {
+        var rest = new List<(UnitBody Cheese, UnitBody Piece)>();
+        foreach (var pair in pairs)
+        {
+            if (pair.Cheese == unit || pair.Piece == unit)
+                CheeseStrings.Spawn(Main.I.FxRoot, pair.Cheese, pair.Piece);
+            else
+                rest.Add(pair);
+        }
+        return rest;
+    }
+
+    /// <summary>The lifted pairs are pinned again where they are now — after letting go, or ungluing.</summary>
+    public void Land(IEnumerable<(UnitBody Cheese, UnitBody Piece)> pairs)
+    {
+        foreach (var (cheese, piece) in pairs)
+            if (IsInstanceValid(cheese) && IsInstanceValid(piece) && !cheese.IsBroken && !piece.IsBroken && !IsBonded(cheese, piece))
+                Stick(cheese, piece, crumbs: false);
+    }
+
+    /// <summary>Every bond of <paramref name="unit"/> goes — it breaks.</summary>
     public void Loosen(UnitBody unit, bool strings)
     {
         for (int i = _bonds.Count - 1; i >= 0; i--)

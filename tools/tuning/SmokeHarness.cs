@@ -93,15 +93,13 @@ public partial class Main
     {
         var def = GameContent.Db.Unit(id);
         _harnessCost += def.Cost;
-        return CreateUnit(def, new Vector2(x, y), 0f);
+        var unit = CreateUnit(def, new Vector2(x, y), 0f);
+        // As if laid by hand: only what the hand lets go sticks by coming to rest (D24).
+        unit.GlueWindow = 5f;
+        return unit;
     }
 
-    void Place(string id, float x, float y)
-    {
-        var def = GameContent.Db.Unit(id);
-        _harnessCost += def.Cost;
-        CreateUnit(def, new Vector2(x, y), 0f);
-    }
+    void Place(string id, float x, float y) => PlaceGet(id, x, y);
 
     int _maxCrowd;
     void HarnessTick(double delta)

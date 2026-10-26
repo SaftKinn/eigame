@@ -229,9 +229,18 @@ All numbers from content (§7); the rules are the core's (§6), the physics and 
     same `Face`), not only the nearest (his screenshot: a cheese laid across two); the snap goes
     to the nearest, and every pair then flush (within 4 px) sticks at once. Sticking shows
     yellow crumbs. A seam drawn while stuck was tried and taken out at his word.
+  - *What sticks by resting:* only a piece with time left in its `UnitBody.GlueWindow` — set to
+    `GlueBonds.PlacedWindow` (2 s) for what the hand lets go, and to `regrabSeconds` + 2 s for
+    both of a pair a blow tears (the regrab of ADR 003). What falls while a tower is taken apart,
+    or drops off when ungluing, does not stick by itself (his word, 2026-10-26). A scene set up
+    in code (the tuning harness) gives its pieces a window.
   - *Lifting:* picking a piece up lifts everything glued to it (`GlueBonds.GroupOf`; Main keeps
     each member's transform relative to the piece in the hand, turns and drops them together, and
-    pops the whole group up if any of it overlaps; a group is not sold). A right click in the hand
+    pops the whole group up if any of it overlaps; a group is not sold). While it is held, the
+    group's pins are gone (`GlueBonds.Lift`) and are set again where it is let go (`Land`): pins
+    left on bodies moved by hand flung the group apart on letting go — a pepper at 5676 px/s,
+    measured from his recording with a probe of his tower; after the fix ≤ 465 px/s (the fall)
+    and still within 2.5 s. A right click in the hand
     unglues the piece from its group (`Main.Unglue`, cheese strings), which is let go where it is
     (his word, 2026-10-26: rebuilding piece by piece was a chore). `Break` loosens all of a
     piece's glue.

@@ -56,7 +56,12 @@ numbers are guesses — expect tuning (all in `units.json`).
   aufgehängt": every drop threw (`PlaceHeld` read `_held`, which `Drop` clears first) — fixed,
   lesson `the-boot-never-lets-go-of-a-piece`. "jeder schuss knocked gegner dezent zurück das
   muss raus … es darf nur mit niesen nockback kommen" → the 5 px per hit in `Enemy.TakeDamage`
-  out (D23); expect the waves harder — measure before retuning.
+  out (D23); expect the waves harder — measure before retuning. His recording ("manchmal springt
+  alles noch komisch und fliegt wild herum"): a lifted group flung away on letting go — measured
+  with a scratch probe of his tower, a pepper at 5676 px/s; the group's pins now go while held
+  (`GlueBonds.Lift`/`Land`) → ≤ 465 px/s (the fall), still in 2.5 s. And what falls while
+  taking a tower apart no longer sticks by itself (D24, `UnitBody.GlueWindow`; the tuning
+  harness gives its pieces a window).
   Build green (0 warnings), 122 tests, headless boot clean; play-unverified.
 
 - **2026-10-25 (fresh checkout)** — The repo cloned anew into `Desktop\Projekte\EggGame` (the
@@ -128,6 +133,7 @@ Trivia and choices without an ADR live here; a row with "→ ADR" points to the 
 | D18 | Käse's sides | **A magnet as a snap: let go beside a cheese's side, the held one moves flush and sticks at once** | His "sonst fällt … einfach runter"; a pull in the physics all the time would tug towers apart → ADR 003 (addendum) |
 | D19 | Käsedreieck | **The cheese block's other shape: an equilateral triangle, one shop card, a right click switches** | His wish ("linksklick" buys, so a right click); three 120° angles cannot be — asked → equilateral. `alternate` in units.json, `ContentDb.ShopUnits` → ADR 003 (addendum) |
 | D20 | Turning | **15° steps kept** (45° tried and taken back the same hour) | 45°: "die anderen winkel wären sonst überflüssig" — then "sonst das 3eck nicht mit jeder seite befestigen": 15° is the coarsest step with 45° and 60°/120° |
+| D24 | Sticking by resting | **Only what the hand just let go (2 s) or a blow just tore off (regrab) sticks by coming to rest** | "wenn man die sachen zerbaut das was runterfällt nicht wieder gleich verkleben" |
 | D23 | Hits | **A hit no longer pushes a pest back (was 5 px a hit); only a sneeze and a toast throw back** | "zu op wenn man 4 pfefferstreuer hat": ~12 hits a second held a walker in place |
 | D22 | Rebuilding | **Lifting a piece lifts its glued group; a right click in the hand unglues it; glue off on G; a shelf under the window where pieces sleep** | "nervig … alles abreisen … um seinen turm neu zu gestalten"; his picks: shelf + group, unglue while holding, shelf pieces sleep (no free shots from up there) → ADR 003 (addendum, replaces point 6) |
 | D21 | Glue off | **A right click while holding a piece switches its glue off and on; it stays with the piece; not for a cheese** | His wish: to build the egg in loose; "alle bauteile außer den käse" |

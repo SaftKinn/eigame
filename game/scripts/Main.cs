@@ -63,6 +63,8 @@ public partial class Main : Node2D
     UnitBody? _held;
     /// <summary>What is glued to the piece in the hand, each with its place relative to it.</summary>
     readonly List<(UnitBody Unit, Transform2D Relative)> _heldGroup = new();
+    /// <summary>The glued pairs of the group in the hand, unpinned while held.</summary>
+    List<(UnitBody Cheese, UnitBody Piece)> _heldPairs = new();
     bool _heldIsNew;
     Vector2 _grabOffset;
     float _heldRotation;
@@ -535,9 +537,12 @@ public partial class Main : Node2D
         _grabOffset = isNew ? Vector2.Zero : unit.GlobalPosition - mouse;
         // What is glued to it comes along, each keeping its place to the piece in the hand (his
         // word, 2026-10-26); a right click in the hand unglues the piece from them (Unglue).
+        // Their pins go while held (Glue.Lift) and are set again where it is let go (Glue.Land).
         _heldGroup.Clear();
         var inverse = unit.GlobalTransform.AffineInverse();
-        foreach (var member in Glue.GroupOf(unit))
+        var members = Glue.GroupOf(unit);
+        _heldPairs = Glue.Lift(unit, members);
+        foreach (var member in members)
         {
             _heldGroup.Add((member, inverse * member.GlobalTransform));
             member.BeginHold();
@@ -613,7 +618,8 @@ public partial class Main : Node2D
     void Unglue()
     {
         var unit = _held!;
-        Glue.Loosen(unit, strings: true);
+        var rest = Glue.Part(unit, _heldPairs);
+        _heldPairs = new();
         var released = _heldGroup.Select(g => g.Unit).ToList();
         _heldGroup.Clear();
         for (int i = 0; i < 250 && released.Any(Overlaps); i++)
@@ -621,6 +627,7 @@ public partial class Main : Node2D
                 piece.GlobalPosition += new Vector2(0f, -4f);
         foreach (var piece in released)
             piece.EndHold();
+        Glue.Land(rest);
         _hud.ShowMessage("Abgekoppelt – du hältst nur dieses Teil.", 1.5f);
         WakeAll();
     }
@@ -658,8 +665,14 @@ public partial class Main : Node2D
         for (int i = 0; i < 250 && HeldAll(unit).Any(Overlaps); i++)
             PlaceHeld(unit, unit.GlobalPosition + new Vector2(0f, -4f), unit.GlobalRotation);
         foreach (var piece in HeldAll(unit))
+        {
             piece.EndHold();
+            // What the hand lets go may stick where it comes to rest; what falls by itself may not.
+            piece.GlueWindow = GlueBonds.PlacedWindow;
+        }
         _heldGroup.Clear();
+        Glue.Land(_heldPairs);
+        _heldPairs = new();
         if (snap != null)
             Glue.StickSnapped(unit);
         WakeAll();

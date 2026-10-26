@@ -139,4 +139,6 @@ man in der hand hält praktisch für das ei": a piece's glue can be switched off
 nothing and nothing to it — and on again; not a cheese's. Then "es ist auch nervig … alles
 abreisen zu müssen … um seinen turm neu zu gestalten" → **point 6 is replaced**: picking a piece
 up lifts everything glued to it; a right click in the hand unglues that piece from the group
-(glue off moved to G); and a shelf on the wall to park pieces — what stands there sleeps.
+(glue off moved to G); and a shelf on the wall to park pieces — what stands there sleeps. Then
+"wenn man die sachen zerbaut das was runterfällt nicht wieder gleich verkleben": only what the
+hand just let go, or a blow just tore off (the regrab of point 3), sticks by coming to rest.
